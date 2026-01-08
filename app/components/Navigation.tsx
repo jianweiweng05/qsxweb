@@ -6,12 +6,20 @@ import { usePathname } from 'next/navigation';
 export default function Navigation() {
   const pathname = usePathname();
 
-  const links = [
+  const isLoggedIn = pathname !== '/' && pathname !== '/login';
+
+  const publicLinks = [
+    { href: '/login', label: 'Sign In' },
+  ];
+
+  const appLinks = [
     { href: '/app', label: 'App' },
     { href: '/reports', label: 'Reports' },
     { href: '/alerts', label: 'Alerts' },
     { href: '/ai', label: 'AI' },
   ];
+
+  const links = isLoggedIn ? appLinks : publicLinks;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl">
