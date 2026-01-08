@@ -2,12 +2,12 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="max-w-3xl text-center">
-        <h1 className="mb-6 text-[clamp(3rem,8vw,6rem)] font-bold leading-[1.05] tracking-tight text-white">
-          See Market Risk Before Price Moves
+    <main className="flex min-h-screen items-center justify-center px-6 py-32">
+      <div className="max-w-4xl text-center">
+        <h1 className="mb-16 text-[clamp(3.5rem,7vw,5.5rem)] font-bold leading-[1.15] tracking-tight text-white">
+          See Market Risk<br />Before Price Moves
         </h1>
-        <p className="mb-12 text-xl text-gray-400">
+        <p className="mb-20 text-[clamp(1.125rem,2vw,1.375rem)] text-gray-400">
           AI-powered regime detection for crypto markets
         </p>
         <div className="flex flex-wrap justify-center gap-4">
@@ -24,7 +24,7 @@ export default function HomePage() {
             View Today&apos;s Report
           </Link>
         </div>
-        <p className="mt-12 text-sm text-gray-500">Not investment advice.</p>
+        <p className="mt-20 text-xs text-gray-600">Not investment advice.</p>
       </div>
     </main>
   );
