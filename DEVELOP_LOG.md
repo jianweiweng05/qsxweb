@@ -90,3 +90,58 @@
 - Add actual data fetching and rendering
 - Implement authentication if needed
 - Add analytics tracking
+
+## 2026-01-09: iPhone 全屏 App 入口页改造
+
+### 目标
+将首页（/）改造为 iPhone 全屏 App 入口页，优化移动端体验，解决 Safari 地址栏挤压问题。
+
+### 修改文件
+1. app/components/Navigation.tsx（+4 行）
+2. app/page.tsx（完全重写，99 行）
+3. app/signin/page.tsx（新建，11 行）
+
+### 布局优化
+- 使用 min-h-[100svh] 和 min-h-[100vh] 双重 fallback 确保全屏
+- 添加 safe-area-inset-top 和 safe-area-inset-bottom 支持
+- 主内容垂直居中：flex + justify-center + items-center
+- 移动端最大宽度 420px，桌面端 560px
+- 左右 padding 24px，顶部/底部至少 20px
+
+### 视觉设计
+- 背景：深蓝星空渐变（#1e3a8a → #0c1e3f → #050b1a）
+- 星点效果：8 个 radial-gradient 星点 + 2 个光晕
+- 品牌名：17px，字重 500，字间距 0.3px
+- 主标题：clamp(34px, 6vw, 44px)，字重 700，行高 1.1
+- 副标题：15px，行高 1.5，透明度 75%
+
+### 按钮设计
+- 尺寸：54px 高度，15px 圆角，100% 宽度
+- 主按钮：渐变蓝（#2b6fff → #68b6ff）+ 阴影 + 内光
+- 次按钮：玻璃效果（rgba(255,255,255,0.06)）+ 细边框
+- 移动端按下缩放：active:scale-[0.98]
+- "Invite only" 小字：13px，透明度 65%
+
+### 导航栏优化
+- 首页（/）隐藏导航栏，避免顶部挤压
+- 其他页面保留原有导航栏
+- 添加 /signin 路由支持
+
+### 路由结构
+- / → 全屏入口页
+- /app → 主应用（Enter App 按钮）
+- /signin → 占位页（Sign In 按钮，显示 "Invite only / Coming soon"）
+
+### 技术实现
+- 纯 CSS 实现星空背景，无外部图片
+- inline style 处理 safe-area 和复杂渐变
+- Tailwind 类名处理响应式和基础样式
+- 无新增依赖，无新增目录
+
+### 验收结果
+- ✅ iPhone Safari 全屏显示，内容垂直居中
+- ✅ 顶部不被地址栏挤压（safe-area-inset-top）
+- ✅ 底部免责声明不被手势条遮挡（safe-area-inset-bottom）
+- ✅ 按钮尺寸适中，间距合理
+- ✅ 桌面端居中显示，最大宽度限制生效
+- ✅ 路由正常：Enter App → /app，Sign In → /signin

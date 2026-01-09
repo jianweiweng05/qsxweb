@@ -6,7 +6,11 @@ import { usePathname } from 'next/navigation';
 export default function Navigation() {
   const pathname = usePathname();
 
-  const isLoggedIn = pathname !== '/' && pathname !== '/login';
+  if (pathname === '/') {
+    return null;
+  }
+
+  const isLoggedIn = pathname !== '/login' && pathname !== '/signin';
 
   const publicLinks = [
     { href: '/login', label: 'Sign In' },
