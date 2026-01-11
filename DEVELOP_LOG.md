@@ -145,3 +145,35 @@
 - ✅ 按钮尺寸适中，间距合理
 - ✅ 桌面端居中显示，最大宽度限制生效
 - ✅ 路由正常：Enter App → /app，Sign In → /signin
+
+## 2026-01-12: Landing 页面排版复刻与导航隐藏
+
+### 目标
+以 iPhone 截图为标准精确复刻 /landing 页面排版，同时隐藏该页面顶部导航。
+
+### 修改文件
+1. app/landing/page.tsx（改 8 行）
+
+### 排版调整
+- 标题位置：paddingTop 从 56px 减至 28px，marginBottom 从 14px 减至 10px
+- 副标题：fontSize 从 15px 减至 14px，lineHeight 从 1.55 减至 1.35，maxWidth 从 280px 减至 260px，opacity 从 0.78 减至 0.7
+- 按钮尺寸：height 从 46px 减至 42px，width 从 150px 增至 164px，borderRadius 从 14px 增至 18px
+- 按钮间距：gap 从 14px 减至 12px，marginBottom 从 14px 减至 12px
+- Sign In 按钮：color 改为 #fff（原 rgba(255,255,255,0.9)），background 从 rgba(255,255,255,0.08) 增至 0.15，backdropFilter 从 blur(10px) 增至 blur(20px)，新增 WebkitBackdropFilter
+- Sign Up 按钮：background 从 rgba(64,140,255,0.92) 减至 0.88，boxShadow 调整为 0 8px 20px rgba(0,0,0,0.4)
+- 背景暗化：radial-gradient 起始值从 rgba(0,0,0,0.25) 增至 0.45，中间值从 0.75 增至 0.85，终点值从 0.88 增至 0.95
+- Invite only 文字：opacity 从 0.55 减至 0.5
+
+### 导航隐藏
+- Navigation.tsx 已包含 pathname === '/landing' 时返回 null 的逻辑，无需修改
+- /landing 页面不显示导航栏
+- 其他页面（/app, /reports, /alerts, /ai）导航栏正常显示
+
+### 验收结果
+- ✅ http://localhost:3000/landing 无顶部导航
+- ✅ 标题位置上移，副标题更小更密
+- ✅ 按钮更矮更宽、圆角更大、玻璃感增强
+- ✅ Sign In 按钮清晰可见（不再透明）
+- ✅ 背景更暗但仍保留星空可见
+- ✅ 其他页面导航不受影响
+- ✅ next dev 正常运行，无 hydration error
