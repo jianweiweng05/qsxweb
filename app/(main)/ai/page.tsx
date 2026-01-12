@@ -38,38 +38,38 @@ export default function AIPage() {
         </div>
 
         {/* Spacer */}
-        <div className="flex-1 min-h-[160px]" />
+        <div className="flex-1 min-h-[200px]" />
 
         {/* Cards Row */}
         <div className="flex gap-3 mb-3">
           {/* Market Weather Card */}
           <div
-            className="flex-1 rounded-[20px] p-4 backdrop-blur-xl border border-emerald-500/20"
+            className="flex-1 rounded-[24px] p-4 backdrop-blur-xl border border-emerald-500/30"
             style={{
               background:
-                "linear-gradient(160deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.02) 50%, rgba(0,0,0,0.4) 100%)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)",
+                "linear-gradient(165deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.03) 40%, rgba(0,0,0,0.5) 100%)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)",
             }}
           >
-            <div className="text-[9px] text-white/35 uppercase tracking-[0.2em] mb-2 font-medium">
+            <div className="text-[9px] text-white/35 uppercase tracking-[0.2em] mb-1.5 font-medium">
               Market Weather
             </div>
-            <div className="text-lg font-semibold text-emerald-400 mb-0.5 tracking-tight">
+            <div className="text-[17px] font-semibold text-emerald-400 mb-0.5 tracking-tight">
               健康牛市
             </div>
-            <div className="text-[11px] text-white/40 mb-2.5">建议仓位</div>
-            <div className="text-[26px] font-bold text-white tracking-tight leading-none mb-1.5">
+            <div className="text-[10px] text-white/40 mb-1">建议仓位</div>
+            <div className="text-[28px] font-bold text-white tracking-tight leading-none mb-1">
               60%-80%
             </div>
-            <div className="text-[10px] text-white/35 leading-relaxed">当前趋势稳定，波动可控</div>
+            <div className="text-[10px] text-white/30 leading-relaxed">当前趋势稳定，波动可控</div>
           </div>
 
           {/* Upgrade Card */}
           <div
-            className="flex-1 rounded-[20px] p-4 backdrop-blur-xl border border-white/[0.06]"
+            className="flex-1 rounded-[24px] p-4 backdrop-blur-xl border border-white/[0.05]"
             style={{
-              background: "linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)",
+              background: "linear-gradient(165deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)",
             }}
           >
             <div className="text-[11px] text-white/55 mb-2.5 leading-relaxed font-medium">
@@ -112,16 +112,16 @@ export default function AIPage() {
         </div>
 
         {/* Quick Questions */}
-        <div className="flex gap-2.5 mb-4">
+        <div className="flex gap-2.5 mb-3">
           <button
-            className="flex-1 px-3.5 py-3 rounded-2xl text-[12px] text-white/50 text-left backdrop-blur-xl border border-white/[0.06] active:scale-[0.98] transition-transform"
-            style={{ background: "rgba(255,255,255,0.03)" }}
+            className="flex-1 px-4 py-3 rounded-[18px] text-[12px] text-white/45 text-left backdrop-blur-xl border border-white/[0.05] active:scale-[0.98] transition-transform"
+            style={{ background: "rgba(255,255,255,0.025)" }}
           >
-            为什么现在是健康牛市？
+            <span className="text-white/30">为什么</span> 是健康牛市？
           </button>
           <button
-            className="flex-1 px-3.5 py-3 rounded-2xl text-[12px] text-white/50 text-left backdrop-blur-xl border border-white/[0.06] active:scale-[0.98] transition-transform"
-            style={{ background: "rgba(255,255,255,0.03)" }}
+            className="flex-1 px-4 py-3 rounded-[18px] text-[12px] text-white/45 text-left backdrop-blur-xl border border-white/[0.05] active:scale-[0.98] transition-transform"
+            style={{ background: "rgba(255,255,255,0.025)" }}
           >
             仓位为什么不是100%？
           </button>
@@ -129,16 +129,16 @@ export default function AIPage() {
 
         {/* Input Area */}
         <div
-          className="rounded-2xl px-4 py-2.5 backdrop-blur-xl border border-white/[0.08] flex items-center gap-3 mb-8"
+          className="rounded-[20px] px-4 py-3 backdrop-blur-xl border border-white/[0.06] flex items-center gap-3 mb-10"
           style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+            background: "rgba(255,255,255,0.035)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
           }}
         >
           <input
             type="text"
             placeholder="问问当前市场风险..."
-            className="flex-1 bg-transparent text-[14px] text-white/90 placeholder:text-white/30 outline-none py-1"
+            className="flex-1 bg-transparent text-[14px] text-white/90 placeholder:text-white/25 outline-none"
           />
           <button
             className="w-8 h-8 rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform flex-shrink-0"
