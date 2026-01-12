@@ -40,11 +40,11 @@ export default function AIPage() {
 
         {/* Main Content - Centered */}
         <div className="flex-1 flex flex-col justify-center pt-8">
-          {/* Two Column Layout - 2:1 Grid */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          {/* Two Column Layout - 1:1 Grid */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
             {/* Left Card - Status */}
             <div
-              className="col-span-2 rounded-[20px] p-5 backdrop-blur-xl border border-white/10 flex flex-col"
+              className="col-span-1 rounded-[20px] p-5 backdrop-blur-xl border border-white/10 flex flex-col"
               style={{ background: "rgba(255,255,255,0.05)" }}
             >
               <div className="flex items-center gap-1.5 mb-3">
@@ -60,7 +60,7 @@ export default function AIPage() {
                 当前趋势稳定，波动可控
               </div>
               <div className="text-[10px] text-white/30 mb-2">建议仓位</div>
-              <div className="text-[36px] font-bold text-white leading-none">
+              <div className="text-[12px] font-bold text-white leading-none">
                 60%-80%
               </div>
             </div>
@@ -116,8 +116,8 @@ export default function AIPage() {
             className="rounded-[16px] px-4 py-6 backdrop-blur-xl border border-white/[0.08] flex items-center gap-3"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
-            <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-[12px] text-emerald-400 font-medium">
-              N
+            <div className="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center text-[12px] text-blue-400 font-medium">
+              Q
             </div>
             <input
               type="text"
