@@ -1,8 +1,11 @@
 "use client";
 
 import { Button, Space } from "antd-mobile";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+
   return (
     <div
       style={{
@@ -80,6 +83,7 @@ export default function Page() {
         >
           <Button
             size="large"
+            onClick={() => router.push("/ai")}
             style={{
               width: 164,
               height: 48,
@@ -96,6 +100,7 @@ export default function Page() {
           <Button
             size="large"
             color="primary"
+            onClick={() => router.push("/ai")}
             style={{
               width: 164,
               height: 48,
