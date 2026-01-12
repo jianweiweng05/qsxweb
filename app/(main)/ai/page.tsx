@@ -38,67 +38,83 @@ export default function AIPage() {
           </div>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="flex gap-3 pt-6">
-          {/* Left Card - Status */}
-          <div
-            className="flex-1 rounded-[20px] p-4 backdrop-blur-xl border border-emerald-500/20"
-            style={{
-              background:
-                "linear-gradient(160deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 40%, rgba(0,0,0,0.5) 100%)",
-            }}
-          >
-            <div className="flex items-center gap-1.5 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] text-white/40 uppercase tracking-wider">
-                当前状态
-              </span>
+        {/* Main Content - Centered */}
+        <div className="flex-1 flex flex-col justify-center pt-8">
+          {/* Two Column Layout */}
+          <div className="flex gap-4 mb-8 items-start">
+            {/* Left Card - Status */}
+            <div
+              className="flex-1 rounded-[20px] p-5 backdrop-blur-xl border border-emerald-500/20"
+              style={{
+                background:
+                  "linear-gradient(160deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 40%, rgba(0,0,0,0.5) 100%)",
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-3">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] text-white/40 uppercase tracking-wider">
+                  当前状态
+                </span>
+              </div>
+              <div className="text-[28px] font-bold text-emerald-400 mb-1">
+                健康牛市
+              </div>
+              <div className="text-[12px] text-white/40 mb-5">
+                当前趋势稳定，波动可控
+              </div>
+              <div className="text-[10px] text-white/30 mb-2">建议仓位</div>
+              <div className="text-[36px] font-bold text-white leading-none">
+                60%-80%
+              </div>
             </div>
-            <div className="text-[24px] font-bold text-emerald-400 mb-1">
-              健康牛市
-            </div>
-            <div className="text-[11px] text-white/40 mb-4">
-              当前趋势稳定，波动可控
-            </div>
-            <div className="text-[10px] text-white/30 mb-1">建议仓位</div>
-            <div className="text-[28px] font-bold text-white leading-none">
-              60%-80%
+
+            {/* Right Card - Upgrade */}
+            <div
+              className="w-[136px] rounded-[20px] p-4 backdrop-blur-xl border border-white/10 flex flex-col"
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            >
+              <div className="text-[10px] text-white/40 uppercase tracking-wider mb-3">
+                解锁更多
+              </div>
+              <div className="space-y-2.5 text-[12px] text-white/50 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-400">✓</span>
+                  <span>风险预警</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-400">✓</span>
+                  <span>实时分析</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-400">✓</span>
+                  <span>专属策略</span>
+                </div>
+              </div>
+              <button className="mt-4 w-full py-2.5 rounded-xl bg-white/10 text-[11px] text-white/70 font-medium">
+                Upgrade to Pro
+              </button>
             </div>
           </div>
 
-          {/* Right Card - Upgrade */}
-          <div
-            className="w-[130px] rounded-[20px] p-4 backdrop-blur-xl border border-white/10 flex flex-col"
-            style={{ background: "rgba(255,255,255,0.05)" }}
-          >
-            <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">
-              解锁更多
-            </div>
-            <div className="space-y-2 text-[11px] text-white/50 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-emerald-400">✓</span>
-                <span>风险预警</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-emerald-400">✓</span>
-                <span>实时分析</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-emerald-400">✓</span>
-                <span>专属策略</span>
-              </div>
-            </div>
-            <button className="mt-3 w-full py-2 rounded-lg bg-white/10 text-[11px] text-white/70 font-medium">
-              Upgrade to Pro
+          {/* Quick Actions */}
+          <div className="space-y-3">
+            <button
+              className="w-full px-4 py-3 rounded-[14px] text-[13px] text-white/50 text-left backdrop-blur-xl border border-white/[0.06] active:scale-[0.98] transition-transform"
+              style={{ background: "rgba(255,255,255,0.03)" }}
+            >
+              为什么现在是健康牛市？
+            </button>
+            <button
+              className="w-full px-4 py-3 rounded-[14px] text-[13px] text-white/50 text-left backdrop-blur-xl border border-white/[0.06] active:scale-[0.98] transition-transform"
+              style={{ background: "rgba(255,255,255,0.03)" }}
+            >
+              仓位为什么不是100%？
             </button>
           </div>
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
-
         {/* Input Area - Fixed at bottom */}
-        <div className="pb-8">
+        <div className="pb-6 pt-4">
           <div
             className="rounded-[16px] px-4 py-3 backdrop-blur-xl border border-white/[0.08] flex items-center gap-3"
             style={{ background: "rgba(255,255,255,0.05)" }}
