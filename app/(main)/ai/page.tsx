@@ -94,12 +94,13 @@ export default function AIPage() {
             placeholder="Ask about market risk..."
             value={input}
             onChange={setInput}
-            style={{
-              "--background": "rgba(255,255,255,0.08)",
-              "--border-radius": "12px",
-              background: "rgba(255,255,255,0.08)",
-              borderRadius: 12,
-            }}
+            style={
+              {
+                "--background": "rgba(255,255,255,0.08)",
+                "--border-radius": "12px",
+                "--placeholder-color": "rgba(255,255,255,0.55)",
+              } as React.CSSProperties
+            }
           />
         </div>
       </div>
