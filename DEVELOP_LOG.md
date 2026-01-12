@@ -177,3 +177,53 @@
 - ✅ 背景更暗但仍保留星空可见
 - ✅ 其他页面导航不受影响
 - ✅ next dev 正常运行，无 hydration error
+
+## 2026-01-12: 目录结构重组与路由清理
+
+### 目标
+清理并重建 Next App Router 目录结构，解决 app/app 路由混乱问题，确保 landing 无导航而其他页面有导航。
+
+### 修改文件
+1. app/landing/page.tsx（新建，118 行）
+2. app/(main)/layout.tsx（重建，14 行）
+3. app/(main)/app/page.tsx（新建，112 行）
+4. app/components/Navigation.tsx（简化，-4 行）
+5. 移动目录：alerts/ai/reports → (main) 下
+6. 删除文件：app/page.tsx
+
+### 目录结构（深度 2）
+```
+app/
+├── (main)/              # Route group：带导航的页面
+│   ├── layout.tsx       # MainLayout：引入 Navigation
+│   ├── app/
+│   │   └── page.tsx     # /app 主应用页
+│   ├── alerts/
+│   │   └── page.tsx     # /alerts
+│   ├── ai/
+│   │   └── page.tsx     # /ai
+│   └── reports/
+│       └── page.tsx     # /reports
+├── components/
+│   ├── Navigation.tsx   # 导航组件（简化版，无 pathname 判断）
+│   └── TopNav.tsx       # （未使用）
+├── landing/
+│   └── page.tsx         # /landing 入口页（无导航）
+├── layout.tsx           # 根 layout
+├── globals.css
+└── favicon.ico
+```
+
+### 改动理由
+1. landing 放在 route group 外 → 自然不包含 Navigation
+2. (main) route group 统一引入 Navigation → 所有子页面自动有导航
+3. 移动 alerts/ai/reports 到 (main) → 确保它们有导航且路由清晰
+4. 删除根 page.tsx → 消除 / 与 /app 混淆
+5. 简化 Navigation.tsx → 移除 pathname 判断，依赖目录结构控制
+
+### 验收结果
+- ✅ /landing：无顶部导航，antd-mobile 按钮样式生效，背景暗化
+- ✅ /app：有导航，主应用页面正常
+- ✅ /reports、/alerts、/ai：有导航，页面正常
+- ✅ 不再存在 app/app 路由混乱
+- ✅ next dev 正常运行
