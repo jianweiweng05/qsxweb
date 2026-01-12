@@ -11,140 +11,115 @@ export default function AIPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 120% 80% at 50% 30%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.9) 100%)",
+            "radial-gradient(ellipse 120% 80% at 50% 30%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.85) 100%)",
         }}
       />
 
       {/* Content */}
-      <div className="relative h-full flex flex-col px-5 max-w-[420px] w-full mx-auto">
-        {/* Header */}
-        <div className="pt-6 pb-4">
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/[0.05] backdrop-blur-md border border-white/[0.06] active:scale-95 transition-transform">
-            <svg
-              width="17"
-              height="11"
-              viewBox="0 0 17 11"
-              fill="none"
-              className="text-white/60"
-            >
-              <path
-                d="M1 1h15M1 5.5h15M1 10h15"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
+      <div className="relative h-full flex flex-col px-4 max-w-[420px] w-full mx-auto">
+        {/* Status Bar - iOS style */}
+        <div className="flex items-center justify-between pt-3 pb-2 text-white text-[14px] font-medium">
+          <span>9:41</span>
+          <div className="flex items-center gap-1">
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor">
+              <rect x="0" y="4" width="3" height="8" rx="1" opacity="0.3"/>
+              <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" opacity="0.5"/>
+              <rect x="9" y="1" width="3" height="11" rx="1" opacity="0.7"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1"/>
             </svg>
-          </button>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+              <path d="M8 2.4c2.7 0 5.2 1.1 7 2.9l-1.4 1.4c-1.4-1.4-3.4-2.3-5.6-2.3s-4.2.9-5.6 2.3L1 5.3c1.8-1.8 4.3-2.9 7-2.9zm0 3c1.8 0 3.4.7 4.6 1.9l-1.4 1.4c-.8-.8-2-1.3-3.2-1.3s-2.4.5-3.2 1.3L3.4 7.3C4.6 6.1 6.2 5.4 8 5.4zm0 3c.9 0 1.7.4 2.3 1l-2.3 2.6-2.3-2.6c.6-.6 1.4-1 2.3-1z"/>
+            </svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+              <rect x="0" y="1" width="21" height="10" rx="2.5" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.4"/>
+              <rect x="21.5" y="4" width="1.5" height="4" rx="0.5" opacity="0.4"/>
+              <rect x="2" y="3" width="17" height="6" rx="1" fill="#34D399"/>
+            </svg>
+          </div>
         </div>
 
-        {/* 主内容区域 - 自然流动 */}
-        <div className="flex-1 flex flex-col pb-8">
-          {/* Cards Row */}
-          <div className="flex gap-3 mb-4">
-            {/* Market Weather Card */}
-            <div
-              className="flex-1 rounded-[22px] p-4 backdrop-blur-xl border border-emerald-500/25"
-              style={{
-                background:
-                  "linear-gradient(165deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.02) 40%, rgba(0,0,0,0.45) 100%)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-              }}
-            >
-              <div className="text-[9px] text-white/30 uppercase tracking-[0.18em] mb-2 font-medium">
-                Market Weather
-              </div>
-              <div className="text-[17px] font-semibold text-emerald-400 mb-1">
-                健康牛市
-              </div>
-              <div className="text-[10px] text-white/35 mb-1.5">建议仓位</div>
-              <div className="text-[26px] font-bold text-white tracking-tight leading-none mb-2">
-                60%-80%
-              </div>
-              <div className="text-[10px] text-white/30">当前趋势稳定，波动可控</div>
-            </div>
-
-            {/* Upgrade Card */}
-            <div
-              className="flex-1 rounded-[22px] p-4 backdrop-blur-xl border border-white/[0.05]"
-              style={{
-                background: "linear-gradient(165deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-              }}
-            >
-              <div className="text-[11px] text-white/50 mb-3 leading-relaxed">
-                解锁更多市场风险洞察
-              </div>
-              <ul className="text-[10px] text-white/35 space-y-1.5 mb-3">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-white/25" />
-                  风险预警
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-white/25" />
-                  历史对比
-                </li>
-              </ul>
-              <div className="flex justify-end mb-3">
-                <svg width="52" height="26" viewBox="0 0 52 26" fill="none">
-                  <path
-                    d="M2 22 L13 17 L24 19 L35 10 L44 5 L50 3"
-                    stroke="url(#chartGrad)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                  <circle cx="50" cy="3" r="3" fill="#10b981" />
-                  <defs>
-                    <linearGradient id="chartGrad" x1="0" y1="0" x2="52" y2="0">
-                      <stop offset="0%" stopColor="#4b5563" />
-                      <stop offset="100%" stopColor="#10b981" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <button className="w-full py-2.5 rounded-xl text-[13px] font-semibold bg-white text-black active:scale-[0.98] transition-transform">
-                Upgrade to Pro
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Questions */}
-          <div className="flex gap-2.5 mb-4">
-            <button
-              className="flex-1 px-4 py-3.5 rounded-[16px] text-[12px] text-white/40 text-left backdrop-blur-xl border border-white/[0.05] active:scale-[0.98] transition-transform leading-relaxed"
-              style={{ background: "rgba(255,255,255,0.025)" }}
-            >
-              为什么现在是健康牛市？
-            </button>
-            <button
-              className="flex-1 px-4 py-3.5 rounded-[16px] text-[12px] text-white/40 text-left backdrop-blur-xl border border-white/[0.05] active:scale-[0.98] transition-transform leading-relaxed"
-              style={{ background: "rgba(255,255,255,0.025)" }}
-            >
-              仓位为什么不是100%？
-            </button>
-          </div>
-
-          {/* 弹性空间 - 把输入框推到底部 */}
-          <div className="flex-1 min-h-[60px]" />
-
-          {/* Input Area */}
+        {/* Two Column Layout */}
+        <div className="flex gap-3 pt-6">
+          {/* Left Card - Status */}
           <div
-            className="rounded-[18px] px-4 py-3.5 backdrop-blur-xl border border-white/[0.06] flex items-center gap-3"
+            className="flex-1 rounded-[20px] p-4 backdrop-blur-xl border border-emerald-500/20"
             style={{
-              background: "rgba(255,255,255,0.04)",
+              background:
+                "linear-gradient(160deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 40%, rgba(0,0,0,0.5) 100%)",
             }}
           >
+            <div className="flex items-center gap-1.5 mb-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] text-white/40 uppercase tracking-wider">
+                当前状态
+              </span>
+            </div>
+            <div className="text-[24px] font-bold text-emerald-400 mb-1">
+              健康牛市
+            </div>
+            <div className="text-[11px] text-white/40 mb-4">
+              当前趋势稳定，波动可控
+            </div>
+            <div className="text-[10px] text-white/30 mb-1">建议仓位</div>
+            <div className="text-[28px] font-bold text-white leading-none">
+              60%-80%
+            </div>
+          </div>
+
+          {/* Right Card - Upgrade */}
+          <div
+            className="w-[130px] rounded-[20px] p-4 backdrop-blur-xl border border-white/10 flex flex-col"
+            style={{ background: "rgba(255,255,255,0.05)" }}
+          >
+            <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">
+              解锁更多
+            </div>
+            <div className="space-y-2 text-[11px] text-white/50 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span>
+                <span>风险预警</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span>
+                <span>实时分析</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span>
+                <span>专属策略</span>
+              </div>
+            </div>
+            <button className="mt-3 w-full py-2 rounded-lg bg-white/10 text-[11px] text-white/70 font-medium">
+              Upgrade to Pro
+            </button>
+          </div>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Input Area - Fixed at bottom */}
+        <div className="pb-8">
+          <div
+            className="rounded-[16px] px-4 py-3 backdrop-blur-xl border border-white/[0.08] flex items-center gap-3"
+            style={{ background: "rgba(255,255,255,0.05)" }}
+          >
+            <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-[12px] text-emerald-400 font-medium">
+              N
+            </div>
             <input
               type="text"
               placeholder="问问当前市场风险..."
-              className="flex-1 bg-transparent text-[14px] text-white/90 placeholder:text-white/25 outline-none"
+              className="flex-1 bg-transparent text-[14px] text-white/90 placeholder:text-white/30 outline-none"
             />
-            <button
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform flex-shrink-0"
-            >
+            <button className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 active:scale-95 transition-transform flex-shrink-0">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M7 17L17 7M17 7H10M17 7V14" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M7 17L17 7M17 7H10M17 7V14"
+                  stroke="#fff"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>

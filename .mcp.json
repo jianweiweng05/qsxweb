@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "browser": {
+      "command": "/usr/local/bin/node",
+      "args": [
+        "/Users/admin/.npm-global/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
+      ]
+    },
+    "filesystem": {
+      "command": "/usr/local/bin/node",
+      "args": [
+        "/Users/admin/.npm-global/lib/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "/Users/admin/qsxweb"
+      ]
+    },
+    "shell": {
+      "command": "/usr/local/bin/node",
+      "args": [
+        "/Users/admin/.npm-global/lib/node_modules/@mako10k/mcp-shell-server/dist/index.js"
+      ]
+    }
+  }
+}
