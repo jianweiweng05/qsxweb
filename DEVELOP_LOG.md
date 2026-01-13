@@ -383,3 +383,27 @@ app/
 - ✅ 桌面宽度（≥1024px）每页变为两列
 - ✅ npm run build 通过
 - ✅ grep 验证 5 个页面均包含 lg:grid-cols-2
+
+## 2026-01-14: 自定义域名登录跳转到 Vercel Auth 域（内测期方案）
+
+### 目标
+解决自定义域名 www.quantscopex.com 无法使用 Clerk 登录的问题，将认证流程统一跳转到 qsxweb.vercel.app。
+
+### 新增环境变量
+- `NEXT_PUBLIC_QSX_AUTH_ORIGIN=https://qsxweb.vercel.app` - 认证域
+
+### 修改文件
+1. `.env.example` - 添加 NEXT_PUBLIC_QSX_AUTH_ORIGIN 环境变量
+2. `app/landing/client.tsx` - Sign In/Sign Up 按钮跳转到 AUTH_ORIGIN 并携带 redirect_url
+3. `middleware.ts` - 自定义域名访问 /sign-in 或 /sign-up 时 307 重定向到 AUTH_ORIGIN
+
+### 实现逻辑
+- Landing 页按钮：使用 window.location.origin 获取当前域名，跳转到 `${AUTH_ORIGIN}/sign-in?redirect_url=${currentOrigin}/today`
+- Middleware：检测 host 包含 quantscopex.com 且 pathname 以 /sign-in 或 /sign-up 开头时，307 重定向到 AUTH_ORIGIN
+- qsxweb.vercel.app 本身不做重定向，避免循环
+
+### 验收结果
+- ✅ npm run build 通过
+- ✅ 自定义域名 /landing 点击按钮跳转到 vercel auth 域
+- ✅ 自定义域名直接访问 /sign-in 或 /sign-up 会 307 重定向
+- ✅ vercel auth 域的 /sign-in /sign-up 正常可用

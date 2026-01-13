@@ -1,9 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+const AUTH_ORIGIN = process.env.NEXT_PUBLIC_QSX_AUTH_ORIGIN || "";
 
 export default function LandingClient() {
-  const router = useRouter();
+  const handleSignIn = () => {
+    const currentOrigin = window.location.origin;
+    const redirectUrl = encodeURIComponent(currentOrigin + "/today");
+    window.location.href = `${AUTH_ORIGIN}/sign-in?redirect_url=${redirectUrl}`;
+  };
+
+  const handleSignUp = () => {
+    const currentOrigin = window.location.origin;
+    const redirectUrl = encodeURIComponent(currentOrigin + "/today");
+    window.location.href = `${AUTH_ORIGIN}/sign-up?redirect_url=${redirectUrl}`;
+  };
 
   return (
     <div
@@ -92,7 +102,7 @@ export default function LandingClient() {
             }}
           >
             <button
-              onClick={() => router.push("/sign-in")}
+              onClick={handleSignIn}
               style={{
                 flex: 1,
                 height: 52,
@@ -112,7 +122,7 @@ export default function LandingClient() {
             </button>
 
             <button
-              onClick={() => router.push("/sign-up")}
+              onClick={handleSignUp}
               style={{
                 flex: 1,
                 height: 52,
