@@ -354,3 +354,32 @@ app/
 - 未登录访问受保护页面 → 自动跳转 /sign-in
 - 登录成功 → 自动跳转 /today
 - /account 显示 UserButton 和用户邮箱
+
+## 2026-01-14: 横屏双列布局（桌面端信息密度提升）
+
+### 目标
+为主页面 /today /radar /alerts /history /ai 增加横屏布局：viewport ≥1024px 时变为两列，提升信息密度。
+
+### 修改文件
+1. `app/(main)/today/page.tsx` - 添加 lg:grid lg:grid-cols-2 lg:gap-6
+2. `app/(main)/radar/page.tsx` - 添加 lg:grid lg:grid-cols-2 lg:gap-6
+3. `app/(main)/alerts/page.tsx` - 添加 lg:grid lg:grid-cols-2 lg:gap-6
+4. `app/(main)/history/page.tsx` - 添加 lg:grid lg:grid-cols-2 lg:gap-6
+5. `app/(main)/ai/page.tsx` - 添加 lg:grid lg:grid-cols-2 lg:gap-6
+
+### 布局结构
+- 左列：主决策/主列表/主可视化
+- 右列：解释/详情/辅助信息
+- 移动端（<1024px）：单列，右列内容在下方显示
+- 桌面端（≥1024px）：双列并排
+
+### 技术实现
+- 纯 Tailwind class 实现：`lg:grid lg:grid-cols-2 lg:gap-6`
+- 右列使用 `mt-4 lg:mt-0` 确保移动端有间距、桌面端无额外间距
+- 部分桌面端专属内容使用 `hidden lg:block`
+
+### 验收结果
+- ✅ iPhone 宽度（≤430px）页面视觉与交互不变
+- ✅ 桌面宽度（≥1024px）每页变为两列
+- ✅ npm run build 通过
+- ✅ grep 验证 5 个页面均包含 lg:grid-cols-2
