@@ -284,3 +284,19 @@ app/
 - subscribe → subscribe/success?plan=xxx
 - success → today
 - today 锁定卡 → pricing
+
+## 2026-01-13: 禁用 mock 静默降级
+
+### 问题
+- API 失败时静默返回 mock 数据，用户无感知
+- 可能导致用户基于假数据做决策
+
+### 修改
+1. `app/lib/qsx_api.ts` - 移除 MOCK_DATA，API 失败时抛出 ApiError
+2. `app/(main)/today/page.tsx` - 捕获错误，显示"数据不可用"提示
+3. `app/(main)/alerts/page.tsx` - 同上
+
+### 行为变化
+- API 正常：显示真实数据
+- API 异常：显示红色错误提示"⚠️ 当前市场数据不可用或延迟"
+- 不再有静默降级到 mock 数据的情况

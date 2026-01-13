@@ -3,7 +3,20 @@ import { getUserTier } from "@/app/lib/entitlements";
 import Link from "next/link";
 
 export default async function TodayPage() {
-  const payload = await getReportPayload();
+  let payload;
+  try {
+    payload = await getReportPayload();
+  } catch {
+    return (
+      <div className="p-4 text-white min-h-full bg-black/90">
+        <h1 className="text-xl font-bold mb-4">今日概览</h1>
+        <div className="p-4 rounded-lg bg-red-900/30 border border-red-500/50">
+          <div className="text-red-400 font-semibold mb-2">⚠️ 当前市场数据不可用或延迟</div>
+          <div className="text-sm text-white/60">请稍后刷新或检查系统状态</div>
+        </div>
+      </div>
+    );
+  }
   const tier = getUserTier();
 
   const macroState = payload.macro_state || "unknown";
