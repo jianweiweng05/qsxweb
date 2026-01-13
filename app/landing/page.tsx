@@ -99,7 +99,7 @@ export default function Page() {
           >
             {/* Sign In - 灰玻璃效果 */}
             <button
-              onClick={() => router.push("/ai")}
+              onClick={() => router.push("/sign-in")}
               style={{
                 flex: 1,
                 height: 52,
@@ -120,7 +120,7 @@ export default function Page() {
 
             {/* Sign Up - 蓝渐变 */}
             <button
-              onClick={() => router.push("/ai")}
+              onClick={() => router.push("/sign-up")}
               style={{
                 flex: 1,
                 height: 52,
