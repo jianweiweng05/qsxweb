@@ -300,3 +300,17 @@ app/
 - API 正常：显示真实数据
 - API 异常：显示红色错误提示"⚠️ 当前市场数据不可用或延迟"
 - 不再有静默降级到 mock 数据的情况
+
+## 2026-01-13: 测试期 Pro 门禁统一化
+
+### 新增
+- `app/lib/gate.tsx` - 统一门禁工具（isPro + ProGate 组件）
+
+### 修改
+- `app/(main)/history/page.tsx` - 整页门禁，NONE 只显示锁定卡
+- `app/(main)/ai/page.tsx` - 部分门禁，深度解读/策略生成需 Pro
+- `app/(main)/today/page.tsx` - 策略建议区块使用统一 ProGate
+
+### 行为
+- NONE：/history 显示"🔒 Pro 内容已锁定"+ 升级按钮
+- PRO：/history 显示正常内容

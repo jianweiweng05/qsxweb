@@ -1,4 +1,14 @@
+import { isPro, ProGate } from "@/app/lib/gate";
+
 export default function HistoryPage() {
+  if (!isPro()) {
+    return (
+      <div className="p-4 text-white min-h-full bg-black/90">
+        <h1 className="text-xl font-bold mb-4">历史</h1>
+        <ProGate><></></ProGate>
+      </div>
+    );
+  }
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-4">历史</h1>

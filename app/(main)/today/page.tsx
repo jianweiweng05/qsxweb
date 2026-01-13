@@ -1,6 +1,5 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
-import { getUserTier } from "@/app/lib/entitlements";
-import Link from "next/link";
+import { ProGate } from "@/app/lib/gate";
 
 export default async function TodayPage() {
   let payload;
@@ -17,7 +16,6 @@ export default async function TodayPage() {
       </div>
     );
   }
-  const tier = getUserTier();
 
   const macroState = payload.macro_state || "unknown";
   const riskCap = ((payload.risk_cap || 0) * 100).toFixed(2);
@@ -53,22 +51,12 @@ export default async function TodayPage() {
         </div>
 
         {/* 策略建议 - 门禁控制 */}
-        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-          <div className="text-sm text-white/50 mb-1">策略建议</div>
-          {tier === "PRO" ? (
+        <div className="text-sm text-white/50 mb-2">策略建议</div>
+        <ProGate>
+          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
             <div className="text-sm">Pro 策略建议（占位）</div>
-          ) : (
-            <div className="text-center py-4">
-              <div className="text-white/50 mb-2">🔒 升级 Pro 查看策略</div>
-              <Link
-                href="/pricing"
-                className="inline-block px-4 py-2 bg-blue-600 rounded-lg text-sm"
-              >
-                升级
-              </Link>
-            </div>
-          )}
-        </div>
+          </div>
+        </ProGate>
       </div>
     </div>
   );
