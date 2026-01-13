@@ -329,3 +329,28 @@ app/
 - iOS/Android 添加到主屏幕后以全屏 App 形态运行
 - 启动直接进入 /today
 - 无浏览器地址栏/UI
+
+## 2026-01-13: 接入 Clerk Auth（测试版闭环）
+
+### 新增依赖
+- `@clerk/nextjs`
+
+### 新增文件
+- `.env.example` - 环境变量示例
+- `middleware.ts` - 路由保护中间件
+- `app/sign-in/[[...sign-in]]/page.tsx` - 登录页
+- `app/sign-up/[[...sign-up]]/page.tsx` - 注册页
+
+### 修改文件
+- `app/layout.tsx` - 接入 ClerkProvider
+- `app/landing/page.tsx` - 按钮跳转改为 /sign-in、/sign-up
+- `app/(main)/account/page.tsx` - 接入 UserButton 和用户邮箱显示
+
+### 路由保护
+- 受保护：/today, /radar, /alerts, /history, /ai, /account
+- 公开：/landing, /pricing, /sign-in, /sign-up
+
+### 行为
+- 未登录访问受保护页面 → 自动跳转 /sign-in
+- 登录成功 → 自动跳转 /today
+- /account 显示 UserButton 和用户邮箱
