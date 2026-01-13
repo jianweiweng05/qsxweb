@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 export default function RadarPage() {
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
