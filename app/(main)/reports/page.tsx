@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+export const dynamic = "force-dynamic";
+
 export default function ReportsPage() {
   const [period, setPeriod] = useState<'am' | 'pm'>('am');
   const today = new Date().toISOString().split('T')[0];

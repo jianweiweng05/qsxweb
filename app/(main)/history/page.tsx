@@ -1,5 +1,7 @@
 import { isPro, ProGate } from "@/app/lib/gate";
 
+export const dynamic = "force-dynamic";
+
 export default function HistoryPage() {
   if (!isPro()) {
     return (
