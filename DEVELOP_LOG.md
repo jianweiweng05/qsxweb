@@ -227,3 +227,60 @@ app/
 - ✅ /reports、/alerts、/ai：有导航，页面正常
 - ✅ 不再存在 app/app 路由混乱
 - ✅ next dev 正常运行
+
+## 2026-01-13: 搭建底部Tab与数据层骨架
+
+### 目标
+搭建系统骨架：统一底部 Tab、统一数据入口、统一会员门禁，占位 UI 先跑通。
+
+### 涉及路由
+- /today - 今日概览
+- /radar - 雷达
+- /alerts - 报警
+- /history - 历史
+- /ai - AI 助手
+
+### 新增文件
+1. app/lib/qsx_api.ts（27 行）- 统一数据层，fetch report_payload，失败返回 mock
+2. app/lib/entitlements.ts（5 行）- 会员门禁占位，暂返回 NONE
+3. app/(main)/today/page.tsx（58 行）- 今日页，展示 macro_state/risk_cap/解读/策略门禁
+4. app/(main)/radar/page.tsx（12 行）- 雷达占位页
+5. app/(main)/history/page.tsx（12 行）- 历史占位页
+
+### 修改文件
+1. app/(main)/layout.tsx（38 行）- 添加 antd-mobile TabBar 底部导航
+2. app/(main)/alerts/page.tsx（16 行）- 重写为展示 red_count
+3. app/(main)/ai/page.tsx（12 行）- 简化为占位页
+
+### 技术实现
+- 底部 Tab 使用 antd-mobile TabBar 组件
+- 数据层统一通过 getReportPayload() 获取，接口挂了返回 mock
+- 会员门禁通过 getUserTier() 控制，today 页策略区块按 PRO/NONE 显示不同内容
+
+## 2026-01-13: 补齐闭环页面 + tier 环境变量切换 + tab 高亮子路由 + ignore log
+
+### 改动
+1. .gitignore - 添加 logs/ 忽略规则
+2. app/lib/entitlements.ts - 支持 NEXT_PUBLIC_QSX_TIER 环境变量切换
+3. app/(main)/layout.tsx - mapActiveKey 支持子路由高亮
+4. app/(main)/today/page.tsx - 升级按钮跳转改为 /pricing
+
+### 新增页面
+1. app/pricing/page.tsx - Pro/Max 方案选择
+2. app/subscribe/page.tsx - Stripe Checkout 占位
+3. app/(main)/account/page.tsx - 账户页，显示当前 tier
+
+## 2026-01-13: 补齐订阅成功回跳页与账户订阅状态展示（前端闭环）
+
+### 改动
+1. app/subscribe/page.tsx - 新增"模拟订阅成功"按钮
+2. app/(main)/account/page.tsx - 新增到期时间展示
+
+### 新增页面
+1. app/subscribe/success/page.tsx - 订阅成功回跳页
+
+### 跳转闭环
+- pricing → subscribe?plan=pro|max
+- subscribe → subscribe/success?plan=xxx
+- success → today
+- today 锁定卡 → pricing
