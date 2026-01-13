@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function PricingPage() {
   return (
     <div className="p-4 text-white min-h-screen bg-black/90">
