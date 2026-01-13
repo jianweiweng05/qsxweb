@@ -1,5 +1,7 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
 
+export const dynamic = "force-dynamic";
+
 export default async function AlertsPage() {
   let payload;
   try {

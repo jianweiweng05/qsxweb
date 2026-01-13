@@ -1,5 +1,7 @@
 import { ProGate } from "@/app/lib/gate";
 
+export const dynamic = "force-dynamic";
+
 export default function AIPage() {
   return (
     <div className="p-4 text-white min-h-full bg-black/90">

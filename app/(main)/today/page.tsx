@@ -1,6 +1,8 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { ProGate } from "@/app/lib/gate";
 
+export const dynamic = "force-dynamic";
+
 export default async function TodayPage() {
   let payload;
   try {
