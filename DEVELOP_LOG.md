@@ -314,3 +314,18 @@ app/
 ### 行为
 - NONE：/history 显示"🔒 Pro 内容已锁定"+ 升级按钮
 - PRO：/history 显示正常内容
+
+## 2026-01-13: 启用 PWA（测试期 App 化壳）
+
+### 新增文件
+- `public/manifest.json` - PWA manifest，start_url=/today，standalone 模式
+- `public/icon-192.png` - 占位图标 192x192
+- `public/icon-512.png` - 占位图标 512x512
+
+### 修改文件
+- `app/layout.tsx` - 添加 PWA meta 标签和 manifest 链接
+
+### 功能
+- iOS/Android 添加到主屏幕后以全屏 App 形态运行
+- 启动直接进入 /today
+- 无浏览器地址栏/UI
