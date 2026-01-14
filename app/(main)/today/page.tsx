@@ -29,8 +29,8 @@ export default async function TodayPage() {
   // C) L1-L6 数据速览 - 优先用 ui.layers
   const layers = payload?.ui?.layers || payload?.layers || [];
 
-  // D) 策略建议
-  const strategy = payload?.strategy;
+  // D) 策略建议 - 使用 pro_strategy_text 字段
+  const proStrategyText = payload?.pro_strategy_text;
 
   // E) 历史相似性
   const similarity = payload?.similarity;
@@ -151,8 +151,8 @@ export default async function TodayPage() {
           </span>
         </div>
         <ProGate lockedMessage="升级 Pro 解锁策略建议">
-          {strategy ? (
-            <div className="text-sm text-white/80">{JSON.stringify(strategy)}</div>
+          {proStrategyText ? (
+            <pre className="text-sm text-white/80 whitespace-pre-wrap font-mono">{proStrategyText}</pre>
           ) : (
             <div className="text-sm text-white/50">暂无在线策略输出</div>
           )}
