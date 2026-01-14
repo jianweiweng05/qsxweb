@@ -294,7 +294,7 @@ export default function RadarClient() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('https://qsx-ai.onrender.com/macro/v1/report_payload', {
+      const res = await fetch('/api/proxy', {
         cache: 'no-store',
       });
       if (!res.ok) throw new Error(`API 返回 ${res.status}`);
