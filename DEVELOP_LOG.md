@@ -453,3 +453,45 @@ app/
 - ✅ /pricing /account /settings 页面可达
 - ✅ 各页面按层级锁定/解锁
 - ✅ npm run build 通过
+
+## 2026-01-15: 雷达页两栏科技风改造
+
+### 目标
+将 /radar 页面改造为"两栏科技风"布局：左侧发光雷达图，右侧层级数据卡片。
+
+### 修改文件
+1. `app/(main)/radar/page.tsx`（-13 行，+4 行）- 简化为引入客户端组件
+2. `app/(main)/radar/client.tsx`（新建，270 行）- 两栏布局+雷达图+卡片
+
+### 技术实现
+- 数据源：GET https://qsx-ai.onrender.com/macro/v1/report_payload
+- 右侧数据：优先 payload.ui.layers，fallback payload.layers
+- 雷达值：每层 metrics[].bar.norm 均值，无则 0.4
+- 发光效果：原生 SVG + feGaussianBlur 滤镜
+- 无新增依赖，纯 Tailwind + CSS
+
+### 功能特性
+- 左侧：6维发光雷达图（L1-L6），中心显示 macro_state + risk_cap(%) + generated_at
+- 右侧：6层数据卡片（title、badge.label/color、asof、metrics 列表）
+- 错误态：显示错误信息 + 重试按钮
+- 加载态：旋转动画
+
+### 门禁逻辑
+- /radar 对 FREE 可见（保持原有逻辑不变）
+- 无新增 VIP/PRO 锁定功能
+
+### 改动统计
+- 功能文件：2 个
+- 新增行数：约 270 行（client.tsx）
+- 修改行数：约 4 行（page.tsx）
+
+### 为什么不能更少
+- page.tsx：必须引入客户端组件（服务端组件不能用 useState/useEffect）
+- client.tsx：包含雷达图 SVG 渲染、数据获取、错误处理、卡片渲染，逻辑不可再拆分
+
+### 验收结果
+- ✅ npm run build 通过
+- ✅ /radar 成功拉取并渲染 report_payload
+- ✅ 左侧雷达有发光多边形+节点
+- ✅ 右侧 6 层卡片信息正确（badge label、asof、metrics v）
+- ✅ 断网/接口异常时显示错误态和"重试"
