@@ -1,8 +1,22 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
+import { PageGate } from "@/app/lib/gate";
+import { getUserTier } from "@/app/lib/entitlements";
 
 export const dynamic = "force-dynamic";
 
 export default async function AlertsPage() {
+  const tier = getUserTier();
+
+  // 非 Pro 用户显示锁定页面
+  if (tier !== "PRO") {
+    return (
+      <PageGate requiredTier="PRO" title="报警">
+        <></>
+      </PageGate>
+    );
+  }
+
+  // Pro 用户获取数据
   let payload;
   try {
     payload = await getReportPayload();
@@ -17,18 +31,17 @@ export default async function AlertsPage() {
       </div>
     );
   }
+
   const redCount = payload.red_summary?.red_count ?? 0;
 
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-4">报警</h1>
       <div className="lg:grid lg:grid-cols-2 lg:gap-6">
-        {/* 左列：主警报数据 */}
         <div className="p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="text-sm text-white/50 mb-1">红色警报数量</div>
           <div className="text-2xl font-bold text-red-400">{redCount}</div>
         </div>
-        {/* 右列：警报详情 */}
         <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="text-sm text-white/50 mb-1">警报说明</div>
           <div className="text-sm text-white/70">桌面端可查看详细警报列表</div>

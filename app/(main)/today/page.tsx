@@ -1,9 +1,31 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
-import { ProGate } from "@/app/lib/gate";
+import { VIPGate, ProGate } from "@/app/lib/gate";
+import { getUserTier } from "@/app/lib/entitlements";
 
 export const dynamic = "force-dynamic";
 
 export default async function TodayPage() {
+  const tier = getUserTier();
+  
+  // FREE 用户显示延迟日报提示
+  if (tier === "FREE") {
+    return (
+      <div className="p-4 text-white min-h-full bg-black/90">
+        <h1 className="text-xl font-bold mb-4">今日概览</h1>
+        <VIPGate lockedMessage="当日日报需要 VIP 订阅">
+          <></>
+        </VIPGate>
+        <div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
+          <div className="text-sm text-white/50 mb-2">延迟历史日报</div>
+          <div className="text-sm text-white/70">
+            免费用户可查看 3-7 天前的历史日报，请访问历史页面。
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // VIP/PRO 用户获取当日数据
   let payload;
   try {
     payload = await getReportPayload();
@@ -29,7 +51,6 @@ export default async function TodayPage() {
       <h1 className="text-xl font-bold mb-4">今日概览</h1>
 
       <div className="lg:grid lg:grid-cols-2 lg:gap-6">
-        {/* 左列：主决策数据 */}
         <div className="space-y-4">
           <div className="p-4 rounded-lg bg-white/5 border border-white/10">
             <div className="text-sm text-white/50 mb-1">市场状态</div>
@@ -40,26 +61,22 @@ export default async function TodayPage() {
             <div className="text-lg font-semibold">{riskCap}%</div>
           </div>
           <div className="text-sm text-white/50 mb-2">策略建议</div>
-          <ProGate>
+          <ProGate lockedMessage="策略建议需要 Pro 订阅">
             <div className="p-4 rounded-lg bg-white/5 border border-white/10">
               <div className="text-sm">Pro 策略建议（占位）</div>
             </div>
           </ProGate>
         </div>
-        {/* 右列：解释/详情 */}
+
         <div className="space-y-4 mt-4 lg:mt-0">
           <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-            <div className="text-sm text-white/50 mb-1">解读</div>
+            <div className="text-sm text-white/50 mb-1">AI 解读</div>
             <div className="text-sm">{oneLiner}</div>
             {marketComment && (
               <div className="text-sm text-white/70 mt-2 lg:line-clamp-none line-clamp-3">
                 {marketComment}
               </div>
             )}
-          </div>
-          <div className="hidden lg:block p-4 rounded-lg bg-white/5 border border-white/10">
-            <div className="text-sm text-white/50 mb-1">详细分析</div>
-            <div className="text-sm text-white/70">桌面端可查看更多市场分析详情</div>
           </div>
         </div>
       </div>

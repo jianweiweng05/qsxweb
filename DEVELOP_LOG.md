@@ -407,3 +407,49 @@ app/
 - ✅ 自定义域名 /landing 点击按钮跳转到 vercel auth 域
 - ✅ 自定义域名直接访问 /sign-in 或 /sign-up 会 307 重定向
 - ✅ vercel auth 域的 /sign-in /sign-up 正常可用
+
+## 2026-01-14: 三层订阅门禁与入口闭环
+
+### 目标
+实现 FREE/VIP/PRO 三层订阅分层，统一门禁组件，补齐 /pricing /account /settings 页面，更新 TabBar 导航。
+
+### 订阅分层定义
+| 层级 | 权限 |
+|------|------|
+| FREE | landing + 延迟历史日报（3-7天） |
+| VIP | 当日日报 + 市场状态 + 仓位上限 + AI 解读 |
+| PRO | VIP 全部 + 策略建议 + 报警 + 历史相似性 |
+
+### 修改文件
+1. `app/lib/entitlements.ts` - 重构支持 FREE/VIP/PRO，新增 hasMinTier()、getTierDisplayName()
+2. `app/lib/gate.tsx` - 新增 TierGate/VIPGate/ProGate/PageGate 统一门禁组件
+3. `app/(main)/layout.tsx` - TabBar 用「我的」替换「AI」，指向 /account
+4. `app/pricing/page.tsx` - 三档方案展示，显示当前方案
+5. `app/(main)/account/page.tsx` - 显示邮箱/tier/到期时间，入口到 settings 和 pricing
+6. `app/(main)/today/page.tsx` - FREE 锁定，VIP 显示日报，PRO 额外显示策略建议
+7. `app/(main)/alerts/page.tsx` - FREE/VIP 锁定，PRO 全功能
+8. `app/(main)/history/page.tsx` - 所有用户可看延迟日报，PRO 额外显示历史相似性
+9. `app/(main)/ai/page.tsx` - FREE 锁定，VIP 显示 AI 解读，PRO 额外显示策略生成
+
+### 新增文件
+1. `app/(main)/settings/page.tsx` - 语言/时区/通知占位
+
+### 功能权限矩阵
+| 页面 | FREE | VIP | PRO |
+|------|------|-----|-----|
+| /today | 锁定 | 日报+状态+仓位+解读 | +策略建议 |
+| /alerts | 锁定 | 锁定 | 全功能 |
+| /history | 延迟日报 | 延迟日报 | +历史相似性 |
+| /ai | 锁定 | AI解读 | +策略生成 |
+
+### 导航更新
+- TabBar: 今日/雷达/报警/历史/我的
+- /ai 保留但不在 TabBar 直达
+- 闭环: /account → /settings → /pricing
+
+### 验收结果
+- ✅ entitlements.ts 支持 FREE/VIP/PRO
+- ✅ gate.tsx 提供统一门禁组件
+- ✅ /pricing /account /settings 页面可达
+- ✅ 各页面按层级锁定/解锁
+- ✅ npm run build 通过
