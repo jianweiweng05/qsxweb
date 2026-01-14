@@ -32,9 +32,6 @@ export default async function TodayPage() {
   // D) 策略建议 - 使用 pro_strategy_text 字段
   const proStrategyText = payload?.pro_strategy_text;
 
-  // E) 历史相似性
-  const similarity = payload?.similarity;
-
   const badgeColorMap: Record<string, string> = {
     red: "bg-red-500/20 text-red-400 border-red-500/30",
     green: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -155,23 +152,6 @@ export default async function TodayPage() {
             <pre className="text-sm text-white/80 whitespace-pre-wrap font-mono">{proStrategyText}</pre>
           ) : (
             <div className="text-sm text-white/50">暂无在线策略输出</div>
-          )}
-        </ProGate>
-      </div>
-
-      {/* E) 历史相似性 - PRO */}
-      <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold">历史相似性</span>
-          <span className="px-2 py-0.5 text-xs rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
-            PRO
-          </span>
-        </div>
-        <ProGate lockedMessage="升级 Pro 解锁历史相似性分析">
-          {similarity ? (
-            <div className="text-sm text-white/80">{JSON.stringify(similarity)}</div>
-          ) : (
-            <div className="text-sm text-white/50">暂无历史相似性数据</div>
           )}
         </ProGate>
       </div>

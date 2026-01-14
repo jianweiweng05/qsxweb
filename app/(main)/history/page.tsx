@@ -1,10 +1,20 @@
 import { ProGate } from "@/app/lib/gate";
 import { getUserTier } from "@/app/lib/entitlements";
+import { getReportPayload } from "@/app/lib/qsx_api";
 
 export const dynamic = "force-dynamic";
 
-export default function HistoryPage() {
+export default async function HistoryPage() {
   const tier = getUserTier();
+
+  let payload: any = null;
+  try {
+    payload = await getReportPayload();
+  } catch {
+    payload = null;
+  }
+
+  const similarity = payload?.similarity;
 
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
@@ -31,7 +41,11 @@ export default function HistoryPage() {
           <div className="text-sm text-white/50 mb-2">历史相似性分析</div>
           <ProGate lockedMessage="历史相似性分析需要 Pro 订阅">
             <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <div className="text-white/70">历史相似性分析（占位）</div>
+              {similarity ? (
+                <pre className="text-sm text-white/70 whitespace-pre-wrap">{JSON.stringify(similarity, null, 2)}</pre>
+              ) : (
+                <div className="text-white/50">暂无历史相似性数据</div>
+              )}
             </div>
           </ProGate>
         </div>
