@@ -6,7 +6,6 @@ import { useState, useEffect, useCallback } from 'react';
 interface Metric {
   label: string;
   v: string | number;
-  bar?: { norm: number };
 }
 
 interface LayerBadge {
@@ -15,31 +14,61 @@ interface LayerBadge {
 }
 
 interface Layer {
-  id: string;
+  key: string;
   title: string;
   badge: LayerBadge;
-  asof: string;
   metrics: Metric[];
 }
 
+interface MacroCoefBreakdown {
+  L1: number;
+  L2: number;
+  L3: number;
+  L4: number;
+  L5: number;
+  L6: number;
+}
+
+interface LayerNotes {
+  L1?: string;
+  L2?: string;
+  L3?: string;
+  L4?: string;
+  L5?: string;
+  L6?: string;
+}
+
+interface UIText {
+  L1?: { title: string; desc: string };
+  L2?: { title: string; desc: string };
+  L3?: { title: string; desc: string };
+  L4?: { title: string; desc: string };
+  L5?: { title: string; desc: string };
+  L6?: { title: string; desc: string };
+}
+
 interface ReportPayload {
-  macro_state: string;
-  risk_cap: number;
-  generated_at: string;
+  macro?: {
+    macro_coef?: {
+      breakdown?: MacroCoefBreakdown;
+    };
+  };
+  ai_json?: {
+    layer_notes?: LayerNotes;
+    ui_text?: UIText;
+  };
   layers?: Layer[];
   ui?: { layers?: Layer[] };
 }
 
-// 6维雷达标签
-const RADAR_LABELS = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
+const LAYER_KEYS = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'] as const;
 
-// 计算每层的雷达值（metrics[].bar.norm 均值，无则 0.4）
-function calcLayerValue(layer: Layer): number {
-  const norms = layer.metrics
-    .map(m => m.bar?.norm)
-    .filter((n): n is number => typeof n === 'number');
-  if (norms.length === 0) return 0.4;
-  return norms.reduce((a, b) => a + b, 0) / norms.length;
+// 归一化算法：将 breakdown 分数转为 0~1
+function normalizeBreakdown(breakdown: MacroCoefBreakdown): number[] {
+  const scores = LAYER_KEYS.map(k => breakdown[k] ?? 0);
+  const maxAbs = Math.max(...scores.map(Math.abs));
+  if (maxAbs === 0) return scores.map(() => 0.5);
+  return scores.map(s => Math.max(0, Math.min(1, (s / maxAbs + 1) / 2)));
 }
 
 // 生成六边形顶点坐标
@@ -64,17 +93,36 @@ function badgeColorClass(color: string): string {
   }
 }
 
-// 发光雷达图组件
-function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] }) {
-  const cx = 150, cy = 150, maxR = 120;
+// 获取层级总结（优先 layer_notes，其次 ui_text，最后 badge.label）
+function getLayerSummary(
+  key: string,
+  layerNotes?: LayerNotes,
+  uiText?: UIText,
+  badge?: LayerBadge
+): string {
+  const k = key as keyof LayerNotes;
+  if (layerNotes?.[k]) return layerNotes[k];
+  const ut = uiText?.[k];
+  if (ut) return `${ut.title} ${ut.desc}`.trim();
+  return badge?.label || '';
+}
 
-  // 背景网格层
+// 发光雷达图组件
+function GlowingRadar({
+  values,
+  layers,
+  breakdown
+}: {
+  values: number[];
+  layers: Layer[];
+  breakdown?: MacroCoefBreakdown;
+}) {
+  const cx = 150, cy = 150, maxR = 120;
   const gridLevels = [0.25, 0.5, 0.75, 1.0];
 
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[300px] mx-auto">
       <defs>
-        {/* 发光滤镜 */}
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="4" result="coloredBlur" />
           <feMerge>
@@ -82,7 +130,6 @@ function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] })
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        {/* 强发光 */}
         <filter id="glowStrong" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="8" result="coloredBlur" />
           <feMerge>
@@ -91,7 +138,6 @@ function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] })
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        {/* 渐变填充 */}
         <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#00ffff" stopOpacity="0.4" />
           <stop offset="100%" stopColor="#0080ff" stopOpacity="0.2" />
@@ -110,24 +156,17 @@ function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] })
       ))}
 
       {/* 轴线 */}
-      {RADAR_LABELS.map((_, i) => {
+      {LAYER_KEYS.map((_, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
         return (
-          <line
-            key={i}
-            x1={cx}
-            y1={cy}
-            x2={x2}
-            y2={y2}
-            stroke="rgba(255,255,255,0.1)"
-            strokeWidth="1"
-          />
+          <line key={i} x1={cx} y1={cy} x2={x2} y2={y2}
+            stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
         );
       })}
 
-      {/* 数据多边形 - 发光效果 */}
+      {/* 数据多边形 */}
       <polygon
         points={hexPoints(cx, cy, maxR, values)}
         fill="url(#radarGradient)"
@@ -144,44 +183,25 @@ function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] })
         const y = cy - maxR * v * Math.sin(angle);
         const layer = layers[i];
         const color = layer?.badge?.color === 'red' ? '#ff4444'
-          : layer?.badge?.color === 'green' ? '#44ff44'
-          : '#ffff44';
+          : layer?.badge?.color === 'green' ? '#44ff44' : '#ffff44';
         return (
           <g key={i}>
-            <circle
-              cx={x}
-              cy={y}
-              r="6"
-              fill={color}
-              filter="url(#glow)"
-              className="transition-all duration-300"
-            />
-            <circle
-              cx={x}
-              cy={y}
-              r="3"
-              fill="#fff"
-            />
+            <circle cx={x} cy={y} r="6" fill={color} filter="url(#glow)" />
+            <circle cx={x} cy={y} r="3" fill="#fff" />
           </g>
         );
       })}
 
-      {/* 标签 */}
-      {RADAR_LABELS.map((label, i) => {
+      {/* 轴标签 */}
+      {LAYER_KEYS.map((label, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
-        const x = cx + (maxR + 20) * Math.cos(angle);
-        const y = cy - (maxR + 20) * Math.sin(angle);
-        const layer = layers[i];
+        const x = cx + (maxR + 22) * Math.cos(angle);
+        const y = cy - (maxR + 22) * Math.sin(angle);
+        const rawScore = breakdown?.[label] ?? 0;
         return (
-          <text
-            key={i}
-            x={x}
-            y={y}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className="fill-white/70 text-xs font-medium"
-          >
-            {layer?.title || label}
+          <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
+            className="fill-white/70 text-[10px] font-medium">
+            {label}
           </text>
         );
       })}
@@ -189,35 +209,18 @@ function GlowingRadar({ values, layers }: { values: number[]; layers: Layer[] })
   );
 }
 
-// 中心信息组件
-function CenterInfo({ macroState, riskCap, generatedAt }: {
-  macroState: string;
-  riskCap: number;
-  generatedAt: string;
-}) {
-  const riskPercent = (riskCap * 100).toFixed(1);
-  const time = new Date(generatedAt).toLocaleString('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  return (
-    <div className="text-center mt-4">
-      <div className="text-lg font-bold text-cyan-400 mb-1" style={{ textShadow: '0 0 10px #00ffff' }}>
-        {macroState}
-      </div>
-      <div className="text-sm text-white/70">
-        风险仓位: <span className="text-yellow-400 font-mono">{riskPercent}%</span>
-      </div>
-      <div className="text-xs text-white/40 mt-1">{time}</div>
-    </div>
-  );
-}
-
 // 层级卡片组件
-function LayerCard({ layer, index }: { layer: Layer; index: number }) {
+function LayerCard({
+  layer,
+  index,
+  rawScore,
+  summary
+}: {
+  layer: Layer;
+  index: number;
+  rawScore: number;
+  summary: string;
+}) {
   return (
     <div className="p-3 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
       {/* 头部 */}
@@ -225,18 +228,16 @@ function LayerCard({ layer, index }: { layer: Layer; index: number }) {
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/40 font-mono">L{index + 1}</span>
           <span className="text-sm font-medium text-white">{layer.title}</span>
+          <span className="text-xs text-cyan-400 font-mono">({rawScore})</span>
         </div>
         <span className={`px-2 py-0.5 text-xs rounded border ${badgeColorClass(layer.badge.color)}`}>
           {layer.badge.label}
         </span>
       </div>
 
-      {/* asof */}
-      <div className="text-xs text-white/40 mb-2">{layer.asof}</div>
-
-      {/* metrics */}
-      <div className="space-y-1">
-        {layer.metrics.slice(0, 4).map((m, i) => (
+      {/* metrics（最多5条） */}
+      <div className="space-y-1 mb-2">
+        {layer.metrics.slice(0, 5).map((m, i) => (
           <div key={i} className="flex justify-between text-xs">
             <span className="text-white/60">{m.label}</span>
             <span className="text-white/90 font-mono">
@@ -244,10 +245,14 @@ function LayerCard({ layer, index }: { layer: Layer; index: number }) {
             </span>
           </div>
         ))}
-        {layer.metrics.length > 4 && (
-          <div className="text-xs text-white/30">+{layer.metrics.length - 4} more</div>
-        )}
       </div>
+
+      {/* 多空总结一句话 */}
+      {summary && (
+        <div className="text-xs text-cyan-300/80 border-t border-white/5 pt-2 mt-2">
+          {summary}
+        </div>
+      )}
     </div>
   );
 }
@@ -256,23 +261,25 @@ function LayerCard({ layer, index }: { layer: Layer; index: number }) {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
-      <div className="text-red-400 mb-3">⚠️ {message}</div>
-      <button
-        onClick={onRetry}
-        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 text-sm transition-colors"
-      >
+      <div className="text-red-400 mb-3">{message}</div>
+      <button onClick={onRetry}
+        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 text-sm">
         重试
       </button>
     </div>
   );
 }
 
-// 加载态组件
-function LoadingState() {
+// 加载骨架屏
+function LoadingSkeleton() {
   return (
-    <div className="p-6 text-center">
-      <div className="inline-block w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-      <div className="text-white/50 mt-3 text-sm">加载中...</div>
+    <div className="animate-pulse">
+      <div className="h-[300px] bg-white/5 rounded-lg mb-4" />
+      <div className="space-y-3">
+        {[1,2,3,4,5,6].map(i => (
+          <div key={i} className="h-20 bg-white/5 rounded-lg" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -290,11 +297,8 @@ export default function RadarClient() {
       const res = await fetch('https://qsx-ai.onrender.com/macro/v1/report_payload', {
         cache: 'no-store',
       });
-      if (!res.ok) {
-        throw new Error(`API 返回 ${res.status}`);
-      }
-      const json = await res.json();
-      setData(json);
+      if (!res.ok) throw new Error(`API 返回 ${res.status}`);
+      setData(await res.json());
     } catch (e) {
       setError(e instanceof Error ? e.message : '网络错误');
     } finally {
@@ -302,57 +306,69 @@ export default function RadarClient() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // 获取 layers 数据（优先 ui.layers）
+  // 获取 layers（优先 ui.layers）
   const layers: Layer[] = data?.ui?.layers || data?.layers || [];
 
-  // 计算雷达值
-  const radarValues = layers.length === 6
-    ? layers.map(calcLayerValue)
-    : [0.4, 0.4, 0.4, 0.4, 0.4, 0.4];
+  // 获取 breakdown 并归一化
+  const breakdown = data?.macro?.macro_coef?.breakdown;
+  const radarValues = breakdown
+    ? normalizeBreakdown(breakdown)
+    : [0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+
+  // ai_json 数据
+  const layerNotes = data?.ai_json?.layer_notes;
+  const uiText = data?.ai_json?.ui_text;
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchData} />;
+  }
 
   return (
     <div className="lg:grid lg:grid-cols-2 lg:gap-6">
       {/* 左列：雷达图 */}
       <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-        <h2 className="text-sm text-white/50 mb-4">六维雷达</h2>
-
-        {loading ? (
-          <LoadingState />
-        ) : error ? (
-          <ErrorState message={error} onRetry={fetchData} />
-        ) : (
-          <>
-            <GlowingRadar values={radarValues} layers={layers} />
-            {data && (
-              <CenterInfo
-                macroState={data.macro_state}
-                riskCap={data.risk_cap}
-                generatedAt={data.generated_at}
-              />
-            )}
-          </>
+        <h2 className="text-sm text-white/50 mb-4">六维雷达 (MacroCoef)</h2>
+        <GlowingRadar values={radarValues} layers={layers} breakdown={breakdown} />
+        {breakdown && (
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+            {LAYER_KEYS.map((k, i) => (
+              <div key={k} className="bg-white/5 rounded p-2">
+                <div className="text-white/40">{k}</div>
+                <div className="text-cyan-400 font-mono">{breakdown[k]}</div>
+                <div className="text-white/30">norm: {radarValues[i].toFixed(2)}</div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       {/* 右列：层级卡片 */}
       <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/5 border border-white/10">
         <h2 className="text-sm text-white/50 mb-4">层级详情</h2>
-
-        {loading ? (
-          <LoadingState />
-        ) : error ? (
-          <div className="text-white/30 text-sm text-center py-4">数据不可用</div>
-        ) : layers.length === 0 ? (
+        {layers.length === 0 ? (
           <div className="text-white/30 text-sm text-center py-4">暂无层级数据</div>
         ) : (
           <div className="space-y-3">
-            {layers.map((layer, i) => (
-              <LayerCard key={layer.id || i} layer={layer} index={i} />
-            ))}
+            {layers.map((layer, i) => {
+              const key = layer.key || LAYER_KEYS[i];
+              const rawScore = breakdown?.[key as keyof MacroCoefBreakdown] ?? 0;
+              const summary = getLayerSummary(key, layerNotes, uiText, layer.badge);
+              return (
+                <LayerCard
+                  key={key}
+                  layer={layer}
+                  index={i}
+                  rawScore={rawScore}
+                  summary={summary}
+                />
+              );
+            })}
           </div>
         )}
       </div>

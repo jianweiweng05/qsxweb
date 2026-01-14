@@ -454,44 +454,36 @@ app/
 - ✅ 各页面按层级锁定/解锁
 - ✅ npm run build 通过
 
-## 2026-01-15: 雷达页两栏科技风改造
+## 2026-01-15: 雷达页两栏科技风改造（v2）
 
 ### 目标
-将 /radar 页面改造为"两栏科技风"布局：左侧发光雷达图，右侧层级数据卡片。
+将 /radar 页面改造为"两栏科技风"布局，严格按指定字段映射。
 
 ### 修改文件
-1. `app/(main)/radar/page.tsx`（-13 行，+4 行）- 简化为引入客户端组件
-2. `app/(main)/radar/client.tsx`（新建，270 行）- 两栏布局+雷达图+卡片
+1. `app/(main)/radar/page.tsx`（4 行）- 引入客户端组件
+2. `app/(main)/radar/client.tsx`（378 行）- 两栏布局+雷达图+卡片
 
-### 技术实现
-- 数据源：GET https://qsx-ai.onrender.com/macro/v1/report_payload
-- 右侧数据：优先 payload.ui.layers，fallback payload.layers
-- 雷达值：每层 metrics[].bar.norm 均值，无则 0.4
-- 发光效果：原生 SVG + feGaussianBlur 滤镜
-- 无新增依赖，纯 Tailwind + CSS
+### 数据映射（严格按规范）
+- 数据源：GET https://qsx-ai.onrender.com/macro/v1/report_payload（仅 1 次请求）
+- 右侧层级：优先 payload.ui.layers，fallback payload.layers
+- 雷达值：payload.macro.macro_coef.breakdown (L1~L6)
+- 归一化：maxAbs = max(|score|)；norm = clamp((score/maxAbs+1)/2, 0, 1)
+- 层级总结：优先 ai_json.layer_notes.Lx，其次 ai_json.ui_text.Lx.title+desc，最后 badge.label
 
 ### 功能特性
-- 左侧：6维发光雷达图（L1-L6），中心显示 macro_state + risk_cap(%) + generated_at
-- 右侧：6层数据卡片（title、badge.label/color、asof、metrics 列表）
-- 错误态：显示错误信息 + 重试按钮
-- 加载态：旋转动画
-
-### 门禁逻辑
-- /radar 对 FREE 可见（保持原有逻辑不变）
-- 无新增 VIP/PRO 锁定功能
+- 左侧：6轴发光雷达图 + breakdown 原始分数/归一化值展示
+- 右侧：L1~L6 六层卡片（title + rawScore + badge + metrics≤5条 + 多空总结）
+- 错误态：错误信息 + 重试按钮
+- 加载态：骨架屏动画
 
 ### 改动统计
 - 功能文件：2 个
-- 新增行数：约 270 行（client.tsx）
-- 修改行数：约 4 行（page.tsx）
-
-### 为什么不能更少
-- page.tsx：必须引入客户端组件（服务端组件不能用 useState/useEffect）
-- client.tsx：包含雷达图 SVG 渲染、数据获取、错误处理、卡片渲染，逻辑不可再拆分
+- 新增行数：约 378 行（client.tsx）
 
 ### 验收结果
 - ✅ npm run build 通过
-- ✅ /radar 成功拉取并渲染 report_payload
-- ✅ 左侧雷达有发光多边形+节点
-- ✅ 右侧 6 层卡片信息正确（badge label、asof、metrics v）
+- ✅ /radar 仅发起 1 次请求到 /macro/v1/report_payload
+- ✅ 右侧 L1~L6：title、badge、metrics(≤5)、layer_notes 一句话
+- ✅ 雷达图 6 轴对应 L1~L6，数值来自 macro_coef.breakdown 归一化
+- ✅ breakdown 分数改变时雷达形状随之改变
 - ✅ 断网/接口异常时显示错误态和"重试"
