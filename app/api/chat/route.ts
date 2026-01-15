@@ -27,22 +27,36 @@ function normalize(s: string): string {
 
 function isInvalid(s: string): boolean {
   if (s.length < 2 || s.length > 200) return true;
-  // 纯数字/符号/重复字符占比 > 0.6
-  const junk = s.replace(/[\u4e00-\u9fa5a-z0-9]/gi, "");
-  if (junk.length / s.length > 0.6) return true;
-  // 重复字符检测
+  // 纯数字/符号
+  if (/^[0-9\s\p{P}\p{S}]+$/u.test(s)) return true;
+  // 重复字符（如 aaa, 😀😀😀）
   const chars = [...s];
   const unique = new Set(chars).size;
-  if (unique <= 2 && s.length > 4) return true;
+  if (unique <= 2 && s.length >= 3) return true;
   return false;
 }
 
 function matchKB(s: string): { id: string; a: string } | null {
+  // 优先精确匹配（完整词）
   for (const cat of manifest.match_policy.priority_order) {
     const items = KB_FILES[cat] || [];
     for (const item of items) {
-      if (item.triggers.some((t: string) => s.includes(t.toLowerCase()))) {
-        return { id: item.id, a: item.a };
+      for (const t of item.triggers) {
+        if (s === t.toLowerCase()) {
+          return { id: item.id, a: item.a };
+        }
+      }
+    }
+  }
+  // 再进行包含匹配
+  for (const cat of manifest.match_policy.priority_order) {
+    const items = KB_FILES[cat] || [];
+    for (const item of items) {
+      for (const t of item.triggers) {
+        const trigger = t.toLowerCase();
+        if (s.includes(trigger)) {
+          return { id: item.id, a: item.a };
+        }
       }
     }
   }
@@ -54,10 +68,10 @@ function matchProKeyword(s: string): boolean {
 }
 
 function canUseLLM(s: string): boolean {
-  // Require 2+ anchor words + 1+ logic word + length 15+
+  // Require 2+ anchor words + 1+ logic word + length 12+
   const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
   const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
-  return s.length >= 15 && anchorCount >= 2 && hasLogic;
+  return s.length >= 12 && anchorCount >= 2 && hasLogic;
 }
 
 function isGreeting(s: string): boolean {
@@ -77,6 +91,21 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
   if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
   if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
 
+  // 先检查是否满足 LLM 条件（高价值问题优先）
+  const meetsLLMCriteria = canUseLLM(s);
+  
+  // 如果满足 LLM 条件，且用户有权限，直接放行
+  if (meetsLLMCriteria) {
+    if (tier === "FREE") {
+      return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
+    }
+    if (matchProKeyword(s) && tier !== "PRO") {
+      return { type: "blocked", reason: "pro_only", text: manifest.pro_config.intercept_message, upgrade_hint: true };
+    }
+    return { type: "llm", is_high_value: true };
+  }
+
+  // 不满足 LLM 条件，尝试 KB 匹配
   const kb = matchKB(s);
   if (kb) {
     // Anti-repeat logic
@@ -97,24 +126,20 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
     return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
   }
 
-  // FREE 永不调 LLM
+  // KB 未命中，根据 tier 返回引导
   if (tier === "FREE") {
     return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
   }
-  // VIP/PRO 检查 pro_keywords 拦截
   if (matchProKeyword(s) && tier !== "PRO") {
     return { type: "blocked", reason: "pro_only", text: manifest.pro_config.intercept_message, upgrade_hint: true };
   }
-  // 检查 LLM 触发条件
-  if (!canUseLLM(s)) {
-    return {
-      type: "blocked",
-      reason: "no_llm_match",
-      text: "💡 [系统提示]：当前提问过于模糊。建议在提问中包含 ≥2 个层级指标（如 L1+L5），AI 将自动为您开启深度逻辑推演。",
-      upgrade_hint: false,
-    };
-  }
-  return { type: "llm", is_high_value: true };
+  // 兵底拦截
+  return {
+    type: "blocked",
+    reason: "no_llm_match",
+    text: "💡 [系统提示]：当前提问过于模糊。建议在提问中包含 ≥2 个层级指标（如 L1+L5），AI 将自动为您开启深度逻辑推演。",
+    upgrade_hint: false,
+  };
 }
 
 const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏观分析。
