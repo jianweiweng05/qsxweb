@@ -542,3 +542,49 @@ app/
 - ✅ 其他问题 → DeepSeek 流式输出
 - ✅ 服务端日志可见 blocked/kb/llm 三种路径
 - ✅ npm run build 通过
+
+## 2026-01-15: AI 问答系统 KB-first 改造
+
+### 目标
+将 AI 问答改造为"KB-first、LLM-exception"：95% 问题命中本地知识库，LLM 仅用于当日数据解读，FREE 用户 0 次 LLM 调用。
+
+### 核心规则
+1. **FREE 用户禁止 LLM**：只允许 KB 或订阅引导
+2. **FREE 用户轮次限制**：最多 2 次有效 KB 回答，第 3 次起直接引导订阅
+3. **KB 优先**：所有问题先走 KB 匹配，命中必须直接返回
+4. **LLM 放行条件**：VIP/PRO + 当日解读意图词 + 数据锚点词 + 长度 6-120 字
+
+### 修改文件
+1. `app/lib/knowledge_faq.json`（199 行，重写）- 扩展知识库，26 条 FAQ，新增 llm_config/free_upgrade_message
+2. `app/api/chat/route.ts`（151 行，重写）- KB-first 逻辑 + FREE 轮次限制 + LLM 流式输出
+3. `app/(main)/ai/client.tsx`（145 行，重写）- 支持流式渲染 + upgrade 按钮
+
+### 知识库覆盖
+- L1-L6 各层含义
+- RR25 / Funding / LS / ETF_D / ETF_7DMA / FGI / Gamma / HCRI
+- Risk Cap / 仓位规则 / MacroCoef
+- FREE / VIP / PRO 权限说明
+- 系统介绍 / 使用方法 / 免责声明
+
+### 服务端路径
+```
+normalize → tier check → quota check → KB match → (if VIP/PRO + intent + anchor) LLM → else block/upgrade
+```
+
+### 日志格式
+```
+[chat] tier=FREE path=kb id=rr25
+[chat] tier=FREE path=upgrade reason=quota
+[chat] tier=FREE path=upgrade reason=kb_miss
+[chat] tier=PRO path=llm reason=explain_today_data
+[chat] tier=VIP path=blocked reason=llm_not_allowed
+```
+
+### 验收结果
+- ✅ 常见问题（RR25/L3/仓位/规则等）100% KB，0 LLM
+- ✅ FREE 用户 0 次 LLM 调用
+- ✅ FREE 用户 KB 未命中 → 订阅引导
+- ✅ FREE 用户超过 2 次 KB 回答 → 订阅引导
+- ✅ VIP/PRO 当日数据解读问题 → LLM 流式输出
+- ✅ 闲聊/无关问题 → 拦截
+- ✅ npm run build 通过
