@@ -29,27 +29,12 @@ interface AlertData {
   layers: AlertLayer[];
 }
 
-function SignalBadge({ signal }: { signal: string }) {
-  const colorMap: Record<string, string> = {
-    RED: 'bg-red-500',
-    YELLOW: 'bg-yellow-500',
-    GREEN: 'bg-green-500',
-  };
-  return (
-    <span className={`inline-block w-3 h-3 rounded-full ${colorMap[signal] || 'bg-gray-500'}`} />
-  );
-}
-
 function LoadingSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="grid grid-cols-3 gap-3">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-16 bg-white/5 rounded-lg" />
-        ))}
-      </div>
+      <div className="h-16 bg-white/5 rounded-lg" />
       <div className="space-y-3">
-        {[1, 2, 3, 4, 5].map(i => (
+        {[1, 2, 3].map(i => (
           <div key={i} className="h-12 bg-white/5 rounded-lg" />
         ))}
       </div>
@@ -75,7 +60,7 @@ export default function AlertsClient() {
   const [data, setData] = useState<AlertData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'RED' | 'YELLOW'>('all');
+  const [tab, setTab] = useState<'current' | 'history'>('current');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -101,80 +86,84 @@ export default function AlertsClient() {
 
   const { summary, layers } = data;
 
-  // 收集所有报警项
-  const allItems = layers.flatMap(layer =>
-    layer.items.map(item => ({ ...item, layer: layer.layer }))
+  // 只收集红色报警
+  const redItems = layers.flatMap(layer =>
+    layer.items
+      .filter(item => item.signal === 'RED')
+      .map(item => ({ ...item, layer: layer.layer }))
   );
-
-  // 过滤
-  const filteredItems = filter === 'all'
-    ? allItems.filter(item => item.signal === 'RED' || item.signal === 'YELLOW')
-    : allItems.filter(item => item.signal === filter);
 
   return (
     <div className="space-y-4">
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-          <div className="text-xs text-red-400 mb-1">红色警报</div>
-          <div className="text-2xl font-bold text-red-400">{summary.red}</div>
-        </div>
-        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
-          <div className="text-xs text-yellow-400 mb-1">黄色警报</div>
-          <div className="text-2xl font-bold text-yellow-400">{summary.yellow}</div>
-        </div>
-        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
-          <div className="text-xs text-green-400 mb-1">正常</div>
-          <div className="text-2xl font-bold text-green-400">{summary.green}</div>
-        </div>
-      </div>
-
-      {/* 过滤按钮 */}
+      {/* Tab 切换 */}
       <div className="flex gap-2">
-        {(['all', 'RED', 'YELLOW'] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 text-xs rounded-lg border transition ${
-              filter === f
-                ? 'bg-white/10 border-white/30 text-white'
-                : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
-            }`}
-          >
-            {f === 'all' ? '全部警报' : f === 'RED' ? '红色' : '黄色'}
-          </button>
-        ))}
+        <button
+          onClick={() => setTab('current')}
+          className={`px-4 py-2 text-sm rounded-lg border transition ${
+            tab === 'current'
+              ? 'bg-red-500/20 border-red-500/30 text-red-400'
+              : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
+          }`}
+        >
+          当前报警
+        </button>
+        <button
+          onClick={() => setTab('history')}
+          className={`px-4 py-2 text-sm rounded-lg border transition ${
+            tab === 'history'
+              ? 'bg-white/10 border-white/30 text-white'
+              : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
+          }`}
+        >
+          历史报警
+        </button>
       </div>
 
-      {/* 警报列表 */}
-      <div className="space-y-2">
-        {filteredItems.length === 0 ? (
-          <div className="p-4 rounded-lg bg-white/5 border border-white/10 text-center text-white/50">
-            {filter === 'all' ? '当前无警报' : `无${filter === 'RED' ? '红色' : '黄色'}警报`}
+      {tab === 'current' ? (
+        <>
+          {/* 红色报警统计 */}
+          <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+            <div className="text-xs text-red-400 mb-1">红色警报</div>
+            <div className="text-3xl font-bold text-red-400">{summary.red}</div>
           </div>
-        ) : (
-          filteredItems.map((item, i) => (
-            <div
-              key={`${item.key}-${i}`}
-              className="p-3 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <SignalBadge signal={item.signal} />
-                <div>
-                  <div className="text-sm text-white">{item.display_name}</div>
-                  <div className="text-xs text-white/40">{item.layer}</div>
+
+          {/* 红色报警列表 */}
+          <div className="space-y-2">
+            {redItems.length === 0 ? (
+              <div className="p-4 rounded-lg bg-white/5 border border-white/10 text-center text-white/50">
+                当前无红色警报
+              </div>
+            ) : (
+              redItems.map((item, i) => (
+                <div
+                  key={`${item.key}-${i}`}
+                  className="p-3 rounded-lg bg-red-500/5 border border-red-500/20 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
+                    <div>
+                      <div className="text-sm text-white">{item.display_name}</div>
+                      <div className="text-xs text-white/40">{item.layer}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-mono text-white/80">{item.value}</div>
+                    {item.reason && item.reason !== 'ok' && (
+                      <div className="text-xs text-red-400/70 max-w-[150px] truncate">{item.reason}</div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-mono text-white/80">{item.value}</div>
-                {item.reason && item.reason !== 'ok' && (
-                  <div className="text-xs text-white/40 max-w-[150px] truncate">{item.reason}</div>
-                )}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+              ))
+            )}
+          </div>
+        </>
+      ) : (
+        /* 历史报警占位 */
+        <div className="p-6 rounded-lg bg-white/5 border border-white/10 text-center">
+          <div className="text-white/50 mb-2">历史报警</div>
+          <div className="text-xs text-white/30">功能开发中...</div>
+        </div>
+      )}
     </div>
   );
 }

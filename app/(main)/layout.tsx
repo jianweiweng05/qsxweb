@@ -8,11 +8,10 @@ const tabs = [
   { key: "/radar", title: "雷达", icon: "📡" },
   { key: "/alerts", title: "报警", icon: "🔔" },
   { key: "/history", title: "历史", icon: "📜" },
-  { key: "/account", title: "我的", icon: "👤" },
+  { key: "/ai", title: "AI", icon: "🤖" },
 ];
 
 function mapActiveKey(pathname: string): string {
-  if (pathname.startsWith("/settings")) return "/account";
   for (const tab of tabs) {
     if (pathname.startsWith(tab.key)) return tab.key;
   }
