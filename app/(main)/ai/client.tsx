@@ -42,7 +42,6 @@ function AIChat() {
 
     setMessages((prev) => [...prev, { role: "user", text: message }]);
     setInput("");
-    setLoading(true);
     setUpgradeHint(false);
 
     try {
@@ -56,6 +55,7 @@ function AIChat() {
       const contentType = res.headers.get("content-type") || "";
 
       if (contentType.includes("text/event-stream") && res.body) {
+        setLoading(true);
         setStreaming(true);
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -92,8 +92,10 @@ function AIChat() {
           }
         }
         setStreaming(false);
+        setLoading(false);
         inputRef.current?.focus();
       } else {
+        // KB/blocked - 同步返回，不显示 loading
         const data = await res.json();
         setMessages((prev) => [...prev, { role: "ai", text: data.text || "请求失败" }]);
         if (data.upgrade_hint) setUpgradeHint(true);
@@ -104,7 +106,6 @@ function AIChat() {
         setMessages((prev) => [...prev, { role: "ai", text: "网络错误" }]);
       }
     }
-    setLoading(false);
   }
 
   const disabled = loading || streaming;

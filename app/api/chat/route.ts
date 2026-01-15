@@ -19,10 +19,8 @@ const LOGIC_WORDS = ["为什么","背离","关联","暗示","因果","影响","�
 // 文案
 const MSG = {
   invalid: "请输入有效的市场问题（2-200字）。",
-  free_fallback: "我能回答：市场状态/仓位规则/指标定义/页面功能。更深的当日解读与策略在 VIP/PRO。你可以问：'今天市场状态？'或'仓位上限多少？'",
-  upgrade_short: "该问题需订阅（VIP/PRO）。请前往 /pricing。",
-  refine: "请用「2个指标 + 关系词」提问，例如：RR25 + Funding 为什么同向/背离？",
   greeting: "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'今天市场状态？'或'仓位上限多少？'",
+  upgrade: "当前功能需要 PRO 才能查看完整分析。\n\n🎁 新用户可享受 3 天 PRO 免费试用（可随时取消，仅一次）。\n👉 立即开通：/pricing",
 };
 
 // 闲聊检测
@@ -99,25 +97,22 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
     return { type: "blocked", reason: "greeting", text: MSG.greeting };
   }
 
-  // A2 KB 匹配（所有 tier）
+  // A1 KB 匹配（所有 tier，100% 优先）
   const kb = matchKB(s);
   if (kb) {
     return { type: "kb", text: kb.a, id: kb.id };
   }
 
-  // A1 FREE 用户：未命中 KB 则返回兜底（不调用 LLM）
-  if (tier === "FREE") {
+  // A2 非 PRO 用户：未命中 KB 则返回订阅引导（不调用 LLM）
+  if (tier !== "PRO") {
     const miss = freeMissMap.get(ip) || 0;
     freeMissMap.set(ip, miss + 1);
-    if (miss >= 2) {
-      return { type: "blocked", reason: "upgrade_short", text: MSG.upgrade_short, upgrade_hint: true };
-    }
-    return { type: "blocked", reason: "free_fallback", text: MSG.free_fallback, upgrade_hint: true };
+    return { type: "blocked", reason: "upgrade", text: MSG.upgrade, upgrade_hint: true };
   }
 
-  // A3 VIP/PRO LLM 放行门槛
+  // A3 PRO 用户：检查智力门槛
   if (!isDataReasoning(s)) {
-    return { type: "blocked", reason: "refine", text: MSG.refine };
+    return { type: "blocked", reason: "upgrade", text: MSG.upgrade, upgrade_hint: true };
   }
 
   return { type: "llm" };
