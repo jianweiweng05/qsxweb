@@ -18,9 +18,6 @@ const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
 const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
 
-// Session-based repeat tracking (in-memory, per IP)
-const repeatTracker = new Map<string, { id: string; count: number }>();
-
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
 }
@@ -93,16 +90,19 @@ type ClassifyResult =
   | { type: "kb"; text: string; source_id: string }
   | { type: "llm"; is_high_value: boolean };
 
-function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
+function classifyQuery(q: string, tier: UserTier): ClassifyResult {
   const s = normalize(q);
   if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
   if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
 
-  // 先检查是否满足 LLM 条件（高价值问题优先）
-  const meetsLLMCriteria = canUseLLM(s);
-  
-  // 如果满足 LLM 条件，且用户有权限，直接放行
-  if (meetsLLMCriteria) {
+  // 1. KB 优先 - 简单问题直接答
+  const kb = matchKB(s);
+  if (kb) {
+    return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
+  }
+
+  // 2. KB 未命中，检查是否满足 LLM 深度分析条件
+  if (canUseLLM(s)) {
     if (tier === "FREE") {
       return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
     }
@@ -112,55 +112,11 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
     return { type: "llm", is_high_value: true };
   }
 
-  // 不满足 LLM 条件，尝试 KB 匹配
-  const kb = matchKB(s);
-  if (kb) {
-    // Anti-repeat logic
-    const tracker = repeatTracker.get(ip);
-    if (tracker && tracker.id === kb.id) {
-      tracker.count++;
-      if (tracker.count >= 3) {
-        repeatTracker.delete(ip);
-        return {
-          type: "blocked",
-          reason: "repeat",
-          text: "💡 [系统提示]：检测到重复提问。为了获取更深度的解答，请尝试结合两个层级指标提问（如：为什么 L1 走强但 L3 费率下降？），这将触发 AI 深度推演模式。",
-        };
-      }
-    } else {
-      repeatTracker.set(ip, { id: kb.id, count: 1 });
-    }
-    return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
-  }
-
-  // KB 未命中，根据 tier 返回引导
-  if (tier === "FREE") {
-    return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
-  }
-  if (matchProKeyword(s) && tier !== "PRO") {
-    return { type: "blocked", reason: "pro_only", text: manifest.pro_config.intercept_message, upgrade_hint: true };
-  }
-  // 兵底拦截 - 动态钩子引导
-  const detectedAnchor = ANCHOR_WORDS.find(w => s.includes(w));
-  const suggestions = [
-    { anchor: "l1", example: "为什么 L1 走强但 L3 费率下降？" },
-    { anchor: "l2", example: "L2 资金流与 L5 情绪的背离暗示了什么？" },
-    { anchor: "l3", example: "当前 L3 费率与 L1 环境的关联如何？" },
-    { anchor: "l4", example: "L4 链上成本与 L2 资金流的逻辑是什么？" },
-    { anchor: "l5", example: "L5 情绪与 L3 杠杆的背离意味着什么？" },
-    { anchor: "l6", example: "L6 结构与 L1 宏观的共振如何影响 Risk Cap？" },
-    { anchor: "rr25", example: "RR25 与 L3 费率的背离暗示了什么？" },
-    { anchor: "gamma", example: "当前 Gamma 释放状态对 Risk Cap 有何影响？" },
-    { anchor: "funding", example: "Funding 与 L2 资金流的逻辑关联是什么？" },
-    { anchor: "risk_cap", example: "Risk Cap 调整与 L1+L3 的逻辑是什么？" },
-  ];
-  const matched = suggestions.find(s => s.anchor === detectedAnchor);
-  const exampleText = matched ? matched.example : "为什么 L1 走强但 L3 费率下降？";
+  // 3. 兜底 - 友好引导
   return {
     type: "blocked",
-    reason: "no_llm_match",
-    text: `💡 [系统提示]：检测到您在关注 ${detectedAnchor ? detectedAnchor.toUpperCase() : "单一指标"}。建议尝试更具深度的逻辑提问以触发 AI：\n\n"${exampleText}"`,
-    upgrade_hint: false,
+    reason: "no_match",
+    text: "抱歉，我没有理解您的问题。\n\n您可以问我：\n• 指标定义：RR25 是什么？Funding 是什么？\n• 系统介绍：系统有什么优势？\n• 会员订阅：怎么开通会员？\n• 深度分析（VIP+）：为什么 L1 走强但 L3 费率下降？",
   };
 }
 
@@ -170,16 +126,11 @@ const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏�
 2. 三条要点（每条必须引用具体字段名或层级，如 L3.RR25 / L3.funding / L2.etf.btc.us_netflow）
 3. 末尾固定："\n\nAI 分析仅基于当前数据，不构成投资建议。"`;
 
-function getIP(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
-}
-
 export async function POST(req: NextRequest) {
   const { message } = await req.json();
   const tier = getUserTier();
-  const ip = getIP(req);
 
-  const result = classifyQuery(message || "", tier, ip);
+  const result = classifyQuery(message || "", tier);
 
   if (result.type === "blocked") {
     console.log(`[chat] path=blocked tier=${tier} reason=${result.reason}`);
