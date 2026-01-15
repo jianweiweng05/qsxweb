@@ -326,16 +326,23 @@ export default function RadarClient() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // 从 control_tower 构建 layers
-  const layers: Layer[] = (ctData?.layers || []).map(ctLayer => ({
-    key: ctLayer.layer,
-    title: ctLayer.layer,
-    badge: { label: '', color: 'green' as const },
-    metrics: ctLayer.items.map(item => ({
-      label: item.display_name,
-      v: item.value
-    }))
-  }));
+  // 从 control_tower 构建 layers（过滤 L7/HCRI 和特定关键词）
+  const layers: Layer[] = (ctData?.layers || [])
+    .filter(ctLayer => ctLayer.layer !== 'L7' && ctLayer.layer !== 'HCRI')
+    .map(ctLayer => ({
+      key: ctLayer.layer,
+      title: ctLayer.layer,
+      badge: { label: '', color: 'green' as const },
+      metrics: ctLayer.items
+        .filter(item => {
+          const name = item.display_name?.toLowerCase() || '';
+          return !name.includes('观望') && !name.includes('结构') && !name.includes('震荡');
+        })
+        .map(item => ({
+          label: item.display_name,
+          v: item.value
+        }))
+    }));
 
   // 获取 breakdown 并归一化
   const breakdown = data?.macro?.macro_coef?.breakdown;
