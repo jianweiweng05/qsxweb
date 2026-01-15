@@ -8,6 +8,16 @@ interface Metric {
   v: string | number;
 }
 
+interface ControlTowerItem {
+  display_name: string;
+  value: any;
+}
+
+interface ControlTowerLayer {
+  layer: string;
+  items: ControlTowerItem[];
+}
+
 interface LayerBadge {
   label: string;
   color: 'red' | 'yellow' | 'green';
@@ -57,8 +67,10 @@ interface ReportPayload {
     layer_notes?: LayerNotes;
     ui_text?: UIText;
   };
-  layers?: Layer[];
-  ui?: { layers?: Layer[] };
+}
+
+interface ControlTowerPayload {
+  layers?: ControlTowerLayer[];
 }
 
 const LAYER_KEYS = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'] as const;
@@ -287,6 +299,7 @@ function LoadingSkeleton() {
 // 主组件
 export default function RadarClient() {
   const [data, setData] = useState<ReportPayload | null>(null);
+  const [ctData, setCtData] = useState<ControlTowerPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -294,11 +307,16 @@ export default function RadarClient() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/proxy', {
-        cache: 'no-store',
-      });
-      if (!res.ok) throw new Error(`API 返回 ${res.status}`);
-      setData(await res.json());
+      const [res1, res2] = await Promise.all([
+        fetch('/api/proxy', { cache: 'no-store' }),
+        fetch('/api/control_tower', { cache: 'no-store' })
+      ]);
+
+      if (!res1.ok) throw new Error(`report_payload 返回 ${res1.status}`);
+      if (!res2.ok) throw new Error(`control_tower 返回 ${res2.status}`);
+
+      setData(await res1.json());
+      setCtData(await res2.json());
     } catch (e) {
       setError(e instanceof Error ? e.message : '网络错误');
     } finally {
@@ -308,8 +326,16 @@ export default function RadarClient() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // 获取 layers（优先 ui.layers）
-  const layers: Layer[] = data?.ui?.layers || data?.layers || [];
+  // 从 control_tower 构建 layers
+  const layers: Layer[] = (ctData?.layers || []).map(ctLayer => ({
+    key: ctLayer.layer,
+    title: ctLayer.layer,
+    badge: { label: '', color: 'green' as const },
+    metrics: ctLayer.items.map(item => ({
+      label: item.display_name,
+      v: item.value
+    }))
+  }));
 
   // 获取 breakdown 并归一化
   const breakdown = data?.macro?.macro_coef?.breakdown;
