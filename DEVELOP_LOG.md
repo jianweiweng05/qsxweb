@@ -487,3 +487,27 @@ app/
 - ✅ 雷达图 6 轴对应 L1~L6，数值来自 macro_coef.breakdown 归一化
 - ✅ breakdown 分数改变时雷达形状随之改变
 - ✅ 断网/接口异常时显示错误态和"重试"
+
+## 2026-01-15: AI 页面 DeepSeek 接入 + Tab Bar 继承
+
+### 目标
+1. 确保 /ai 页面接入 DeepSeek，线上 Vercel 可正常问答
+2. 确保 /ai 页面底部有与其他页面一致的 Tab Bar
+
+### 新增文件
+1. `app/api/chat/route.ts`（32 行）- DeepSeek API 代理，读取 DEEPSEEK_BASE_URL/DEEPSEEK_API_KEY
+2. `app/(main)/ai/client.tsx`（65 行）- AI 问答客户端组件，支持 URL 参数预填问题
+
+### 修改文件
+1. `app/(main)/ai/page.tsx`（12 行）- 改为服务端组件 + force-dynamic，引入 AIClient
+
+### 技术实现
+- API Key 仅在服务端使用，客户端 fetch /api/chat 同源请求
+- 使用 Suspense 包裹 useSearchParams 避免预渲染错误
+- AI 页面已在 (main) 分组内，自动继承 layout.tsx 的 TabBar
+
+### 验收结果
+- ✅ /ai 页面底部有 Tab Bar（今日/雷达/报警/历史/AI/我的）
+- ✅ 问答功能：输入问题 → 服务端代理调用 DeepSeek → 返回回复
+- ✅ 浏览器 Network 中看不到 API Key
+- ✅ npm run build 通过
