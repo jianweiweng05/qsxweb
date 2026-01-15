@@ -625,3 +625,54 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ FREE 问"策略/点位/预警" → blocked + 订阅引导
 - ✅ VIP/PRO 问"今天 RR25+Funding 为什么背离" → LLM stream
 - ✅ npm run build 通过
+
+## 2026-01-16: 问答系统深度重构 - 前缀标识/防复读/软化拦截/智力门槛
+
+### 目标
+四维度深度重构问答系统：前缀区分、防复读、软化拦截、智力门槛升级。
+
+### 修改文件
+1. `app/lib/kb/terms.json`（+21 行）- 新增 sub_cancel/sub_upgrade/advantage 三条
+2. `app/lib/kb/rules.json`（改 2 条）- 软化 non_decomposable_policy/no_trade_instruction 话术
+3. `app/api/chat/route.ts`（+40 行）- 前缀/防复读/智力门槛/高价值标记
+
+### 核心改动
+
+#### 1. 前缀标识
+- KB 回答：`💡 [系统百科]\n{content}`
+- LLM 回答：`🧠 [AI 深度推演]\n{content}`（通过 SSE 流首包注入）
+
+#### 2. 防复读逻辑
+- 内存 Map 按 IP 追踪：`{ id: string, count: number }`
+- 连续 3 次命中同一 KB 条目 → 返回引导提示：
+  > "💡 [系统提示]：检测到重复提问。为了获取更深度的解答，请尝试结合两个层级指标提问（如：为什么 L1 走强但 L3 费率下降？），这将触发 AI 深度推演模式。"
+
+#### 3. 软化拦截话术
+- `non_decomposable_policy`：改为建议询问"L1 与 L3 逻辑背离"
+- `no_trade_instruction`：改为建议询问"Risk Cap 调整逻辑"
+- 兜底拦截：改为"建议包含 ≥2 个层级指标"
+
+#### 4. 智力门槛升级
+- 旧规则：`min_length=6 + (intent_words OR anchor_words)`
+- 新规则：`length≥15 + anchor_words≥2 + logic_words≥1`
+- LOGIC_WORDS：`["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑"]`
+- ANCHOR_WORDS：`["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"]`
+
+#### 5. 高价值标记
+- LLM 放行时返回 `{ type: "llm", is_high_value: true }`
+- 日志格式：`[chat] path=llm tier=PRO is_high_value=true`
+
+### 新增 KB 条目
+- `sub_cancel`：售后引导，提示 Stripe/MixPay 后台管理
+- `sub_upgrade`：销售引导，强调 USDT (MixPay) 极速开通
+- `advantage`：系统优势，引导体验 AI 深度推演
+
+### 验收结果
+- ✅ KB 回答带 `💡 [系统百科]` 前缀
+- ✅ LLM 回答带 `🧠 [AI 深度推演]` 前缀
+- ✅ 连续 3 次问同一问题 → 引导提示
+- ✅ 问"多少钱/订阅/优势" → 命中新 KB 条目
+- ✅ 问"为什么 L1 走强但 L3 费率下降" → LLM 放行（2 anchors + 1 logic）
+- ✅ 问"L1 怎么样" → 拦截（只有 1 anchor）
+- ✅ npm run build 通过
+

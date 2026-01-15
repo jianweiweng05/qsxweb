@@ -15,6 +15,11 @@ const KB_FILES: Record<string, KBItem[]> = {
 };
 
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
+const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑"];
+const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
+
+// Session-based repeat tracking (in-memory, per IP)
+const repeatTracker = new Map<string, { id: string; count: number }>();
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
@@ -49,9 +54,10 @@ function matchProKeyword(s: string): boolean {
 }
 
 function canUseLLM(s: string): boolean {
-  const { min_length, max_length, intent_words, anchor_words } = manifest.llm_config;
-  if (s.length < min_length || s.length > max_length) return false;
-  return intent_words.some(w => s.includes(w)) || anchor_words.some(w => s.includes(w));
+  // Require 2+ anchor words + 1+ logic word + length 15+
+  const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
+  const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
+  return s.length >= 15 && anchorCount >= 2 && hasLogic;
 }
 
 function isGreeting(s: string): boolean {
@@ -64,15 +70,32 @@ const MSG_INVALID = "请输入有效的市场问题（2-200字）。";
 type ClassifyResult =
   | { type: "blocked"; reason: string; text: string; upgrade_hint?: boolean }
   | { type: "kb"; text: string; source_id: string }
-  | { type: "llm" };
+  | { type: "llm"; is_high_value: boolean };
 
-function classifyQuery(q: string, tier: UserTier): ClassifyResult {
+function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
   const s = normalize(q);
   if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
   if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
 
   const kb = matchKB(s);
-  if (kb) return { type: "kb", text: kb.a, source_id: kb.id };
+  if (kb) {
+    // Anti-repeat logic
+    const tracker = repeatTracker.get(ip);
+    if (tracker && tracker.id === kb.id) {
+      tracker.count++;
+      if (tracker.count >= 3) {
+        repeatTracker.delete(ip);
+        return {
+          type: "blocked",
+          reason: "repeat",
+          text: "💡 [系统提示]：检测到重复提问。为了获取更深度的解答，请尝试结合两个层级指标提问（如：为什么 L1 走强但 L3 费率下降？），这将触发 AI 深度推演模式。",
+        };
+      }
+    } else {
+      repeatTracker.set(ip, { id: kb.id, count: 1 });
+    }
+    return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
+  }
 
   // FREE 永不调 LLM
   if (tier === "FREE") {
@@ -84,9 +107,14 @@ function classifyQuery(q: string, tier: UserTier): ClassifyResult {
   }
   // 检查 LLM 触发条件
   if (!canUseLLM(s)) {
-    return { type: "blocked", reason: "no_llm_match", text: "抱歉，该问题暂不支持 AI 深度分析。请尝试更具体的市场问题，或查阅知识库。", upgrade_hint: false };
+    return {
+      type: "blocked",
+      reason: "no_llm_match",
+      text: "💡 [系统提示]：当前提问过于模糊。建议在提问中包含 ≥2 个层级指标（如 L1+L5），AI 将自动为您开启深度逻辑推演。",
+      upgrade_hint: false,
+    };
   }
-  return { type: "llm" };
+  return { type: "llm", is_high_value: true };
 }
 
 const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏观分析。
@@ -95,11 +123,16 @@ const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏�
 2. 三条要点（每条必须引用具体字段名或层级，如 L3.RR25 / L3.funding / L2.etf.btc.us_netflow）
 3. 末尾固定："\n\nAI 分析仅基于当前数据，不构成投资建议。"`;
 
+function getIP(req: NextRequest): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
+}
+
 export async function POST(req: NextRequest) {
   const { message } = await req.json();
   const tier = getUserTier();
+  const ip = getIP(req);
 
-  const result = classifyQuery(message || "", tier);
+  const result = classifyQuery(message || "", tier, ip);
 
   if (result.type === "blocked") {
     console.log(`[chat] path=blocked tier=${tier} reason=${result.reason}`);
@@ -112,7 +145,7 @@ export async function POST(req: NextRequest) {
   }
 
   // LLM
-  console.log(`[chat] path=llm tier=${tier} reason=data_reasoning`);
+  console.log(`[chat] path=llm tier=${tier} is_high_value=${result.is_high_value}`);
   const apiKey = process.env.DEEPSEEK_API_KEY;
   const baseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
   if (!apiKey) {
@@ -137,7 +170,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ type: "blocked", text: "AI 服务暂时不可用" });
     }
 
-    return new Response(res.body, {
+    // Transform stream to add prefix
+    const reader = res.body.getReader();
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    let isFirst = true;
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            let chunk = decoder.decode(value, { stream: true });
+            if (isFirst) {
+              chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: "🧠 [AI 深度推演]\n" } }] })}\n\n${chunk}`;
+              isFirst = false;
+            }
+            controller.enqueue(encoder.encode(chunk));
+          }
+          controller.close();
+        } catch (e) {
+          controller.error(e);
+        }
+      },
+    });
+
+    return new Response(stream, {
       headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" },
     });
   } catch {
