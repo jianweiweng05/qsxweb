@@ -41,10 +41,20 @@ export default async function HistoryPage() {
           <div className="text-sm text-white/50 mb-2">历史相似性分析</div>
           <ProGate lockedMessage="历史相似性分析需要 Pro 订阅">
             <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              {similarity ? (
-                <pre className="text-sm text-white/70 whitespace-pre-wrap">{JSON.stringify(similarity, null, 2)}</pre>
+              {similarity?.note ? (
+                <div className="text-sm text-cyan-300/90">{similarity.note}</div>
               ) : (
                 <div className="text-white/50">暂无历史相似性数据</div>
+              )}
+              {similarity?.top && similarity.top.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {similarity.top.slice(0, 3).map((item: any, i: number) => (
+                    <div key={i} className="text-xs text-white/60 flex justify-between">
+                      <span>{item.label} ({item.date})</span>
+                      <span className="text-cyan-400 font-mono">{(item.score * 100).toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </ProGate>
