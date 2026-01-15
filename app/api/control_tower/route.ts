@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const res = await fetch('https://qsx-ai.onrender.com/macro/v1/control_tower/ui', {
+    const res = await fetch('https://qsx-ai.onrender.com/macro/v1/control_tower', {
       cache: 'no-store',
     });
 
