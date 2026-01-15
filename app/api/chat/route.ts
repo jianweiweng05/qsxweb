@@ -19,10 +19,14 @@ const LOGIC_WORDS = ["为什么","背离","关联","暗示","因果","影响","�
 // 文案
 const MSG = {
   invalid: "请输入有效的市场问题（2-200字）。",
-  upgrade_long: "该问题需要订阅后查看（VIP/PRO）。你也可以问：RR25/资金费率/多空比/ETF净流 是什么（这些可直接解答）。",
+  free_fallback: "我能回答：市场状态/仓位规则/指标定义/页面功能。更深的当日解读与策略在 VIP/PRO。你可以问：'今天市场状态？'或'仓位上限多少？'",
   upgrade_short: "该问题需订阅（VIP/PRO）。请前往 /pricing。",
   refine: "请用「2个指标 + 关系词」提问，例如：RR25 + Funding 为什么同向/背离？",
+  greeting: "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'今天市场状态？'或'仓位上限多少？'",
 };
+
+// 闲聊检测
+const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
 
 function getIP(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
@@ -65,6 +69,10 @@ function hasLogicWord(s: string): boolean {
   return LOGIC_WORDS.some(w => s.includes(w));
 }
 
+function isGreeting(s: string): boolean {
+  return GREETING_WORDS.some(w => s.includes(w));
+}
+
 function isDataReasoning(s: string): boolean {
   const n = s.length;
   if (n < 15 || n > 120) return false;
@@ -74,7 +82,7 @@ function isDataReasoning(s: string): boolean {
 }
 
 type ClassifyResult =
-  | { type: "blocked"; reason: string; text: string }
+  | { type: "blocked"; reason: string; text: string; upgrade_hint?: boolean }
   | { type: "kb"; text: string; id: string }
   | { type: "llm" };
 
@@ -86,20 +94,25 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
     return { type: "blocked", reason: "invalid", text: MSG.invalid };
   }
 
+  // A0.5 闲聊检测（所有 tier 都用固定回复）
+  if (isGreeting(s)) {
+    return { type: "blocked", reason: "greeting", text: MSG.greeting };
+  }
+
   // A2 KB 匹配（所有 tier）
   const kb = matchKB(s);
   if (kb) {
     return { type: "kb", text: kb.a, id: kb.id };
   }
 
-  // A1 FREE 额度与引导
+  // A1 FREE 用户：未命中 KB 则返回兜底（不调用 LLM）
   if (tier === "FREE") {
     const miss = freeMissMap.get(ip) || 0;
     freeMissMap.set(ip, miss + 1);
     if (miss >= 2) {
-      return { type: "blocked", reason: "upgrade_short", text: MSG.upgrade_short };
+      return { type: "blocked", reason: "upgrade_short", text: MSG.upgrade_short, upgrade_hint: true };
     }
-    return { type: "blocked", reason: "upgrade_long", text: MSG.upgrade_long };
+    return { type: "blocked", reason: "free_fallback", text: MSG.free_fallback, upgrade_hint: true };
   }
 
   // A3 VIP/PRO LLM 放行门槛
@@ -125,7 +138,7 @@ export async function POST(req: NextRequest) {
 
   if (result.type === "blocked") {
     console.log(`[chat] path=blocked tier=${tier} reason=${result.reason}`);
-    return NextResponse.json({ type: "blocked", text: result.text });
+    return NextResponse.json({ type: "blocked", text: result.text, upgrade_hint: result.upgrade_hint });
   }
 
   if (result.type === "kb") {

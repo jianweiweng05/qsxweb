@@ -3,7 +3,14 @@
 import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-const SUGGESTIONS = ["RR25 是什么？", "L3 层是什么？", "仓位规则"];
+const SUGGESTIONS = [
+  "今天市场状态一句话？",
+  "我现在建议仓位是多少？给上限%",
+  "L1-L6 哪一层最危险？为什么？",
+  "今天最重要的 3 个风险点？",
+  "有没有红色警报？如果没有，最接近的是哪项？",
+  "历史相似性 Top3 是什么？各自一句话意义",
+];
 
 function AIChat() {
   const searchParams = useSearchParams();
@@ -98,18 +105,20 @@ function AIChat() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex gap-2 mb-3 flex-wrap">
-        {SUGGESTIONS.map((s) => (
-          <button
-            key={s}
-            onClick={() => { setInput(s); handleAsk(s); }}
-            disabled={disabled}
-            className="px-3 py-1 text-xs rounded-full bg-white/10 hover:bg-white/20 transition disabled:opacity-50"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      {!reply && !input && (
+        <div className="flex gap-2 mb-3 flex-wrap">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              onClick={() => { setInput(s); handleAsk(s); }}
+              disabled={disabled}
+              className="px-3 py-1 text-xs rounded-full bg-white/10 hover:bg-white/20 transition disabled:opacity-50"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex-1 p-4 rounded-lg bg-white/5 border border-white/10 overflow-auto mb-4">
         {reply ? (
           <div>
