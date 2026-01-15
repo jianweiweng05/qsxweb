@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "QuantscopeX - AI-Powered Market Intelligence",
@@ -28,7 +22,7 @@ export default function RootLayout({
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <link rel="apple-touch-icon" href="/icon-192.png" />
         </head>
-        <body className={`${inter.variable} antialiased`}>{children}</body>
+        <body className="font-sans antialiased">{children}</body>
       </html>
     </ClerkProvider>
   );

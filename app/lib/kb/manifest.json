@@ -1,0 +1,43 @@
+{
+  "version": "3.0.0",
+  "system_name": "L1-L6 Macro Weather System",
+  "language": "zh-CN",
+  "kb_mode": "constitution_first",
+  "match_policy": {
+    "normalize": true,
+    "case_insensitive": true,
+    "max_query_len": 2000,
+    "max_hits": 1,
+    "priority_order": ["constitution", "rules", "terms", "templates"],
+    "fallback": "llm"
+  },
+  "pro_config": {
+    "intercept_message": "该问题涉及实战执行与深度研究输出（如实时预警、历史相似性推演或策略级解读）。\n此能力仅对订阅用户开放。升级后可解锁：当日 L1–L6 全量解读、风险预算细化、历史相似性深度与实时预警。",
+    "pro_keywords": [
+      "策略",
+      "策略建议",
+      "具体操作",
+      "买入",
+      "卖出",
+      "止盈",
+      "止损",
+      "目标价",
+      "点位",
+      "该不该买",
+      "该不该卖",
+      "什么时候平仓",
+      "带单",
+      "跟单",
+      "报警",
+      "预警",
+      "历史相似性推演",
+      "相似性推演"
+    ]
+  },
+  "llm_config": {
+    "min_length": 6,
+    "max_length": 2000,
+    "intent_words": ["今天", "当前", "最新", "为何", "怎么解读", "风险", "仓位", "相似性", "预警", "雷达", "现在"],
+    "anchor_words": ["l1", "l2", "l3", "l4", "l5", "l6", "macro", "rr25", "funding", "ls", "etf", "fgi", "hcri", "gamma", "risk_cap", "coef", "macrocoef"]
+  }
+}

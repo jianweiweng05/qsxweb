@@ -1,0 +1,18 @@
+{
+  "templates": [
+    {
+      "id": "similarity_short_over_80",
+      "cat": "Templates",
+      "triggers": ["相似度80", "相似度>80", "相似性80以上怎么写", "相似性模板"],
+      "q": "相似性 80%+ 的简短参考模板（言简意赅）",
+      "a": "相似性参考（仅形态参考，不代表方向或收益）：\n• 最高相似度：{max_sim_pct}%\n• 对应历史节点：{top1_name}（{top1_date}）\n• 当时背景标签：{top1_tags}\n• 参考含义：当前更像“{summary_phrase}”阶段，建议以风险预算为主，等待共振确认。\n（注：历史不代表未来）"
+    },
+    {
+      "id": "one_liner_market",
+      "cat": "Templates",
+      "triggers": ["一句话市场", "市场状态一句话", "一句话总结", "一句话解读"],
+      "q": "一句话市场状态模板",
+      "a": "当前属于“{macro_state}｜{stage}”环境：以{stance}为主，风险暴露上限以 Risk Cap 为准，等待 L1/L2/L3 出现更一致的共振信号。"
+    }
+  ]
+}

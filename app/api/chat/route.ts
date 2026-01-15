@@ -1,34 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserTier, UserTier } from "@/app/lib/entitlements";
-import faqData from "@/app/lib/knowledge_faq.json";
+import manifest from "@/app/lib/kb/manifest.json";
+import constitution from "@/app/lib/kb/constitution.json";
+import rules from "@/app/lib/kb/rules.json";
+import terms from "@/app/lib/kb/terms.json";
+import templates from "@/app/lib/kb/templates.json";
 
-// FREE miss 计数
-const freeMissMap = new Map<string, number>();
-
-// 锚点词表（按 group 分）
-const ANCHOR_GROUPS: Record<string, string[]> = {
-  L: ["l1","l2","l3","l4","l5","l6","宏观","资金","衍生品","链上","情绪","结构"],
-  D: ["rr25","skew","偏度","funding","资金费率","ls","多空比","oi","未平仓","基差","basis","liq","清算","gamma","vega"],
-  F: ["etf","净流","7dma","flow","资金流","dxy","vix","spx","ndx","us10y","gold","oil","liquidity","流动性"],
-  R: ["risk_cap","仓位","风控","风险上限","回撤","阈值","分层"],
+type KBItem = { id: string; triggers: string[]; a: string };
+const KB_FILES: Record<string, KBItem[]> = {
+  constitution: constitution.constitution,
+  rules: rules.rules,
+  terms: terms.terms,
+  templates: templates.templates,
 };
 
-// 逻辑词表
-const LOGIC_WORDS = ["为什么","背离","关联","暗示","因果","影响","说明","意味着","怎么解读","如何理解","冲突","共振","验证","确认"];
-
-// 文案
-const MSG = {
-  invalid: "请输入有效的市场问题（2-200字）。",
-  greeting: "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'今天市场状态？'或'仓位上限多少？'",
-  upgrade: "当前功能需要 PRO 才能查看完整分析。\n\n🎁 新用户可享受 3 天 PRO 免费试用（可随时取消，仅一次）。\n👉 立即开通：/pricing",
-};
-
-// 闲聊检测
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
-
-function getIP(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-}
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
@@ -47,74 +33,59 @@ function isInvalid(s: string): boolean {
 }
 
 function matchKB(s: string): { id: string; a: string } | null {
-  for (const item of faqData.faq) {
-    if (item.triggers.some((t: string) => s.includes(t.toLowerCase()))) {
-      return { id: item.id, a: item.a };
+  for (const cat of manifest.match_policy.priority_order) {
+    const items = KB_FILES[cat] || [];
+    for (const item of items) {
+      if (item.triggers.some((t: string) => s.includes(t.toLowerCase()))) {
+        return { id: item.id, a: item.a };
+      }
     }
   }
   return null;
 }
 
-function countAnchorGroups(s: string): number {
-  let count = 0;
-  for (const words of Object.values(ANCHOR_GROUPS)) {
-    if (words.some(w => s.includes(w))) count++;
-  }
-  return count;
+function matchProKeyword(s: string): boolean {
+  return manifest.pro_config.pro_keywords.some(k => s.includes(k.toLowerCase()));
 }
 
-function hasLogicWord(s: string): boolean {
-  return LOGIC_WORDS.some(w => s.includes(w));
+function canUseLLM(s: string): boolean {
+  const { min_length, max_length, intent_words, anchor_words } = manifest.llm_config;
+  if (s.length < min_length || s.length > max_length) return false;
+  return intent_words.some(w => s.includes(w)) || anchor_words.some(w => s.includes(w));
 }
 
 function isGreeting(s: string): boolean {
   return GREETING_WORDS.some(w => s.includes(w));
 }
 
-function isDataReasoning(s: string): boolean {
-  const n = s.length;
-  if (n < 15 || n > 120) return false;
-  if (countAnchorGroups(s) < 2) return false;
-  if (!hasLogicWord(s)) return false;
-  return true;
-}
+const MSG_GREETING = "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'RR25 是什么？'或'仓位规则'";
+const MSG_INVALID = "请输入有效的市场问题（2-200字）。";
 
 type ClassifyResult =
   | { type: "blocked"; reason: string; text: string; upgrade_hint?: boolean }
-  | { type: "kb"; text: string; id: string }
+  | { type: "kb"; text: string; source_id: string }
   | { type: "llm" };
 
-function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
+function classifyQuery(q: string, tier: UserTier): ClassifyResult {
   const s = normalize(q);
+  if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
+  if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
 
-  // A0 输入校验
-  if (isInvalid(s)) {
-    return { type: "blocked", reason: "invalid", text: MSG.invalid };
-  }
-
-  // A0.5 闲聊检测（所有 tier 都用固定回复）
-  if (isGreeting(s)) {
-    return { type: "blocked", reason: "greeting", text: MSG.greeting };
-  }
-
-  // A1 KB 匹配（所有 tier，100% 优先）
   const kb = matchKB(s);
-  if (kb) {
-    return { type: "kb", text: kb.a, id: kb.id };
-  }
+  if (kb) return { type: "kb", text: kb.a, source_id: kb.id };
 
-  // A2 非 PRO 用户：未命中 KB 则返回订阅引导（不调用 LLM）
-  if (tier !== "PRO") {
-    const miss = freeMissMap.get(ip) || 0;
-    freeMissMap.set(ip, miss + 1);
-    return { type: "blocked", reason: "upgrade", text: MSG.upgrade, upgrade_hint: true };
+  // FREE 永不调 LLM
+  if (tier === "FREE") {
+    return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
   }
-
-  // A3 PRO 用户：检查智力门槛
-  if (!isDataReasoning(s)) {
-    return { type: "blocked", reason: "upgrade", text: MSG.upgrade, upgrade_hint: true };
+  // VIP/PRO 检查 pro_keywords 拦截
+  if (matchProKeyword(s) && tier !== "PRO") {
+    return { type: "blocked", reason: "pro_only", text: manifest.pro_config.intercept_message, upgrade_hint: true };
   }
-
+  // 检查 LLM 触发条件
+  if (!canUseLLM(s)) {
+    return { type: "blocked", reason: "no_llm_match", text: "抱歉，该问题暂不支持 AI 深度分析。请尝试更具体的市场问题，或查阅知识库。", upgrade_hint: false };
+  }
   return { type: "llm" };
 }
 
@@ -127,9 +98,8 @@ const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏�
 export async function POST(req: NextRequest) {
   const { message } = await req.json();
   const tier = getUserTier();
-  const ip = getIP(req);
 
-  const result = classifyQuery(message || "", tier, ip);
+  const result = classifyQuery(message || "", tier);
 
   if (result.type === "blocked") {
     console.log(`[chat] path=blocked tier=${tier} reason=${result.reason}`);
@@ -137,8 +107,8 @@ export async function POST(req: NextRequest) {
   }
 
   if (result.type === "kb") {
-    console.log(`[chat] path=kb tier=${tier} reason=${result.id}`);
-    return NextResponse.json({ type: "kb", text: result.text });
+    console.log(`[chat] path=kb tier=${tier} source_id=${result.source_id}`);
+    return NextResponse.json({ type: "kb", text: result.text, source_id: result.source_id });
   }
 
   // LLM

@@ -588,3 +588,40 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ VIP/PRO 当日数据解读问题 → LLM 流式输出
 - ✅ 闲聊/无关问题 → 拦截
 - ✅ npm run build 通过
+
+## 2026-01-15: KB 拆分 5 文件 + FREE no-LLM 门禁
+
+### 目标
+将 KB 从单文件 knowledge_faq.json 升级为 5 文件架构，实现 KB-first、LLM-exception 策略。
+
+### 新增文件
+1. `app/lib/kb/manifest.json` - KB 配置：match_policy、pro_config、llm_config
+2. `app/lib/kb/constitution.json` - 系统宪法（5 条）
+3. `app/lib/kb/rules.json` - 运营规则（6 条）
+4. `app/lib/kb/terms.json` - 术语定义（17 条）
+5. `app/lib/kb/templates.json` - 输出模板（2 条）
+
+### 修改文件
+1. `app/api/chat/route.ts` - 接入 5 文件 KB，按 priority_order 匹配
+2. `app/layout.tsx` - 移除 Google Fonts 依赖（解决网络问题）
+
+### KB 匹配规则
+- 优先级：constitution → rules → terms → templates
+- 匹配方式：normalize + case_insensitive + triggers 包含
+- 命中即返回，不调用 LLM
+
+### LLM 门禁规则
+- FREE 用户：永不调用 LLM，KB 未命中返回订阅引导
+- VIP 用户：pro_keywords 命中则拦截，否则检查 llm_config
+- PRO 用户：检查 llm_config（min_length/max_length/intent_words/anchor_words）
+
+### 返回结构
+```json
+{ "type": "kb"|"llm"|"blocked", "text": "...", "source_id?": "..." }
+```
+
+### 验收结果
+- ✅ 问"RR25 是什么/L3 是什么/仓位规则" → KB 秒回
+- ✅ FREE 问"策略/点位/预警" → blocked + 订阅引导
+- ✅ VIP/PRO 问"今天 RR25+Funding 为什么背离" → LLM stream
+- ✅ npm run build 通过
