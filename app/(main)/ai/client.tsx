@@ -12,7 +12,9 @@ function AIChat() {
   const [reply, setReply] = useState("");
   const [replyType, setReplyType] = useState<"kb" | "llm" | "blocked" | "upgrade" | "">("");
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -46,6 +48,8 @@ function AIChat() {
       // 流式响应 (LLM)
       if (contentType.includes("text/event-stream") && res.body) {
         setReplyType("llm");
+        setInput("");
+        setStreaming(true);
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
@@ -55,7 +59,6 @@ function AIChat() {
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
 
-          // 解析 SSE
           const lines = buffer.split("\n");
           buffer = lines.pop() || "";
 
@@ -71,51 +74,43 @@ function AIChat() {
             }
           }
         }
+        setStreaming(false);
+        inputRef.current?.focus();
       } else {
         // JSON 响应 (KB/blocked/upgrade)
         const data = await res.json();
         setReplyType(data.type || "blocked");
         setReply(data.text || "请求失败");
+        setInput("");
+        inputRef.current?.focus();
       }
     } catch (e) {
       if ((e as Error).name !== "AbortError") {
         setReply("网络错误");
         setReplyType("blocked");
+        // 出错不清空输入
       }
     }
     setLoading(false);
   }
 
+  const disabled = loading || streaming;
+
   return (
-    <>
+    <div className="flex flex-col h-full">
       <div className="flex gap-2 mb-3 flex-wrap">
         {SUGGESTIONS.map((s) => (
           <button
             key={s}
             onClick={() => { setInput(s); handleAsk(s); }}
-            className="px-3 py-1 text-xs rounded-full bg-white/10 hover:bg-white/20 transition"
+            disabled={disabled}
+            className="px-3 py-1 text-xs rounded-full bg-white/10 hover:bg-white/20 transition disabled:opacity-50"
           >
             {s}
           </button>
         ))}
       </div>
-      <div className="flex gap-2 mb-4">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-          placeholder="输入问题..."
-          className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm"
-        />
-        <button
-          onClick={() => handleAsk()}
-          disabled={loading || !input.trim()}
-          className="px-4 py-2 rounded-lg bg-blue-600 text-sm disabled:opacity-50"
-        >
-          {loading ? "..." : "发送"}
-        </button>
-      </div>
-      <div className="flex-1 p-4 rounded-lg bg-white/5 border border-white/10 overflow-auto">
+      <div className="flex-1 p-4 rounded-lg bg-white/5 border border-white/10 overflow-auto mb-4">
         {reply ? (
           <div>
             <pre className="text-sm text-white/80 whitespace-pre-wrap">{reply}</pre>
@@ -132,7 +127,26 @@ function AIChat() {
           <div className="text-sm text-white/40">AI 回复将显示在这里</div>
         )}
       </div>
-    </>
+      <div className="relative">
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAsk(); } }}
+          placeholder="输入问题..."
+          disabled={disabled}
+          rows={2}
+          className="w-full px-3 py-3 pr-16 rounded-lg bg-white/10 border border-white/20 text-sm resize-none disabled:opacity-50"
+        />
+        <button
+          onClick={() => handleAsk()}
+          disabled={disabled || !input.trim()}
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-md bg-blue-600 text-xs disabled:opacity-50"
+        >
+          {loading ? "..." : "发送"}
+        </button>
+      </div>
+    </div>
   );
 }
 
