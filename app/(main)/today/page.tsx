@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { VIPGate, ProGate } from "@/app/lib/gate";
+import { AIInput } from "./ai-input";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,8 @@ export default async function TodayPage() {
             查看数据
           </Link>
         </div>
+
+        <AIInput />
       </div>
 
       {/* B) AI 解读 - VIP+ */}
