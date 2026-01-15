@@ -9,6 +9,7 @@ const tabs = [
   { key: "/alerts", title: "报警", icon: "🔔" },
   { key: "/history", title: "历史", icon: "📜" },
   { key: "/ai", title: "AI", icon: "🤖" },
+  { key: "/account", title: "我的", icon: "👤" },
 ];
 
 function mapActiveKey(pathname: string): string {
