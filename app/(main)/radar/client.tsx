@@ -335,7 +335,7 @@ export default function RadarClient() {
       badge: { label: '', color: 'green' as const },
       metrics: ctLayer.items
         .filter(item => {
-          const name = item.display_name?.toLowerCase() || '';
+          const name = item.display_name || '';
           return !name.includes('观望') && !name.includes('结构') && !name.includes('震荡');
         })
         .map(item => ({
