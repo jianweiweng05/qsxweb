@@ -19,7 +19,7 @@ const KB_FILES: Record<string, KBItem[]> = {
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
 const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
-const STATUS_WORDS = ["现在", "当前", "今天", "市场", "风险", "仓位", "还能不能", "适合", "观望", "加仓", "减仓", "短线", "波段", "满仓", "轻仓", "防守", "进攻", "参与", "大不大", "高不高", "怎么控制", "怎么样", "状态"];
+const DECISION_WORDS = ["怎么办", "能不能", "要不要", "可以吗", "适合", "应该", "仓位", "风险", "短线", "波段", "观望", "昨天", "持续", "状态", "市场", "行情", "大跌", "加仓", "减仓", "满仓", "轻仓", "防守", "进攻"];
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
@@ -37,17 +37,6 @@ function isInvalid(s: string): boolean {
 }
 
 function matchKB(s: string): { id: string; a: string } | null {
-  // 状态类问题优先匹配 status KB
-  const statusCount = STATUS_WORDS.filter(w => s.includes(w)).length;
-  if (statusCount >= 1) {
-    for (const item of KB_FILES.status || []) {
-      for (const t of item.triggers) {
-        if (s.includes(t.toLowerCase())) {
-          return { id: item.id, a: item.a };
-        }
-      }
-    }
-  }
   // 优先精确匹配（完整词）
   for (const cat of manifest.match_policy.priority_order) {
     const items = KB_FILES[cat] || [];
@@ -74,21 +63,31 @@ function matchKB(s: string): { id: string; a: string } | null {
   return null;
 }
 
+function matchStatusKB(s: string): { id: string; a: string } | null {
+  for (const item of KB_FILES.status || []) {
+    for (const t of item.triggers) {
+      if (s.includes(t.toLowerCase())) {
+        return { id: item.id, a: item.a };
+      }
+    }
+  }
+  return null;
+}
+
 function matchProKeyword(s: string): boolean {
   return manifest.pro_config.pro_keywords.some(k => s.includes(k.toLowerCase()));
 }
 
-function isStatusIntent(s: string): boolean {
-  const statusCount = STATUS_WORDS.filter(w => s.includes(w)).length;
-  return statusCount >= 2;
+function isDecisionIntent(s: string): boolean {
+  return DECISION_WORDS.some(w => s.includes(w));
 }
 
 function canUseLLM(s: string): boolean {
-  // 状态类问题放宽门槛：只需 1 个状态词 + 长度 ≥ 6
-  if (isStatusIntent(s) && [...s].length >= 6) {
+  // 裁决类问题放宽门槛：只需长度 ≥ 6
+  if (isDecisionIntent(s) && [...s].length >= 6) {
     return true;
   }
-  // 非状态类：严格门槛 2+ anchor + 1+ logic + 12+ chars
+  // 非裁决类：严格门槛 2+ anchor + 1+ logic + 12+ chars
   const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
   const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
   const charCount = [...s].length;
@@ -117,13 +116,21 @@ function classifyQuery(q: string, tier: UserTier): ClassifyResult {
   if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
   if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
 
-  // 1. KB 优先 - 简单问题直接答
+  // 1. 裁决短路：裁决意图优先匹配 status KB
+  if (isDecisionIntent(s)) {
+    const statusKb = matchStatusKB(s);
+    if (statusKb) {
+      return { type: "kb", text: statusKb.a, source_id: statusKb.id };
+    }
+  }
+
+  // 2. 通用 KB 匹配
   const kb = matchKB(s);
   if (kb) {
     return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
   }
 
-  // 2. KB 未命中，检查是否满足 LLM 深度分析条件
+  // 3. 裁决意图但 status KB 未命中 → LLM 放行（门槛已放宽）
   if (canUseLLM(s)) {
     if (tier === "FREE") {
       return { type: "blocked", reason: "upgrade", text: manifest.pro_config.intercept_message, upgrade_hint: true };
@@ -134,7 +141,7 @@ function classifyQuery(q: string, tier: UserTier): ClassifyResult {
     return { type: "llm", is_high_value: true };
   }
 
-  // 3. 兜底 - 友好引导
+  // 4. 兜底 - 友好引导
   return {
     type: "blocked",
     reason: "no_match",

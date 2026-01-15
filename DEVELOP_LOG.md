@@ -719,3 +719,52 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ 非状态类问题保持原有严格门槛
 - ✅ 输出不含 HCRI/coef/锚 等内部词
 
+## 2026-01-16: 裁决类问题短路优化 + DECISION_WORDS 门槛放宽
+
+### 问题
+状态类问题（怎么办/能不能/仓位/风险/短线/观望）被挡或乱跳百科/会员提示。
+
+### 修改文件
+1. `app/lib/kb/status.json`（扩展 triggers + 四行裁决格式）
+2. `app/api/chat/route.ts`（+15 行）- DECISION_WORDS + 裁决短路 + matchStatusKB
+
+### 核心改动
+
+#### 1. DECISION_WORDS 关键词（≥1 即为裁决意图）
+```
+怎么办、能不能、要不要、可以吗、适合、应该、仓位、风险、短线、波段、观望、昨天、持续、状态、市场、行情、大跌、加仓、减仓、满仓、轻仓、防守、进攻
+```
+
+#### 2. 裁决短路逻辑
+- `isDecisionIntent(s)` 命中 ≥1 个 DECISION_WORD → 优先匹配 status KB
+- status KB 命中 → 直接返回四行裁决（不带 💡 前缀）
+- status KB 未命中 → 走 LLM（门槛已放宽：裁决意图只需长度 ≥6）
+
+#### 3. status.json 扩展 triggers
+- `market_status`：+状态是什么、行情怎么样
+- `risk_now`：+风险是什么
+- `position_now`：+仓位应该
+- `can_trade`：+可以做短线、短线吗、观望吗、怎么办、行情这么差
+- `compare_yesterday`：+会持续多久、一般会持续
+
+#### 4. 四行裁决格式（【原因】替代【风险提示】，允许 L1/L2/L3）
+```
+【市场状态】...
+【风险等级】...
+【仓位建议】≤N%
+【原因】L1/L2/L3 相关解释
+```
+
+### 验收结果（8 问题全部通过）
+- ✅ 现在市场状态是什么？ → 命中 market_status
+- ✅ 当前最大的风险是什么？ → 命中 risk_now
+- ✅ 现在仓位应该怎么控制？ → 命中 position_now
+- ✅ 现在行情这么差，怎么办？ → 命中 can_trade
+- ✅ 我今天可以做短线吗？ → 命中 can_trade
+- ✅ 现在适合观望吗？ → 命中 can_trade
+- ✅ 和昨天相比有变化吗？ → 命中 compare_yesterday
+- ✅ 这种情况一般会持续多久？ → 命中 compare_yesterday
+- ✅ 回答均为四行裁决格式
+- ✅ 输出不含 HCRI/coef/锚/Anchor/MacroCoef/Gate 等内部词
+- ✅ npm run build 通过
+
