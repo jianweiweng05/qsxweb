@@ -133,11 +133,26 @@ function classifyQuery(q: string, tier: UserTier, ip: string): ClassifyResult {
   if (matchProKeyword(s) && tier !== "PRO") {
     return { type: "blocked", reason: "pro_only", text: manifest.pro_config.intercept_message, upgrade_hint: true };
   }
-  // 兵底拦截
+  // 兵底拦截 - 动态钩子引导
+  const detectedAnchor = ANCHOR_WORDS.find(w => s.includes(w));
+  const suggestions = [
+    { anchor: "l1", example: "为什么 L1 走强但 L3 费率下降？" },
+    { anchor: "l2", example: "L2 资金流与 L5 情绪的背离暗示了什么？" },
+    { anchor: "l3", example: "当前 L3 费率与 L1 环境的关联如何？" },
+    { anchor: "l4", example: "L4 链上成本与 L2 资金流的逻辑是什么？" },
+    { anchor: "l5", example: "L5 情绪与 L3 杠杆的背离意味着什么？" },
+    { anchor: "l6", example: "L6 结构与 L1 宏观的共振如何影响 Risk Cap？" },
+    { anchor: "rr25", example: "RR25 与 L3 费率的背离暗示了什么？" },
+    { anchor: "gamma", example: "当前 Gamma 释放状态对 Risk Cap 有何影响？" },
+    { anchor: "funding", example: "Funding 与 L2 资金流的逻辑关联是什么？" },
+    { anchor: "risk_cap", example: "Risk Cap 调整与 L1+L3 的逻辑是什么？" },
+  ];
+  const matched = suggestions.find(s => s.anchor === detectedAnchor);
+  const exampleText = matched ? matched.example : "为什么 L1 走强但 L3 费率下降？";
   return {
     type: "blocked",
     reason: "no_llm_match",
-    text: "💡 [系统提示]：当前提问过于模糊。建议在提问中包含 ≥2 个层级指标（如 L1+L5），AI 将自动为您开启深度逻辑推演。",
+    text: `💡 [系统提示]：检测到您在关注 ${detectedAnchor ? detectedAnchor.toUpperCase() : "单一指标"}。建议尝试更具深度的逻辑提问以触发 AI：\n\n"${exampleText}"`,
     upgrade_hint: false,
   };
 }
