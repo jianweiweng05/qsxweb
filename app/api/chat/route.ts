@@ -15,7 +15,7 @@ const KB_FILES: Record<string, KBItem[]> = {
 };
 
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
-const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑"];
+const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
 const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
 
 // Session-based repeat tracking (in-memory, per IP)
@@ -71,7 +71,14 @@ function canUseLLM(s: string): boolean {
   // Require 2+ anchor words + 1+ logic word + length 12+
   const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
   const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
-  return s.length >= 12 && anchorCount >= 2 && hasLogic;
+  const charCount = [...s].length;  // Use character count for proper Chinese support
+
+  // Quality check: reject queries with 5+ indicators but no specific context
+  if (anchorCount >= 5 && !s.match(/\d+|具体|当前|现在|如果/)) {
+    return false;  // Low-quality indicator stacking
+  }
+
+  return charCount >= 12 && anchorCount >= 2 && hasLogic;
 }
 
 function isGreeting(s: string): boolean {
