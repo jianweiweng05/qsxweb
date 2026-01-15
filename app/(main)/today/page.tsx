@@ -13,7 +13,7 @@ export default async function TodayPage() {
   }
 
   // A) Hero 字段
-  const macroState = payload?.macro_state || "暂无数据";
+  const weatherTitle = payload?.weather?.title || "暂无数据";
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : "暂无数据";
@@ -26,10 +26,7 @@ export default async function TodayPage() {
   const bearish = payload?.ai_json?.collision?.bearish_2 || [];
   const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
-  // C) L1-L6 数据速览 - 优先用 ui.layers
-  const layers = payload?.ui?.layers || payload?.layers || [];
-
-  // D) 策略建议 - 使用 pro_strategy_text 字段
+  // C) 策略建议 - 使用 pro_strategy_text 字段
   const proStrategyText = payload?.pro_strategy_text;
 
   const badgeColorMap: Record<string, string> = {
@@ -46,7 +43,7 @@ export default async function TodayPage() {
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="text-xs text-white/40">市场状态</div>
-            <div className="text-2xl font-bold text-red-400">{macroState}</div>
+            <div className="text-2xl font-bold text-red-400">{weatherTitle}</div>
           </div>
           <div className="text-right text-xs text-white/50">
             <div>更新时间</div>
@@ -69,40 +66,19 @@ export default async function TodayPage() {
 
         <div className="grid grid-cols-2 gap-3">
           <Link
-            href="/radar"
+            href="/alerts"
             className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition"
           >
             查看风险
           </Link>
           <Link
-            href="/history"
+            href="/radar"
             className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition"
           >
             查看数据
           </Link>
         </div>
       </div>
-
-      {/* C) L1-L6 数据速览 - FREE 可见 */}
-      {layers.length > 0 && (
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
-          <div className="text-sm font-semibold mb-3">数据速览</div>
-          <div className="grid grid-cols-2 gap-2">
-            {layers.map((layer: any) => {
-              const color = layer.badge?.color || layer.badge?.level || "gray";
-              const label = layer.badge?.label || color;
-              return (
-                <div key={layer.key} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
-                  <span className="text-sm text-white/70">{layer.title}</span>
-                  <span className={`px-2 py-0.5 text-xs rounded border ${badgeColorMap[color] || badgeColorMap.gray}`}>
-                    {label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* B) AI 解读 - VIP+ */}
       <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
@@ -139,7 +115,7 @@ export default async function TodayPage() {
         </VIPGate>
       </div>
 
-      {/* D) 策略建议 - PRO */}
+      {/* C) 策略建议 - PRO */}
       <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold">策略建议</span>
