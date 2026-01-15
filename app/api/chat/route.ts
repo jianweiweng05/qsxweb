@@ -7,7 +7,7 @@ const rateLimitMap = new Map<string, number>();
 const RATE_LIMITS: Record<UserTier, number> = { FREE: 10000, VIP: 3000, PRO: 1000 };
 
 // PRO 专属关键词
-const PRO_KEYWORDS = faqData.pro_keywords;
+const PRO_KEYWORDS = faqData.pro_config.pro_keywords;
 
 // 获取客户端 IP
 function getClientIP(req: NextRequest): string {
