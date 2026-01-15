@@ -18,7 +18,7 @@ export default async function TodayPage() {
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : "暂无数据";
   const riskCap = payload?.risk_cap != null ? Math.round(payload.risk_cap * 100 * 10) / 10 : null;
-  const regimeLabel = payload?.ai_json?.regime_label || payload?.macro?.macro_coef?.regime || "暂无数据";
+  const gammaTitle = payload?.gamma?.title || "暂无数据";
 
   // B) AI 解读
   const oneLiner = payload?.ai_json?.one_liner || "暂无数据";
@@ -59,8 +59,14 @@ export default async function TodayPage() {
             </div>
           </div>
           <div className="p-3 rounded-lg bg-white/5">
-            <div className="text-xs text-white/50 mb-1">风险状态</div>
-            <div className="text-xl font-bold text-yellow-400">{regimeLabel}</div>
+            <div className="flex items-center gap-1 text-xs text-white/50 mb-1">
+              <span>波动状态</span>
+              <span className="text-[10px] text-purple-400">(Gamma视角)</span>
+              <span className="px-1 py-0.5 text-[8px] rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">PRO</span>
+            </div>
+            <ProGate lockedMessage="升级 Pro 查看">
+              <div className="text-xl font-bold text-yellow-400">{gammaTitle}</div>
+            </ProGate>
           </div>
         </div>
 
