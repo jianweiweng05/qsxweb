@@ -714,6 +714,8 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ "当前最大的风险是什么？" → 命中 risk_now
 - ✅ "现在仓位应该怎么控制？" → 命中 position_now
 - ✅ "现在适合做短线吗？" → 命中 can_trade
+- ✅ "和昨天相比有变化吗？" → 命中 compare_yesterday
+- ✅ 回答均为固定四行模板（市场状态/风险等级/仓位建议/风险提示）
 - ✅ 非状态类问题保持原有严格门槛
-- ✅ 不暴露内部指标名（HCRI/coef 等）
+- ✅ 输出不含 HCRI/coef/锚 等内部词
 
