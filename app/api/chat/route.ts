@@ -5,6 +5,7 @@ import constitution from "@/app/lib/kb/constitution.json";
 import rules from "@/app/lib/kb/rules.json";
 import terms from "@/app/lib/kb/terms.json";
 import templates from "@/app/lib/kb/templates.json";
+import status from "@/app/lib/kb/status.json";
 
 type KBItem = { id: string; triggers: string[]; a: string };
 const KB_FILES: Record<string, KBItem[]> = {
@@ -12,11 +13,13 @@ const KB_FILES: Record<string, KBItem[]> = {
   rules: rules.rules,
   terms: terms.terms,
   templates: templates.templates,
+  status: status.status,
 };
 
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
 const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
+const STATUS_WORDS = ["现在", "当前", "今天", "市场", "风险", "仓位", "还能不能", "适合", "观望", "加仓", "减仓", "短线", "波段", "满仓", "轻仓", "防守", "进攻", "参与", "大不大", "高不高", "怎么控制", "怎么样", "状态"];
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
@@ -34,6 +37,17 @@ function isInvalid(s: string): boolean {
 }
 
 function matchKB(s: string): { id: string; a: string } | null {
+  // 状态类问题优先匹配 status KB
+  const statusCount = STATUS_WORDS.filter(w => s.includes(w)).length;
+  if (statusCount >= 1) {
+    for (const item of KB_FILES.status || []) {
+      for (const t of item.triggers) {
+        if (s.includes(t.toLowerCase())) {
+          return { id: item.id, a: item.a };
+        }
+      }
+    }
+  }
   // 优先精确匹配（完整词）
   for (const cat of manifest.match_policy.priority_order) {
     const items = KB_FILES[cat] || [];
@@ -64,15 +78,23 @@ function matchProKeyword(s: string): boolean {
   return manifest.pro_config.pro_keywords.some(k => s.includes(k.toLowerCase()));
 }
 
+function isStatusIntent(s: string): boolean {
+  const statusCount = STATUS_WORDS.filter(w => s.includes(w)).length;
+  return statusCount >= 2;
+}
+
 function canUseLLM(s: string): boolean {
-  // Require 2+ anchor words + 1+ logic word + length 12+
+  // 状态类问题放宽门槛：只需 1 个状态词 + 长度 ≥ 6
+  if (isStatusIntent(s) && [...s].length >= 6) {
+    return true;
+  }
+  // 非状态类：严格门槛 2+ anchor + 1+ logic + 12+ chars
   const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
   const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
-  const charCount = [...s].length;  // Use character count for proper Chinese support
+  const charCount = [...s].length;
 
-  // Quality check: reject queries with 5+ indicators but no specific context
   if (anchorCount >= 5 && !s.match(/\d+|具体|当前|现在|如果/)) {
-    return false;  // Low-quality indicator stacking
+    return false;
   }
 
   return charCount >= 12 && anchorCount >= 2 && hasLogic;

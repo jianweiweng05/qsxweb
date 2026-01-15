@@ -676,3 +676,44 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ 问"L1 怎么样" → 拦截（只有 1 anchor）
 - ✅ npm run build 通过
 
+## 2026-01-16: 状态类问题 KB 扩展 + LLM 门槛放宽
+
+### 目标
+让"市场状态/风险/仓位"类问题不被挡，80% 以上可直接回答。
+
+### 新增文件
+1. `app/lib/kb/status.json`（5 条）- 状态类 KB，覆盖市场状态/风险/仓位/交易方式/趋势对比
+
+### 修改文件
+1. `app/api/chat/route.ts`（+15 行）- 新增 STATUS_WORDS + isStatusIntent() + status KB 优先匹配
+
+### 核心改动
+
+#### 1. 新增 status.json KB
+- `market_status`：市场状态类问题（偏多偏空/牛熊/反弹下跌）
+- `risk_now`：风险类问题（风险大不大/会不会大跌/最怕什么）
+- `position_now`：仓位类问题（仓位怎么控制/满仓/加仓减仓）
+- `can_trade`：交易方式类问题（适合短线/波段/观望）
+- `compare_yesterday`：趋势对比类问题（和昨天比/持续多久/历史阶段）
+
+#### 2. STATUS_WORDS 关键词
+```
+现在、当前、今天、市场、风险、仓位、还能不能、适合、观望、加仓、减仓、短线、波段、满仓、轻仓、防守、进攻、参与、大不大、高不高、怎么控制、怎么样、状态
+```
+
+#### 3. isStatusIntent() 逻辑
+- 命中 ≥2 个 STATUS_WORDS → 识别为状态类问题
+- 状态类问题 LLM 门槛放宽：只需长度 ≥6（不要求锚点词/逻辑词）
+
+#### 4. matchKB() 优先级调整
+- 状态类问题（≥1 个 STATUS_WORD）优先匹配 status KB
+- 其他问题按原有 priority_order 匹配
+
+### 验收结果
+- ✅ "现在市场状态是什么？" → 命中 market_status
+- ✅ "当前最大的风险是什么？" → 命中 risk_now
+- ✅ "现在仓位应该怎么控制？" → 命中 position_now
+- ✅ "现在适合做短线吗？" → 命中 can_trade
+- ✅ 非状态类问题保持原有严格门槛
+- ✅ 不暴露内部指标名（HCRI/coef 等）
+
