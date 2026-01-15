@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
+const SUGGESTIONS = ["RR25 是什么？", "L3 层是什么？", "仓位建议规则"];
+
 function AIChat() {
   const searchParams = useSearchParams();
   const [input, setInput] = useState("");
@@ -29,7 +31,7 @@ function AIChat() {
         body: JSON.stringify({ message }),
       });
       const data = await res.json();
-      setReply(data.reply || data.error || "请求失败");
+      setReply(data.text || "请求失败");
     } catch {
       setReply("网络错误");
     }
@@ -38,6 +40,17 @@ function AIChat() {
 
   return (
     <>
+      <div className="flex gap-2 mb-3 flex-wrap">
+        {SUGGESTIONS.map((s) => (
+          <button
+            key={s}
+            onClick={() => { setInput(s); handleAsk(s); }}
+            className="px-3 py-1 text-xs rounded-full bg-white/10 hover:bg-white/20 transition"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-2 mb-4">
         <input
           value={input}

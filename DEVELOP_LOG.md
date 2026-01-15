@@ -511,3 +511,34 @@ app/
 - ✅ 问答功能：输入问题 → 服务端代理调用 DeepSeek → 返回回复
 - ✅ 浏览器 Network 中看不到 API Key
 - ✅ npm run build 通过
+
+## 2026-01-15: AI 问答升级 - 服务端 Gate + 知识库优先 + LLM 兜底
+
+### 目标
+将 /ai 问答升级为"优先知识库直答，否则调用 DeepSeek"，权限/限流在服务端生效。
+
+### 新增文件
+1. `app/lib/knowledge_faq.json`（55 行）- 本地知识库，含 L1-L6 解释、RR25、仓位规则、免责声明等
+
+### 修改文件
+1. `app/api/chat/route.ts`（119 行，+85）- 服务端 Gate + KB 匹配 + LLM 兜底
+2. `app/(main)/ai/client.tsx`（85 行，+10）- 添加推荐问题 chips，适配新返回格式
+
+### 服务端 Gate 逻辑
+1. **输入校验**：空/过长(>2000字) → blocked
+2. **频率限制**：FREE 10s/次，VIP 3s/次，PRO 1s/次（内存 Map，key=IP）
+3. **PRO 专属拦截**：命中"策略/报警/历史相似"等关键词且非 PRO → blocked
+4. **知识库匹配**：关键词命中 → 直接返回 KB 答案
+5. **LLM 兜底**：DeepSeek 调用，注入系统提示词（禁止编造、禁止指令性建议、强制免责）
+
+### 返回结构
+```json
+{ "type": "blocked"|"kb"|"llm", "text": "...", "reason?": "..." }
+```
+
+### 验收结果
+- ✅ FREE 问"策略建议" → 服务端拦截，提示升级
+- ✅ 问"RR25 是什么" → 命中知识库直答
+- ✅ 其他问题 → DeepSeek 流式输出
+- ✅ 服务端日志可见 blocked/kb/llm 三种路径
+- ✅ npm run build 通过
