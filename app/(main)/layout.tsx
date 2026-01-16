@@ -1,13 +1,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, Radar, Bell, Clock, Bot, User } from "lucide-react";
+import { Activity, Radar, Bell, Wrench, Bot, User } from "lucide-react";
 
 const tabs = [
   { key: "/today", title: "今日", Icon: Activity },
   { key: "/radar", title: "雷达", Icon: Radar },
   { key: "/alerts", title: "报警", Icon: Bell },
-  { key: "/history", title: "历史", Icon: Clock },
+  { key: "/toolbox", title: "工具箱", Icon: Wrench },
   { key: "/ai", title: "AI", Icon: Bot },
   { key: "/account", title: "我的", Icon: User },
 ];

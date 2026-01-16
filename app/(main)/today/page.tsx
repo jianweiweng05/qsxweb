@@ -31,9 +31,6 @@ export default async function TodayPage() {
   const bearish = payload?.ai_json?.collision?.bearish_2 || [];
   const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
-  // C) 策略建议
-  const proStrategyText = payload?.pro_strategy_text;
-
   return (
     <div className="py-6 pb-24 text-white">
       {/* Header */}
@@ -158,35 +155,6 @@ export default async function TodayPage() {
         </div>
       )}
 
-      {/* 策略建议 - 最底部，视觉权重最低 */}
-      <div className="rounded-lg bg-white/4 border border-white/8 p-4 mt-8">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-white/50">策略建议</span>
-          <span className="px-1.5 py-0.5 text-[9px] rounded bg-white/5 text-white/40 border border-white/10">
-            PRO
-          </span>
-        </div>
-        <ProGate
-          lockedMessage="升级 Pro 解锁策略建议"
-          unlockConfig={{
-            title: "专业策略建议",
-            description: "基于实时市场数据和历史模式，为您提供可执行的交易策略建议。",
-            features: [
-              "每日策略方向指引",
-              "关键支撑阻力位分析",
-              "风险控制建议"
-            ]
-          }}
-        >
-          {proStrategyText ? (
-            <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono leading-relaxed">
-              {proStrategyText}
-            </pre>
-          ) : (
-            <div className="text-xs text-white/40">暂无在线策略输出</div>
-          )}
-        </ProGate>
-      </div>
     </div>
   );
 }
