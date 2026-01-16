@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { VIPGate, ProGate } from "@/app/lib/gate";
 import { AIInput } from "./ai-input";
@@ -43,134 +42,115 @@ export default async function TodayPage() {
         <span className="text-xs text-white/40">{generatedAt}</span>
       </div>
 
-      {/* KPI Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        {/* 建议仓位 */}
-        <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/30">
-          <div className="text-xs text-white/50 mb-1">建议仓位</div>
+      {/* KPI Row - 第一屏：3块等高等宽，只有建议仓位高亮 */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+        {/* 市场状态 */}
+        <div className="p-5 rounded-lg bg-white/5 border border-white/10">
+          <div className="text-xs text-white/40 mb-2">市场状态</div>
+          <div className="text-2xl font-semibold text-white/90">
+            {weatherTitle}
+          </div>
+        </div>
+
+        {/* 建议仓位 - 唯一高亮 */}
+        <div className="p-5 rounded-lg bg-cyan-500/15 border border-cyan-500/30">
+          <div className="text-xs text-white/50 mb-2">建议仓位</div>
           <div className="text-3xl font-bold text-cyan-400">
             {riskCap != null ? `≤ ${riskCap}%` : "—"}
           </div>
         </div>
 
-        {/* 市场状态 */}
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-          <div className="text-xs text-white/50 mb-1">市场状态</div>
-          <div className="text-2xl font-semibold text-red-400">
-            {weatherTitle}
-          </div>
-        </div>
-
         {/* 波动状态 */}
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-          <div className="flex items-center gap-1.5 text-xs text-white/50 mb-1">
+        <div className="p-5 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
             <span>波动状态</span>
-            <span className="text-[10px] text-purple-400/70">(Gamma)</span>
-            <span className="px-1 py-0.5 text-[8px] rounded bg-purple-500/20 text-purple-400/80 border border-purple-500/20">
+            <span className="text-[9px] text-white/30">(Gamma)</span>
+            <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
               PRO
             </span>
           </div>
           <ProGate lockedMessage="升级 Pro 查看">
-            <div className="text-2xl font-semibold text-yellow-400">
+            <div className="text-2xl font-semibold text-white/90">
               {gammaTitle}
             </div>
           </ProGate>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="grid grid-cols-2 gap-3 mb-10">
-        <Link
-          href="/alerts"
-          className="flex items-center justify-center py-3 rounded-lg bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition"
-        >
-          查看风险
-        </Link>
-        <Link
-          href="/radar"
-          className="flex items-center justify-center py-3 rounded-lg bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition"
-        >
-          查看数据
-        </Link>
-      </div>
-
       {/* AI 输入 */}
       <AIInput />
 
-      {/* 内容区 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
-        {/* AI 解读 */}
-        <div className="rounded-xl bg-white/5 border border-white/10 p-5">
-          <div className="text-sm font-semibold mb-4">AI 解读</div>
-          <VIPGate lockedMessage="AI 解读需要 VIP 订阅">
-            <div className="space-y-3 max-w-prose">
-              <div className="text-sm text-white/90 font-medium leading-relaxed">
-                {oneLiner}
-              </div>
-              <div className="text-sm text-white/70 leading-relaxed">
-                {marketComment}
-              </div>
+      {/* AI 解读区 - 独立一块，中性背景 */}
+      <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
+        <div className="text-sm font-medium text-white/60 mb-4">AI 解读</div>
+        <VIPGate lockedMessage="AI 解读需要 VIP 订阅">
+          <div className="space-y-3">
+            <div className="text-sm text-white/95 font-medium leading-relaxed">
+              {oneLiner}
             </div>
-          </VIPGate>
-        </div>
-
-        {/* 多空信号 */}
-        {(bearish.length > 0 || bullish.length > 0) && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-              <div className="text-xs text-red-400 mb-2">空方信号</div>
-              <VIPGate lockedMessage="VIP 可见">
-                {bearish.length > 0 ? (
-                  bearish.map((item: string, i: number) => (
-                    <div
-                      key={i}
-                      className="text-xs text-white/70 mb-1 leading-relaxed"
-                    >
-                      • {item}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-xs text-white/40">暂无</div>
-                )}
-              </VIPGate>
-            </div>
-
-            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-              <div className="text-xs text-green-400 mb-2">多方信号</div>
-              <VIPGate lockedMessage="VIP 可见">
-                {bullish.length > 0 ? (
-                  bullish.map((item: string, i: number) => (
-                    <div
-                      key={i}
-                      className="text-xs text-white/70 mb-1 leading-relaxed"
-                    >
-                      • {item}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-xs text-white/40">暂无</div>
-                )}
-              </VIPGate>
+            <div className="text-sm text-white/70 leading-relaxed">
+              {marketComment}
             </div>
           </div>
-        )}
+        </VIPGate>
       </div>
 
-      {/* 策略建议 */}
-      <div className="rounded-xl bg-white/5 border border-white/10 p-5 mt-10">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-semibold">策略建议</span>
-          <span className="px-1.5 py-0.5 text-[10px] rounded bg-purple-500/20 text-purple-400/80 border border-purple-500/20">
+      {/* 多空信号区 - 降低透明度 */}
+      {(bearish.length > 0 || bullish.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+          <div className="p-4 rounded-lg bg-red-500/8 border border-red-500/15">
+            <div className="text-xs text-red-400/80 mb-2">空方信号</div>
+            <VIPGate lockedMessage="VIP 可见">
+              {bearish.length > 0 ? (
+                bearish.map((item: string, i: number) => (
+                  <div
+                    key={i}
+                    className="text-xs text-white/70 mb-1 leading-relaxed"
+                  >
+                    • {item}
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-white/40">暂无</div>
+              )}
+            </VIPGate>
+          </div>
+
+          <div className="p-4 rounded-lg bg-green-500/8 border border-green-500/15">
+            <div className="text-xs text-green-400/80 mb-2">多方信号</div>
+            <VIPGate lockedMessage="VIP 可见">
+              {bullish.length > 0 ? (
+                bullish.map((item: string, i: number) => (
+                  <div
+                    key={i}
+                    className="text-xs text-white/70 mb-1 leading-relaxed"
+                  >
+                    • {item}
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-white/40">暂无</div>
+              )}
+            </VIPGate>
+          </div>
+        </div>
+      )}
+
+      {/* 策略建议 - 最底部，视觉权重最低 */}
+      <div className="rounded-lg bg-white/4 border border-white/8 p-4 mt-8">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-white/50">策略建议</span>
+          <span className="px-1.5 py-0.5 text-[9px] rounded bg-white/5 text-white/40 border border-white/10">
             PRO
           </span>
         </div>
         <ProGate lockedMessage="升级 Pro 解锁策略建议">
           {proStrategyText ? (
-            <pre className="text-sm text-white/80 whitespace-pre-wrap font-mono leading-relaxed max-w-prose">
+            <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono leading-relaxed">
               {proStrategyText}
             </pre>
           ) : (
-            <div className="text-sm text-white/40">暂无在线策略输出</div>
+            <div className="text-xs text-white/40">暂无在线策略输出</div>
           )}
         </ProGate>
       </div>
