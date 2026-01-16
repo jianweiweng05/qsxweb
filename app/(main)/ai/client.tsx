@@ -234,7 +234,7 @@ function AIChat() {
               key={s}
               onClick={() => handleAsk(s)}
               disabled={disabled}
-              className="px-3 py-1.5 text-xs rounded-full bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white/80 transition disabled:opacity-50"
+              className="px-3 py-1.5 text-xs rounded-lg bg-white/6 border border-white/12 text-white/70 hover:bg-white/10 hover:text-white/90 transition disabled:opacity-50"
             >
               {s}
             </button>
@@ -243,7 +243,7 @@ function AIChat() {
       )}
 
       {/* Input */}
-      <div className="mt-4 pt-3 border-t border-white/10">
+      <div className="mt-4 pt-4 px-4 -mx-4 -mb-4 bg-white/8 border-t border-white/15 rounded-t-lg">
         <div className="relative">
           <textarea
             ref={inputRef}
@@ -258,14 +258,14 @@ function AIChat() {
             placeholder="请输入市场问题..."
             disabled={disabled}
             rows={1}
-            className="w-full px-4 py-3 pr-14 rounded-lg bg-white/5 border border-white/10 text-sm text-white/90 placeholder:text-white/30 resize-none disabled:opacity-50 focus:outline-none focus:border-cyan-500/50"
+            className="w-full px-4 py-3 pr-14 rounded-lg bg-white/10 border border-white/15 text-sm text-white/90 placeholder:text-white/40 resize-none disabled:opacity-50 focus:outline-none focus:border-cyan-500/30"
           />
           <button
             onClick={() => handleAsk()}
             disabled={disabled || !input.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md bg-cyan-600/80 hover:bg-cyan-600 flex items-center justify-center disabled:opacity-30 transition"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md bg-white/10 hover:bg-cyan-500/70 flex items-center justify-center disabled:opacity-30 transition text-white/60 hover:text-white"
           >
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>
