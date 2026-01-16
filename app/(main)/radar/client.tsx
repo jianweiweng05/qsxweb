@@ -369,7 +369,7 @@ export default function RadarClient() {
     <div className="lg:grid lg:grid-cols-2 lg:gap-6">
       {/* 左列：雷达图 */}
       <div className="p-4 rounded-lg bg-white/8 border border-white/10">
-        <h2 className="text-sm text-white/50 mb-4">六维雷达 (MacroCoef)</h2>
+        <h2 className="text-sm text-white/50 mb-4">六维雷达</h2>
         <GlowingRadar values={radarValues} layers={layers} />
         {breakdown && (
           <div className="mt-4 grid grid-cols-3 gap-2">

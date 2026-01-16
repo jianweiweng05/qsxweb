@@ -294,7 +294,7 @@
       "id": "macrocoef",
       "cat": "Core",
       "triggers": ["macrocoef", "coef", "coef_norm", "coef_raw", "综合评分", "综合分", "macro_state"],
-      "q": "coef_raw / coef_norm（MacroCoef）是什么？",
+      "q": "coef_raw / coef_norm（宏观风险合成指数）是什么？",
       "a": "coef_raw 是综合评分原始值，用于表达多层信号强度；coef_norm 是归一化后的风险刻度，范围约在 [-1,1]，越接近 -1 表示风险偏好更差/防守权重更高，越接近 +1 表示风险偏好改善/风险预算更高。它用于风险管理，不代表收益承诺。"
     },
     {
