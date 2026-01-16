@@ -122,12 +122,10 @@ function getLayerSummary(
 // 发光雷达图组件
 function GlowingRadar({
   values,
-  layers,
-  breakdown
+  layers
 }: {
   values: number[];
   layers: Layer[];
-  breakdown?: MacroCoefBreakdown;
 }) {
 
   const cx = 150, cy = 150, maxR = 120;
@@ -215,7 +213,6 @@ function GlowingRadar({
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + (maxR + 22) * Math.cos(angle);
         const y = cy - (maxR + 22) * Math.sin(angle);
-        const rawScore = breakdown?.[label] ?? 0;
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
             className="fill-white/85 text-[10px] font-medium">
@@ -373,16 +370,56 @@ export default function RadarClient() {
       {/* 左列：雷达图 */}
       <div className="p-4 rounded-lg bg-white/8 border border-white/10">
         <h2 className="text-sm text-white/50 mb-4">六维雷达 (MacroCoef)</h2>
-        <GlowingRadar values={radarValues} layers={layers} breakdown={breakdown} />
+        <GlowingRadar values={radarValues} layers={layers} />
         {breakdown && (
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-            {LAYER_KEYS.map((k, i) => (
-              <div key={k} className="bg-white/5 rounded p-2">
-                <div className="text-white/40">{k}</div>
-                <div className="text-cyan-400 font-mono">{breakdown[k]}</div>
-                <div className="text-white/30">norm: {radarValues[i].toFixed(2)}</div>
-              </div>
-            ))}
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {LAYER_KEYS.map((k) => {
+              const raw = breakdown[k];
+              const absRaw = Math.abs(raw);
+              const fillPercent = Math.min(100, (absRaw / 15) * 100);
+              const label = raw <= -5 ? '风险' : raw >= 5 ? '偏多' : '观望';
+
+              return (
+                <div key={k} className="bg-white/5 rounded p-2">
+                  <div className="text-white/40 text-xs text-center mb-2">{k}</div>
+
+                  <div className="relative h-2 bg-white/5 rounded-full">
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
+
+                    {raw > 0 && (
+                      <div
+                        className="absolute top-0 bottom-0 rounded-r-full"
+                        style={{
+                          left: '50%',
+                          width: `${fillPercent / 2}%`,
+                          background: 'rgba(60,200,120,0.9)'
+                        }}
+                      />
+                    )}
+
+                    {raw < 0 && (
+                      <div
+                        className="absolute top-0 bottom-0 rounded-l-full"
+                        style={{
+                          right: '50%',
+                          width: `${fillPercent / 2}%`,
+                          background: 'rgba(220,60,60,0.9)'
+                        }}
+                      />
+                    )}
+
+                    {raw === 0 && (
+                      <div
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
+                        style={{ background: 'rgba(245,200,60,0.9)' }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="text-white/50 text-[10px] text-center mt-1.5">{label}</div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
