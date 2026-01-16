@@ -3,6 +3,61 @@
 import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+// Decision Card for four-line verdicts
+function DecisionCard({ text }: { text: string }) {
+  const lines = text.split("\n").filter(Boolean);
+  const fields: Record<string, string> = {};
+  for (const line of lines) {
+    const match = line.match(/【(.+?)】(.+)/);
+    if (match) fields[match[1]] = match[2].trim();
+  }
+
+  return (
+    <div className="max-w-[85%] rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/20 shadow-lg overflow-hidden">
+      {/* Header badge */}
+      <div className="px-4 py-1.5 bg-cyan-500/10 border-b border-cyan-500/10 flex items-center gap-1.5">
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+        <span className="text-[10px] text-cyan-400/80 font-medium tracking-wide">系统裁决</span>
+      </div>
+      {/* Content */}
+      <div className="p-4 space-y-3">
+        {/* Market Status */}
+        {fields["市场状态"] && (
+          <div>
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">市场状态</span>
+            <p className="text-sm text-white/90 font-medium mt-0.5">{fields["市场状态"]}</p>
+          </div>
+        )}
+        {/* Risk Level */}
+        {fields["风险等级"] && (
+          <div>
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">风险等级</span>
+            <p className="text-sm text-white/90 font-medium mt-0.5">{fields["风险等级"]}</p>
+          </div>
+        )}
+        {/* Position Suggestion - HIGHLIGHTED */}
+        {fields["仓位建议"] && (
+          <div className="py-2 px-3 -mx-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <span className="text-[10px] text-amber-400/80 uppercase tracking-wider">仓位建议</span>
+            <p className="text-lg text-amber-400 font-bold mt-0.5">{fields["仓位建议"]}</p>
+          </div>
+        )}
+        {/* Reason */}
+        {fields["原因"] && (
+          <div className="pt-2 border-t border-white/5">
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">原因</span>
+            <p className="text-xs text-white/60 mt-1 leading-relaxed">{fields["原因"]}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function isDecisionText(text: string): boolean {
+  return text.includes("【市场状态】") && text.includes("【仓位建议】");
+}
+
 const SUGGESTIONS = [
   "现在的市场状态是什么？",
   "当前仓位应该怎么控制？",
@@ -135,15 +190,19 @@ function AIChat() {
                   Q
                 </div>
               )}
-              <div
-                className={`max-w-[85%] px-4 py-3 rounded-lg text-sm leading-relaxed ${
-                  m.role === "user"
-                    ? "bg-blue-600/20 text-white/90"
-                    : "bg-white/5 text-white/80 border border-white/5"
-                }`}
-              >
-                <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
-              </div>
+              {m.role === "ai" && isDecisionText(m.text) ? (
+                <DecisionCard text={m.text} />
+              ) : (
+                <div
+                  className={`max-w-[85%] px-4 py-3 rounded-lg text-sm leading-relaxed ${
+                    m.role === "user"
+                      ? "bg-blue-600/20 text-white/90"
+                      : "bg-white/5 text-white/80 border border-white/5"
+                  }`}
+                >
+                  <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+                </div>
+              )}
             </div>
           ))
         )}
