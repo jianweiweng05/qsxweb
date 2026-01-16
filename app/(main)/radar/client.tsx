@@ -366,7 +366,7 @@ export default function RadarClient() {
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+    <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
       {/* 左列：雷达图 */}
       <div className="p-4 rounded-lg bg-white/8 border border-white/10">
         <h2 className="text-sm text-white/50 mb-4">六维雷达</h2>
@@ -425,12 +425,12 @@ export default function RadarClient() {
       </div>
 
       {/* 右列：层级卡片 */}
-      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10">
+      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
         <h2 className="text-sm text-white/50 mb-4">层级详情</h2>
         {layers.length === 0 ? (
           <div className="text-white/30 text-sm text-center py-4">暂无层级数据</div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 pb-4">
             {layers.map((layer, i) => {
               const key = layer.key || LAYER_KEYS[i];
               const rawScore = breakdown?.[key as keyof MacroCoefBreakdown] ?? 0;
