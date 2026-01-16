@@ -34,7 +34,7 @@ export default function MainLayout({
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-1 overflow-auto">{children}</div>
-      <nav className="border-t border-white/10 bg-black/90 backdrop-blur-sm">
+      <nav className="border-t border-white/10 bg-black/90 backdrop-blur-sm" data-nav="LAYOUT_MAIN_V2">
         <div className="flex justify-around items-center h-14">
           {tabs.map((tab) => {
             const isActive = activeKey === tab.key;
