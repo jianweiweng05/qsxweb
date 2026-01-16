@@ -105,20 +105,6 @@ function badgeColorClass(color: string): string {
   }
 }
 
-// 获取层级总结（优先 layer_notes，其次 ui_text，最后 badge.label）
-function getLayerSummary(
-  key: string,
-  layerNotes?: LayerNotes,
-  uiText?: UIText,
-  badge?: LayerBadge
-): string {
-  const k = key as keyof LayerNotes;
-  if (layerNotes?.[k]) return layerNotes[k];
-  const ut = uiText?.[k];
-  if (ut) return `${ut.title} ${ut.desc}`.trim();
-  return badge?.label || '';
-}
-
 // 发光雷达图组件
 function GlowingRadar({
   values,
@@ -227,21 +213,16 @@ function GlowingRadar({
 // 层级卡片组件
 function LayerCard({
   layer,
-  index,
-  rawScore,
-  summary
+  rawScore
 }: {
   layer: Layer;
-  index: number;
   rawScore: number;
-  summary: string;
 }) {
   return (
     <div className="p-3 rounded-lg bg-white/8 border border-white/10 hover:border-cyan-500/30 transition-colors">
       {/* 头部 */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-white/40 font-mono">L{index + 1}</span>
           <span className="text-sm font-medium text-white">{layer.title}</span>
           <span className="text-xs text-cyan-400 font-mono">({rawScore})</span>
         </div>
@@ -250,9 +231,9 @@ function LayerCard({
         </span>
       </div>
 
-      {/* metrics（最多5条） */}
-      <div className="space-y-1 mb-2">
-        {layer.metrics.slice(0, 5).map((m, i) => (
+      {/* metrics（显示全部） */}
+      <div className="space-y-1">
+        {layer.metrics.map((m, i) => (
           <div key={i} className="flex justify-between text-xs">
             <span className="text-white/60">{m.label}</span>
             <span className="text-white/95 font-mono">
@@ -261,13 +242,6 @@ function LayerCard({
           </div>
         ))}
       </div>
-
-      {/* 多空总结一句话 */}
-      {summary && (
-        <div className="text-xs text-cyan-300/80 border-t border-white/5 pt-2 mt-2">
-          {summary}
-        </div>
-      )}
     </div>
   );
 }
@@ -329,12 +303,22 @@ export default function RadarClient() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // 层级名称映射
+  const layerTitles: Record<string, string> = {
+    'L1': 'L1｜宏观环境层',
+    'L2': 'L2｜资金流动层',
+    'L3': 'L3｜杠杆与衍生品层',
+    'L4': 'L4｜链上行为层',
+    'L5': 'L5｜市场情绪层',
+    'L6': 'L6｜结构与趋势层'
+  };
+
   // 从 control_tower 构建 layers（过滤 L7/HCRI 和特定关键词）
   const layers: Layer[] = (ctData?.layers || [])
     .filter(ctLayer => ctLayer.layer !== 'L7' && ctLayer.layer !== 'HCRI')
     .map(ctLayer => ({
       key: ctLayer.layer,
-      title: ctLayer.layer,
+      title: layerTitles[ctLayer.layer] || ctLayer.layer,
       badge: { label: '', color: 'green' as const },
       metrics: ctLayer.items
         .filter(item => {
@@ -352,10 +336,6 @@ export default function RadarClient() {
   const radarValues = breakdown
     ? normalizeBreakdown(breakdown)
     : [0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
-
-  // ai_json 数据
-  const layerNotes = data?.ai_json?.layer_notes;
-  const uiText = data?.ai_json?.ui_text;
 
   if (loading) {
     return <LoadingSkeleton />;
@@ -434,14 +414,11 @@ export default function RadarClient() {
             {layers.map((layer, i) => {
               const key = layer.key || LAYER_KEYS[i];
               const rawScore = breakdown?.[key as keyof MacroCoefBreakdown] ?? 0;
-              const summary = getLayerSummary(key, layerNotes, uiText, layer.badge);
               return (
                 <LayerCard
                   key={key}
                   layer={layer}
-                  index={i}
                   rawScore={rawScore}
-                  summary={summary}
                 />
               );
             })}
