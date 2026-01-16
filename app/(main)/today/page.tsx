@@ -69,7 +69,18 @@ export default async function TodayPage() {
               PRO
             </span>
           </div>
-          <ProGate lockedMessage="升级 Pro 查看">
+          <ProGate
+            lockedMessage="升级 Pro 查看"
+            unlockConfig={{
+              title: "波动状态监控",
+              description: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
+              features: [
+                "Gamma 波动率实时监控",
+                "市场情绪波动预警",
+                "历史波动率对比分析"
+              ]
+            }}
+          >
             <div className="text-2xl font-semibold text-white/90">
               {gammaTitle}
             </div>
@@ -83,7 +94,18 @@ export default async function TodayPage() {
       {/* AI 解读区 - 独立一块，中性背景 */}
       <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
         <div className="text-sm font-medium text-white/60 mb-4">AI 解读</div>
-        <VIPGate lockedMessage="AI 解读需要 VIP 订阅">
+        <VIPGate
+          lockedMessage="AI 解读需要 VIP 订阅"
+          unlockConfig={{
+            title: "AI 市场解读",
+            description: "基于多维度数据分析，为您提供专业的市场解读和投资建议。",
+            features: [
+              "每日市场核心观点总结",
+              "多空信号智能识别",
+              "关键风险点提示"
+            ]
+          }}
+        >
           <div className="space-y-3">
             <div className="text-sm text-white/95 font-medium leading-relaxed">
               {oneLiner}
@@ -144,7 +166,18 @@ export default async function TodayPage() {
             PRO
           </span>
         </div>
-        <ProGate lockedMessage="升级 Pro 解锁策略建议">
+        <ProGate
+          lockedMessage="升级 Pro 解锁策略建议"
+          unlockConfig={{
+            title: "专业策略建议",
+            description: "基于实时市场数据和历史模式，为您提供可执行的交易策略建议。",
+            features: [
+              "每日策略方向指引",
+              "关键支撑阻力位分析",
+              "风险控制建议"
+            ]
+          }}
+        >
           {proStrategyText ? (
             <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono leading-relaxed">
               {proStrategyText}

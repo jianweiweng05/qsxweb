@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { UnlockTrigger } from "@/app/lib/unlock-modal";
 
 // Decision Card for four-line verdicts
 function DecisionCard({ text }: { text: string }) {
@@ -218,12 +219,20 @@ function AIChat() {
 
       {/* Upgrade hint */}
       {upgradeHint && (
-        <button
-          onClick={() => router.push("/pricing")}
-          className="mt-3 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600/80 to-blue-600/80 text-sm text-white/90 hover:from-cyan-600 hover:to-blue-600 transition self-start"
+        <UnlockTrigger
+          tier="VIP"
+          title="AI 深度分析"
+          description="解锁更深入的市场分析能力，获取更详细的投资建议和风险评估。"
+          features={[
+            "无限次数 AI 对话",
+            "深度市场分析报告",
+            "个性化投资建议"
+          ]}
         >
-          升级 VIP/PRO →
-        </button>
+          <div className="mt-3 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-sm text-white/90 hover:bg-white/15 transition cursor-pointer inline-block">
+            升级 VIP/PRO →
+          </div>
+        </UnlockTrigger>
       )}
 
       {/* Suggestions */}
