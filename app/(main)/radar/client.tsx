@@ -137,7 +137,7 @@ function GlowingRadar({
   ];
 
   return (
-    <svg viewBox="0 0 300 300" className="w-full max-w-[300px] mx-auto">
+    <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="4" result="coloredBlur" />
@@ -368,11 +368,11 @@ export default function RadarClient() {
   return (
     <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
       {/* 左列：雷达图 */}
-      <div className="p-4 rounded-lg bg-white/8 border border-white/10">
+      <div className="p-4 rounded-lg bg-white/8 border border-white/10 lg:min-h-[calc(100vh-14rem)]">
         <h2 className="text-sm text-white/50 mb-4">六维雷达</h2>
         <GlowingRadar values={radarValues} layers={layers} />
         {breakdown && (
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-6 grid grid-cols-3 gap-3">
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const absRaw = Math.abs(raw);
@@ -380,10 +380,10 @@ export default function RadarClient() {
               const label = raw <= -5 ? '风险' : raw >= 5 ? '偏多' : '观望';
 
               return (
-                <div key={k} className="bg-white/5 rounded p-2">
+                <div key={k} className="bg-white/5 rounded p-3">
                   <div className="text-white/40 text-xs text-center mb-2">{k}</div>
 
-                  <div className="relative h-2 bg-white/5 rounded-full">
+                  <div className="relative h-3 bg-white/5 rounded-full mt-1">
                     <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
 
                     {raw > 0 && (
