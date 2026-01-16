@@ -1,5 +1,5 @@
 import { getUserTier, hasMinTier, type UserTier } from "./entitlements";
-import { UnlockTrigger } from "./unlock-modal";
+import { LockedContentClient } from "./gate-client";
 
 // 检查是否为 VIP 或更高
 export function isVIP(): boolean {
@@ -26,29 +26,24 @@ function LockedContent({ requiredTier, message, unlockConfig }: LockedContentPro
   const tierLabel = requiredTier === "VIP" ? "VIP" : "Pro";
   const defaultMsg = `${tierLabel} 内容已锁定`;
 
-  const content = (
+  if (unlockConfig) {
+    return (
+      <LockedContentClient
+        tier={requiredTier === "VIP" ? "VIP" : "PRO"}
+        message={message || defaultMsg}
+        unlockConfig={unlockConfig}
+      />
+    );
+  }
+
+  return (
     <div className="p-4 rounded-lg bg-white/5 border border-white/10 text-center py-6">
       <div className="text-white/50 mb-3">🔒 {message || defaultMsg}</div>
-      <div className="inline-block px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white hover:bg-white/15 transition">
+      <div className="inline-block px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white">
         升级到 {tierLabel}
       </div>
     </div>
   );
-
-  if (unlockConfig) {
-    return (
-      <UnlockTrigger
-        tier={requiredTier === "VIP" ? "VIP" : "PRO"}
-        title={unlockConfig.title}
-        description={unlockConfig.description}
-        features={unlockConfig.features}
-      >
-        {content}
-      </UnlockTrigger>
-    );
-  }
-
-  return content;
 }
 
 // 通用层级门禁组件
@@ -131,30 +126,28 @@ export function PageGate({ requiredTier, title, children, unlockConfig }: PageGa
 
   const tierLabel = requiredTier === "VIP" ? "VIP" : "Pro";
 
-  const content = (
+  if (unlockConfig) {
+    return (
+      <div className="p-4 text-white min-h-full bg-black/90">
+        <h1 className="text-xl font-bold mb-4">{title}</h1>
+        <LockedContentClient
+          tier={requiredTier === "VIP" ? "VIP" : "PRO"}
+          message={`此功能需要 ${tierLabel} 订阅`}
+          unlockConfig={unlockConfig}
+        />
+      </div>
+    );
+  }
+
+  return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-4">{title}</h1>
       <div className="p-6 rounded-lg bg-white/5 border border-white/10 text-center">
         <div className="text-white/50 mb-4">🔒 此功能需要 {tierLabel} 订阅</div>
-        <div className="inline-block px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white font-medium hover:bg-white/15 transition">
+        <div className="inline-block px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white font-medium">
           升级到 {tierLabel}
         </div>
       </div>
     </div>
   );
-
-  if (unlockConfig) {
-    return (
-      <UnlockTrigger
-        tier={requiredTier === "VIP" ? "VIP" : "PRO"}
-        title={unlockConfig.title}
-        description={unlockConfig.description}
-        features={unlockConfig.features}
-      >
-        {content}
-      </UnlockTrigger>
-    );
-  }
-
-  return content;
 }
