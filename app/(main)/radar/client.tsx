@@ -212,20 +212,15 @@ function GlowingRadar({
 
 // 层级卡片组件
 function LayerCard({
-  layer,
-  rawScore
+  layer
 }: {
   layer: Layer;
-  rawScore: number;
 }) {
   return (
     <div className="p-3 rounded-lg bg-white/8 border border-white/10 hover:border-cyan-500/30 transition-colors">
       {/* 头部 */}
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white">{layer.title}</span>
-          <span className="text-xs text-cyan-400 font-mono">({rawScore})</span>
-        </div>
+        <span className="text-sm font-medium text-white">{layer.title}</span>
         <span className={`px-2 py-0.5 text-xs rounded border ${badgeColorClass(layer.badge.color)}`}>
           {layer.badge.label}
         </span>
@@ -413,12 +408,10 @@ export default function RadarClient() {
           <div className="space-y-3 pb-4">
             {layers.map((layer, i) => {
               const key = layer.key || LAYER_KEYS[i];
-              const rawScore = breakdown?.[key as keyof MacroCoefBreakdown] ?? 0;
               return (
                 <LayerCard
                   key={key}
                   layer={layer}
-                  rawScore={rawScore}
                 />
               );
             })}
