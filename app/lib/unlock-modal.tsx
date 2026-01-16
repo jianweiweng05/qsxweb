@@ -62,7 +62,13 @@ export function UnlockTrigger({ tier, title, description, features, children }: 
 
   return (
     <>
-      <div onClick={() => setOpen(true)} className="cursor-pointer">
+      <div
+        onClick={() => {
+          console.log('UnlockTrigger clicked, opening modal');
+          setOpen(true);
+        }}
+        className="cursor-pointer"
+      >
         {children}
       </div>
       {open && (
