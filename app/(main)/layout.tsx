@@ -28,17 +28,24 @@ export default function MainLayout({
   const router = useRouter();
   const activeKey = mapActiveKey(pathname);
 
-  // TODO: Replace with actual unread alerts count from your state/API
   const unreadAlerts = 3;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-1 flex justify-center">{children}</div>
-      <nav className="sticky bottom-0 border-t border-white/10 bg-black/90 backdrop-blur-sm" data-nav="LAYOUT_MAIN_V2">
-        <div className="flex justify-around items-center h-14">
+    <div className="min-h-screen flex flex-col bg-black">
+      {/* 内容区：锁定视觉中心 */}
+      <main className="flex-1 flex justify-center pb-14">
+        <div className="w-full max-w-[1200px] px-4">
+          {children}
+        </div>
+      </main>
+
+      {/* 底部导航：完全脱离内容布局 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/90 backdrop-blur-sm">
+        <div className="mx-auto max-w-[1200px] h-14 flex items-center justify-around px-2">
           {tabs.map((tab) => {
             const isActive = activeKey === tab.key;
             const isAlerts = tab.key === "/alerts";
+
             return (
               <button
                 key={tab.key}
@@ -52,16 +59,18 @@ export default function MainLayout({
                 {isActive && (
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-400" />
                 )}
+
                 <span className="relative">
                   <tab.Icon size={20} strokeWidth={1.5} />
                   {isAlerts && unreadAlerts > 0 && (
                     <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                   )}
                 </span>
+
                 <span
                   className={`
-                    text-[10px] mt-1 tracking-wide
-                    ${isActive ? "font-medium opacity-100" : "font-normal opacity-60"}
+                    mt-1 text-[10px] tracking-wide
+                    ${isActive ? "opacity-100 font-medium" : "opacity-60"}
                   `}
                 >
                   {tab.title}
