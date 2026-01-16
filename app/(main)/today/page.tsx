@@ -90,7 +90,7 @@ export default async function TodayPage() {
 
       {/* AI 解读区 - 独立一块，中性背景 */}
       <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
-        <div className="text-sm font-medium text-white/60 mb-4">AI 解读</div>
+        <div className="text-sm font-medium text-white/60 mb-4">机构分析师观点</div>
         <VIPGate
           lockedMessage="AI 解读需要 VIP 订阅"
           unlockConfig={{

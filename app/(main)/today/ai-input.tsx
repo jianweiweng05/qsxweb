@@ -14,19 +14,19 @@ export function AIInput() {
   };
 
   return (
-    <div className="flex gap-3 h-[calc(3rem*2+0.75rem)]">
+    <div className="flex gap-2 h-10">
       <input
         type="text"
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         placeholder="向 AI 提问..."
-        className="flex-1 px-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+        className="flex-1 px-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
       />
       <button
         onClick={handleSubmit}
         disabled={!question.trim()}
-        className="px-6 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 rounded-lg bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         确认
       </button>
