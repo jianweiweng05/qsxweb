@@ -129,8 +129,14 @@ function GlowingRadar({
   layers: Layer[];
   breakdown?: MacroCoefBreakdown;
 }) {
+
   const cx = 150, cy = 150, maxR = 120;
-  const gridLevels = [0.25, 0.5, 0.75, 1.0];
+
+  const gridLevels = [
+    { level: 0.33, color: 'rgba(220, 60, 60, 0.22)' },   // 内圈 红
+    { level: 0.66, color: 'rgba(245, 200, 60, 0.18)' }, // 中圈 黄
+    { level: 1.0, color: 'rgba(60, 200, 120, 0.14)' }  // 外圈 绿
+  ];
 
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[300px] mx-auto">
@@ -156,13 +162,13 @@ function GlowingRadar({
         </linearGradient>
       </defs>
 
-      {/* 背景网格 */}
-      {gridLevels.map((level, i) => (
+      {/* 背景风险分区 */}
+      {gridLevels.map((g, i) => (
         <polygon
           key={i}
-          points={hexPoints(cx, cy, maxR * level, [1,1,1,1,1,1])}
-          fill="none"
-          stroke="rgba(255,255,255,0.1)"
+          points={hexPoints(cx, cy, maxR * g.level, [1, 1, 1, 1, 1, 1])}
+          fill={g.color}
+          stroke="rgba(255,255,255,0.12)"
           strokeWidth="1"
         />
       ))}
@@ -288,7 +294,7 @@ function LoadingSkeleton() {
     <div className="animate-pulse">
       <div className="h-[300px] bg-white/5 rounded-lg mb-4" />
       <div className="space-y-3">
-        {[1,2,3,4,5,6].map(i => (
+        {[1, 2, 3, 4, 5, 6].map(i => (
           <div key={i} className="h-20 bg-white/5 rounded-lg" />
         ))}
       </div>
