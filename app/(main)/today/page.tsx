@@ -31,8 +31,8 @@ export default async function TodayPage() {
   const proStrategyText = payload?.pro_strategy_text;
 
   return (
-    <div className="w-full min-h-full bg-black pb-20">
-      <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-6 text-white">
+    <div className="w-full bg-black">
+      <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-6 pb-24 text-white">
         {/* Header */}
         <div className="flex items-baseline justify-between mb-8">
           <h1 className="text-xl font-semibold">今日概览</h1>
