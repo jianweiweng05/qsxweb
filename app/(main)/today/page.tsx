@@ -155,6 +155,14 @@ export default async function TodayPage() {
         </div>
       )}
 
+      {/* 风险提示 */}
+      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 mt-6">
+        <div className="text-sm font-medium text-red-400 mb-2">📌 风险提示</div>
+        <div className="text-xs text-white/60 leading-relaxed">
+          本系统提供的所有内容均为市场研究与风险分析参考，不构成任何形式的投资建议或收益承诺。数字资产价格波动剧烈，请用户根据自身风险承受能力独立决策。
+        </div>
+      </div>
+
     </div>
   );
 }

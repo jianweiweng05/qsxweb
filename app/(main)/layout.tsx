@@ -1,14 +1,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, Radar, Bell, Wrench, Bot, User, History } from "lucide-react";
+import { Activity, Radar, Bell, Wrench, User, History } from "lucide-react";
 
 const tabs = [
   { key: "/today", title: "今日", Icon: Activity },
   { key: "/radar", title: "数据中心", Icon: Radar },
   { key: "/similarity", title: "相似性", Icon: History },
   { key: "/toolbox", title: "工具箱", Icon: Wrench },
-  { key: "/ai", title: "AI", Icon: Bot },
 ];
 
 function mapActiveKey(pathname: string): string {

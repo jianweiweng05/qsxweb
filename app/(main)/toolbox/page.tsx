@@ -1,5 +1,6 @@
 import { PageGate } from "@/app/lib/gate";
 import { getReportPayload } from "@/app/lib/qsx_api";
+import { SharedAIInput } from "../shared-ai-input";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,8 @@ export default async function ToolboxPage() {
       <div className="p-4 text-white min-h-full bg-black/90">
         <h1 className="text-xl font-bold mb-2">🧰 全市场风险对冲工具箱</h1>
         <p className="text-xs text-white/40 mb-6">Pro 专属</p>
+
+        <SharedAIInput />
 
         {/* ToolBox A: 结构对冲工具 */}
         <div className="mb-6">

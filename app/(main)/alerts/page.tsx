@@ -2,6 +2,7 @@ import { PageGate } from "@/app/lib/gate";
 import { getUserTier } from "@/app/lib/entitlements";
 import { getReportPayload } from "@/app/lib/qsx_api";
 import AlertsClient from "./client";
+import { SharedAIInput } from "../shared-ai-input";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ export default async function AlertsPage() {
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-4">报警</h1>
+      <SharedAIInput />
       <AlertsClient />
     </div>
   );
