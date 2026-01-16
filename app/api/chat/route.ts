@@ -20,6 +20,8 @@ const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
 const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
 const DECISION_WORDS = ["怎么办", "能不能", "要不要", "可以吗", "适合", "应该", "仓位", "风险", "短线", "波段", "观望", "昨天", "持续", "状态", "市场", "行情", "大跌", "加仓", "减仓", "满仓", "轻仓", "防守", "进攻"];
+const JUDGEMENT_WORDS = ["偏多", "偏空", "牛市", "熊市", "震荡", "反弹", "下跌", "筑底", "情绪", "基本面", "顺势", "逆势", "成功率", "靠谱", "安全", "确定", "错误", "注意", "信号", "历史", "机构", "策略", "现货", "警惕", "问题", "类似"];
+const CONFIDENCE_WORDS = ["确定", "靠谱", "安全", "什么都不做", "不做"];
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
@@ -79,7 +81,7 @@ function matchProKeyword(s: string): boolean {
 }
 
 function isDecisionIntent(s: string): boolean {
-  return DECISION_WORDS.some(w => s.includes(w));
+  return DECISION_WORDS.some(w => s.includes(w)) || JUDGEMENT_WORDS.some(w => s.includes(w));
 }
 
 function canUseLLM(s: string): boolean {
