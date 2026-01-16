@@ -218,7 +218,7 @@ function GlowingRadar({
         const rawScore = breakdown?.[label] ?? 0;
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-            className="fill-white/70 text-[10px] font-medium">
+            className="fill-white/85 text-[10px] font-medium">
             {label}
           </text>
         );
@@ -240,7 +240,7 @@ function LayerCard({
   summary: string;
 }) {
   return (
-    <div className="p-3 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors">
+    <div className="p-3 rounded-lg bg-white/8 border border-white/10 hover:border-cyan-500/30 transition-colors">
       {/* 头部 */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ function LayerCard({
         {layer.metrics.slice(0, 5).map((m, i) => (
           <div key={i} className="flex justify-between text-xs">
             <span className="text-white/60">{m.label}</span>
-            <span className="text-white/90 font-mono">
+            <span className="text-white/95 font-mono">
               {typeof m.v === 'number' ? m.v.toFixed(2) : m.v}
             </span>
           </div>
@@ -292,10 +292,10 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 function LoadingSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="h-[300px] bg-white/5 rounded-lg mb-4" />
+      <div className="h-[300px] bg-white/8 rounded-lg mb-4" />
       <div className="space-y-3">
         {[1, 2, 3, 4, 5, 6].map(i => (
-          <div key={i} className="h-20 bg-white/5 rounded-lg" />
+          <div key={i} className="h-20 bg-white/8 rounded-lg" />
         ))}
       </div>
     </div>
@@ -371,7 +371,7 @@ export default function RadarClient() {
   return (
     <div className="lg:grid lg:grid-cols-2 lg:gap-6">
       {/* 左列：雷达图 */}
-      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+      <div className="p-4 rounded-lg bg-white/8 border border-white/10">
         <h2 className="text-sm text-white/50 mb-4">六维雷达 (MacroCoef)</h2>
         <GlowingRadar values={radarValues} layers={layers} breakdown={breakdown} />
         {breakdown && (
@@ -388,7 +388,7 @@ export default function RadarClient() {
       </div>
 
       {/* 右列：层级卡片 */}
-      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/5 border border-white/10">
+      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10">
         <h2 className="text-sm text-white/50 mb-4">层级详情</h2>
         {layers.length === 0 ? (
           <div className="text-white/30 text-sm text-center py-4">暂无层级数据</div>
