@@ -133,9 +133,9 @@ function GlowingRadar({
   const cx = 150, cy = 150, maxR = 120;
 
   const gridLevels = [
-    { level: 0.33, color: 'rgba(220, 60, 60, 0.22)' },   // 内圈 红
-    { level: 0.66, color: 'rgba(245, 200, 60, 0.18)' }, // 中圈 黄
-    { level: 1.0, color: 'rgba(60, 200, 120, 0.14)' }  // 外圈 绿
+    { level: 0.33, color: 'rgba(200, 40, 40, 0.16)' },   // 高风险 红
+    { level: 0.66, color: 'rgba(245, 200, 60, 0.10)' }, // 中性 黄
+    { level: 1.0, color: 'rgba(60, 200, 120, 0.08)' }  // 健康 绿
   ];
 
   return (
@@ -168,7 +168,7 @@ function GlowingRadar({
           key={i}
           points={hexPoints(cx, cy, maxR * g.level, [1, 1, 1, 1, 1, 1])}
           fill={g.color}
-          stroke="rgba(255,255,255,0.12)"
+          stroke="rgba(255,255,255,0.06)"
           strokeWidth="1"
         />
       ))}
@@ -201,7 +201,7 @@ function GlowingRadar({
         const y = cy - maxR * v * Math.sin(angle);
         const layer = layers[i];
         const color = layer?.badge?.color === 'red' ? '#ff4444'
-          : layer?.badge?.color === 'green' ? '#44ff44' : '#ffff44';
+          : layer?.badge?.color === 'green' ? '#e6ffff' : '#ffff44';
         return (
           <g key={i}>
             <circle cx={x} cy={y} r="6" fill={color} filter="url(#glow)" />
