@@ -1,4 +1,3 @@
-// page.tsx
 export const dynamic = "force-dynamic";
 
 import LandingClient from "./client";
