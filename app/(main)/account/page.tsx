@@ -1,30 +1,40 @@
-import { getUserTier, getTierDisplayName } from "@/app/lib/entitlements";
+"use client";
+
+import { useState, useEffect } from "react";
 import { UserButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { getLanguage, translations, type Language } from "@/app/lib/i18n";
 
-export const dynamic = "force-dynamic";
+export default function AccountPage() {
+  const [lang, setLang] = useState<Language>("zh");
+  const { user } = useUser();
 
-export default async function AccountPage() {
-  const tier = getUserTier();
-  const tierName = getTierDisplayName(tier);
-  const user = await currentUser();
-  const email = user?.emailAddresses?.[0]?.emailAddress || "未知";
+  useEffect(() => {
+    setLang(getLanguage());
+  }, []);
+
+  const t = translations[lang];
+  const email = user?.emailAddresses?.[0]?.emailAddress || t.unknown;
+
+  // Mock tier data - replace with actual tier logic
+  const tier = "FREE" as "FREE" | "VIP" | "PRO";
+  const tierName = tier === "PRO" ? "Pro" : tier === "VIP" ? "VIP" : "Free";
 
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold">账户</h1>
+        <h1 className="text-xl font-bold">{t.account}</h1>
         <UserButton />
       </div>
 
       <div className="p-4 rounded-lg bg-white/5 border border-white/10 mb-4">
-        <div className="text-sm text-white/50 mb-1">邮箱</div>
+        <div className="text-sm text-white/50 mb-1">{t.email}</div>
         <div className="font-semibold">{email}</div>
       </div>
 
       <div className="p-4 rounded-lg bg-white/5 border border-white/10 mb-4">
-        <div className="text-sm text-white/50 mb-1">当前方案</div>
+        <div className="text-sm text-white/50 mb-1">{t.currentPlan}</div>
         <div className="flex items-center justify-between">
           <div className="font-semibold">{tierName}</div>
           {tier !== "PRO" && (
@@ -32,14 +42,14 @@ export default async function AccountPage() {
               href="/pricing"
               className="text-sm text-blue-400 underline"
             >
-              升级
+              {t.upgrade}
             </Link>
           )}
         </div>
       </div>
 
       <div className="p-4 rounded-lg bg-white/5 border border-white/10 mb-4">
-        <div className="text-sm text-white/50 mb-1">到期时间</div>
+        <div className="text-sm text-white/50 mb-1">{t.expiryDate}</div>
         <div className="font-semibold">
           {tier === "FREE" ? "-" : "2026-12-31"}
         </div>
@@ -50,13 +60,13 @@ export default async function AccountPage() {
           href="/settings"
           className="block text-center px-4 py-3 bg-white/10 rounded-lg font-medium"
         >
-          设置
+          {t.settings}
         </Link>
       </div>
 
       {/* 订阅能力对比 */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">订阅能力</h2>
+        <h2 className="text-lg font-semibold mb-4">{t.subscriptionFeatures}</h2>
 
         <div className="space-y-4">
           {/* VIP 能力 */}
@@ -65,14 +75,14 @@ export default async function AccountPage() {
               <span className="font-medium">VIP</span>
               {tier === "VIP" && (
                 <span className="px-2 py-0.5 text-xs rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                  当前方案
+                  {t.currentPlanBadge}
                 </span>
               )}
             </div>
             <ul className="space-y-2 text-sm text-white/70">
-              <li>• AI 市场解读</li>
-              <li>• 多空信号分析</li>
-              <li>• 无限次 AI 对话</li>
+              <li>• {lang === "zh" ? "AI 市场解读" : "AI Market Analysis"}</li>
+              <li>• {lang === "zh" ? "多空信号分析" : "Long/Short Signal Analysis"}</li>
+              <li>• {lang === "zh" ? "无限次 AI 对话" : "Unlimited AI Chat"}</li>
             </ul>
           </div>
 
@@ -82,16 +92,16 @@ export default async function AccountPage() {
               <span className="font-medium">Pro</span>
               {tier === "PRO" && (
                 <span className="px-2 py-0.5 text-xs rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                  当前方案
+                  {t.currentPlanBadge}
                 </span>
               )}
             </div>
             <ul className="space-y-2 text-sm text-white/70">
-              <li>• 包含所有 VIP 功能</li>
-              <li>• 实时报警系统</li>
-              <li>• 波动状态监控 (Gamma)</li>
-              <li>• 专业策略建议</li>
-              <li>• 历史报警回溯</li>
+              <li>• {lang === "zh" ? "包含所有 VIP 功能" : "All VIP Features"}</li>
+              <li>• {lang === "zh" ? "实时报警系统" : "Real-time Alert System"}</li>
+              <li>• {lang === "zh" ? "波动状态监控 (Gamma)" : "Volatility Monitoring (Gamma)"}</li>
+              <li>• {lang === "zh" ? "专业策略建议" : "Professional Strategy Advice"}</li>
+              <li>• {lang === "zh" ? "历史报警回溯" : "Historical Alert Review"}</li>
             </ul>
           </div>
         </div>

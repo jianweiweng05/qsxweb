@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, Radar, Bell, Wrench, User } from "lucide-react";
 import { FloatingAIBubble } from "./floating-ai-bubble";
+import { getLanguage, translations, type Language } from "@/app/lib/i18n";
 
-const tabs = [
-  { key: "/today", title: "今日", Icon: Activity },
-  { key: "/radar", title: "数据中心", Icon: Radar },
-  { key: "/toolbox", title: "PRO", Icon: Wrench },
+const getTabs = (lang: Language) => [
+  { key: "/today", title: translations[lang].today, Icon: Activity },
+  { key: "/radar", title: translations[lang].dataCenter, Icon: Radar },
+  { key: "/toolbox", title: translations[lang].pro, Icon: Wrench },
 ];
 
-function mapActiveKey(pathname: string): string {
+function mapActiveKey(pathname: string, tabs: any[]): string {
   for (const tab of tabs) {
     if (pathname.startsWith(tab.key)) return tab.key;
   }
@@ -27,8 +28,16 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const activeKey = mapActiveKey(pathname);
+  const [lang, setLang] = useState<Language>("zh");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
+
+  useEffect(() => {
+    setLang(getLanguage());
+  }, []);
+
+  const t = translations[lang];
+  const tabs = getTabs(lang);
+  const activeKey = mapActiveKey(pathname, tabs);
 
   const unreadAlerts = 3;
 
@@ -44,7 +53,7 @@ export default function MainLayout({
             }`}
           >
             <User size={20} strokeWidth={1.5} />
-            <span className="text-sm">我的</span>
+            <span className="text-sm">{t.myAccount}</span>
           </button>
 
           <button
@@ -59,7 +68,7 @@ export default function MainLayout({
                 <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full" />
               )}
             </span>
-            <span className="text-sm">报警</span>
+            <span className="text-sm">{t.alerts}</span>
           </button>
         </div>
       </header>

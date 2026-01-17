@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { getLanguage, translations, type Language } from '@/app/lib/i18n';
 
 interface AlertItem {
   key: string;
@@ -63,7 +64,8 @@ function LoadingSkeleton() {
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorState({ message, onRetry, lang }: { message: string; onRetry: () => void; lang: Language }) {
+  const t = translations[lang];
   return (
     <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
       <div className="text-red-400 mb-3">{message}</div>
@@ -71,13 +73,14 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
         onClick={onRetry}
         className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 text-sm"
       >
-        重试
+        {t.retry}
       </button>
     </div>
   );
 }
 
 export default function AlertsClient() {
+  const [lang, setLang] = useState<Language>("zh");
   const [data, setData] = useState<AlertData | null>(null);
   const [historyData, setHistoryData] = useState<HistoryData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +89,12 @@ export default function AlertsClient() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [tab, setTab] = useState<'current' | 'history'>('current');
   const [historyDays, setHistoryDays] = useState(7);
+
+  useEffect(() => {
+    setLang(getLanguage());
+  }, []);
+
+  const t = translations[lang];
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -128,7 +137,7 @@ export default function AlertsClient() {
   }, [tab, historyData, historyLoading, historyDays, fetchHistory]);
 
   if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} onRetry={fetchData} />;
+  if (error) return <ErrorState message={error} onRetry={fetchData} lang={lang} />;
   if (!data) return null;
 
   const { layers } = data;
@@ -155,7 +164,7 @@ export default function AlertsClient() {
               : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
           }`}
         >
-          当前报警
+          {t.currentAlerts}
         </button>
         <button
           onClick={() => setTab('history')}
@@ -165,7 +174,7 @@ export default function AlertsClient() {
               : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
           }`}
         >
-          历史报警
+          {t.historyAlerts}
         </button>
       </div>
 
@@ -173,7 +182,7 @@ export default function AlertsClient() {
         <>
           {/* 红色报警统计 */}
           <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
-            <div className="text-xs text-red-400 mb-1">红色警报</div>
+            <div className="text-xs text-red-400 mb-1">{t.redAlerts}</div>
             <div className="text-3xl font-bold text-red-400">{redCount}</div>
           </div>
 
@@ -181,7 +190,7 @@ export default function AlertsClient() {
           <div className="space-y-2">
             {redItems.length === 0 ? (
               <div className="p-4 rounded-lg bg-white/5 border border-white/10 text-center text-white/50">
-                当前无红色警报
+                {t.noRedAlerts}
               </div>
             ) : (
               redItems.map((item, i) => (
@@ -226,7 +235,7 @@ export default function AlertsClient() {
                     : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
                 }`}
               >
-                {d}天
+                {d}{t.days}
               </button>
             ))}
           </div>
@@ -234,10 +243,10 @@ export default function AlertsClient() {
           {historyLoading ? (
             <LoadingSkeleton />
           ) : historyError ? (
-            <ErrorState message={historyError} onRetry={() => fetchHistory(historyDays)} />
+            <ErrorState message={historyError} onRetry={() => fetchHistory(historyDays)} lang={lang} />
           ) : historyData?.history?.length === 0 ? (
             <div className="p-6 rounded-lg bg-white/5 border border-white/10 text-center text-white/50">
-              暂无历史报警记录
+              {t.noHistoryAlerts}
             </div>
           ) : (
             <div className="space-y-3">

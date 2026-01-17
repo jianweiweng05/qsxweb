@@ -31,7 +31,7 @@ export default function SettingsPage() {
             <div>
               <div className="font-medium">{t.language}</div>
               <div className="text-sm text-white/50">
-                {lang === "zh" ? "选择界面语言" : "Select interface language"}
+                {t.selectLanguage}
               </div>
             </div>
             <div className="relative">
@@ -64,9 +64,9 @@ export default function SettingsPage() {
         <div className="p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium">{lang === "zh" ? "时区" : "Timezone"}</div>
+              <div className="font-medium">{t.timezone}</div>
               <div className="text-sm text-white/50">
-                {lang === "zh" ? "设置显示时区" : "Set display timezone"}
+                {t.setTimezone}
               </div>
             </div>
             <div className="text-white/50">UTC+8</div>
@@ -76,19 +76,19 @@ export default function SettingsPage() {
         <div className="p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium">{lang === "zh" ? "通知" : "Notifications"}</div>
+              <div className="font-medium">{t.notifications}</div>
               <div className="text-sm text-white/50">
-                {lang === "zh" ? "管理推送通知" : "Manage push notifications"}
+                {t.manageNotifications}
               </div>
             </div>
-            <div className="text-white/50">{lang === "zh" ? "已开启" : "Enabled"}</div>
+            <div className="text-white/50">{t.enabled}</div>
           </div>
         </div>
       </div>
 
       <div className="mt-6">
         <Link href="/account" className="text-sm text-white/50 underline">
-          {lang === "zh" ? "返回账户" : "Back to account"}
+          {t.backToAccount}
         </Link>
       </div>
     </div>
