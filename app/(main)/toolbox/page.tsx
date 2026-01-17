@@ -55,7 +55,7 @@ export default async function ToolboxPage() {
           <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
             <div className="text-sm font-medium text-red-400 mb-2">📌 风险提示</div>
             <div className="text-xs text-white/60 leading-relaxed">
-              本系统提供的所有内容均为市场研究与风险分析参考，不构成任何形式的投资建议或收益承诺。数字资产价格波动剧烈，请用户根据自身风险承受能力独立决策。
+              本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。
             </div>
           </div>
         </div>
