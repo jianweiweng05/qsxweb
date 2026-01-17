@@ -25,10 +25,10 @@ const PAGE_SUGGESTIONS: Record<string, string[]> = {
     "报警级别如何判断？",
     "历史报警数据显示什么规律？"
   ],
-  ai: [
-    "如何分析当前市场环境？",
-    "有什么投资建议？",
-    "风险点在哪里？"
+  account: [
+    "VIP 和 Pro 订阅有什么区别？",
+    "如何修改账户信息或取消订阅？",
+    "遇到问题如何联系客服或提交反馈？"
   ]
 };
 
@@ -43,47 +43,43 @@ export function FloatingAIBubble({
   const pathname = usePathname();
 
   const getContext = () => {
-    const parts = pathname.split("/").filter(Boolean);
-    const page = parts[parts.length - 1] || "today";
-    return { from: `/${page}`, suggestions: PAGE_SUGGESTIONS[page] || PAGE_SUGGESTIONS.today };
+    if (pathname.startsWith("/account")) return { from: "/account", suggestions: PAGE_SUGGESTIONS.account };
+    if (pathname.startsWith("/alerts")) return { from: "/alerts", suggestions: PAGE_SUGGESTIONS.alerts };
+    if (pathname.startsWith("/toolbox")) return { from: "/toolbox", suggestions: PAGE_SUGGESTIONS.toolbox };
+    if (pathname.startsWith("/radar")) return { from: "/radar", suggestions: PAGE_SUGGESTIONS.radar };
+    return { from: "/today", suggestions: PAGE_SUGGESTIONS.today };
   };
 
   return (
     <>
+      <style jsx>{`
+        @keyframes breathe {
+          0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.3), 0 0 16px rgba(0, 229, 255, 0.15); }
+          50% { box-shadow: 0 0 12px rgba(0, 229, 255, 0.5), 0 0 24px rgba(0, 229, 255, 0.25); }
+        }
+        .ai-bubble {
+          animation: breathe 3.5s ease-in-out infinite;
+        }
+        .ai-bubble:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 16px rgba(0, 229, 255, 0.6), 0 0 32px rgba(0, 229, 255, 0.3) !important;
+        }
+      `}</style>
       <button
         onClick={() => setOpen(true)}
-        className="fixed z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg"
+        className="ai-bubble fixed z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all"
         style={{
           bottom: "calc(72px + env(safe-area-inset-bottom) + 16px)",
           right: "16px",
-          background: "rgba(10,14,20,0.6)",
+          background: "rgba(10, 20, 30, 0.65)",
           backdropFilter: "blur(8px)",
-          border: "1px solid rgba(0,229,255,0.3)"
+          border: "1px solid rgba(0, 229, 255, 0.6)"
         }}
         aria-label="AI助手"
       >
-        <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
-          {/* 外层能量环 */}
-          <circle cx="16" cy="16" r="14" stroke="url(#grad1)" strokeWidth="0.5" opacity="0.4" />
-          <circle cx="16" cy="16" r="12" stroke="url(#grad1)" strokeWidth="0.5" opacity="0.6" />
-
-          {/* 中心核心 */}
-          <circle cx="16" cy="16" r="6" fill="url(#grad2)" opacity="0.9" />
-          <circle cx="16" cy="16" r="4" fill="#00E5FF" opacity="0.6" />
-          <circle cx="16" cy="16" r="2" fill="#fff" opacity="0.8" />
-
-          {/* 渐变定义 */}
-          <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00E5FF" />
-              <stop offset="100%" stopColor="#4F9CFF" />
-            </linearGradient>
-            <radialGradient id="grad2">
-              <stop offset="0%" stopColor="#00E5FF" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#4F9CFF" stopOpacity="0.3" />
-            </radialGradient>
-          </defs>
-        </svg>
+        <span className="text-cyan-400 text-xl font-semibold tracking-tight" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+          AI
+        </span>
       </button>
 
       {open && (
