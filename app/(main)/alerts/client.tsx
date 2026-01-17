@@ -131,7 +131,7 @@ export default function AlertsClient() {
   if (error) return <ErrorState message={error} onRetry={fetchData} />;
   if (!data) return null;
 
-  const { summary, layers } = data;
+  const { layers } = data;
 
   // 只收集红色报警
   const redItems = layers.flatMap(layer =>
@@ -139,6 +139,9 @@ export default function AlertsClient() {
       .filter(item => item.signal === 'RED')
       .map(item => ({ ...item, layer: layer.layer }))
   );
+
+  // 重新计算红色报警数量（修复后端统计错误）
+  const redCount = redItems.length;
 
   return (
     <div className="space-y-4">
@@ -171,7 +174,7 @@ export default function AlertsClient() {
           {/* 红色报警统计 */}
           <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
             <div className="text-xs text-red-400 mb-1">红色警报</div>
-            <div className="text-3xl font-bold text-red-400">{summary.red}</div>
+            <div className="text-3xl font-bold text-red-400">{redCount}</div>
           </div>
 
           {/* 红色报警列表 */}

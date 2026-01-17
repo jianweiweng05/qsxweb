@@ -158,8 +158,9 @@ const SYSTEM_PROMPT = `你是 QuantscopeX AI 助手，专注于加密市场宏�
 3. 末尾固定："\n\nAI 分析仅基于当前数据，不构成投资建议。"`;
 
 export async function POST(req: NextRequest) {
-  const { message } = await req.json();
+  const { message, language } = await req.json();
   const tier = getUserTier();
+  const lang = language || "zh";
 
   const result = classifyQuery(message || "", tier);
 
@@ -182,6 +183,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const systemPrompt = lang === "en"
+      ? SYSTEM_PROMPT.replace("你是 QSX 全市场风险引擎的 AI 助手", "You are the AI assistant for QSX Market Risk Engine")
+        .replace("不构成投资建议", "does not constitute investment advice")
+        .replace("AI 分析仅基于当前数据，不构成投资建议。", "AI analysis is based on current data only and does not constitute investment advice.")
+      : SYSTEM_PROMPT;
+
     const res = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
@@ -189,7 +196,7 @@ export async function POST(req: NextRequest) {
         model: "deepseek-chat",
         stream: true,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: message },
         ],
       }),
