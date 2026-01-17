@@ -1,258 +1,368 @@
+// client.tsx
 "use client";
 
-import Link from "next/link";
-import { useMemo } from "react";
+const AUTH_ORIGIN = process.env.NEXT_PUBLIC_QSX_AUTH_ORIGIN || "";
 
-type BtnProps = {
-  href: string;
-  children: React.ReactNode;
-  variant?: "primary" | "ghost";
-  className?: string;
-};
+function cx(...arr: Array<string | false | null | undefined>) {
+  return arr.filter(Boolean).join(" ");
+}
 
-function ButtonLink({ href, children, variant = "ghost", className = "" }: BtnProps) {
-  const base =
-    "inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
-  const v =
-    variant === "primary"
-      ? "bg-cyan-500/90 text-black hover:bg-cyan-400 shadow-[0_0_0_1px_rgba(34,211,238,0.35),0_10px_30px_rgba(34,211,238,0.12)]"
-      : "bg-white/6 text-white hover:bg-white/10 border border-white/12";
+function IconDot() {
   return (
-    <Link href={href} className={`${base} ${v} ${className}`}>
-      {children}
-    </Link>
+    <span className="inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_18px_rgba(34,211,238,0.6)]" />
   );
 }
 
-function SectionTitle({
-  title,
-  subtitle,
-  align = "center",
-}: {
-  title: string;
-  subtitle?: string;
-  align?: "left" | "center";
-}) {
-  const a = align === "left" ? "text-left" : "text-center";
+function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${a} mb-10`}>
-      <h2 className="text-xl sm:text-2xl font-semibold text-white/92 tracking-wide">{title}</h2>
-      {subtitle ? <div className="mt-3 text-sm text-white/55">{subtitle}</div> : null}
-    </div>
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] font-medium text-white/70 backdrop-blur">
+      <IconDot />
+      {children}
+    </span>
   );
 }
 
 function GlassCard({
-  title,
-  desc,
-  icon,
+  className,
+  children,
 }: {
-  title: string;
-  desc: string;
-  icon: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/12 border border-cyan-400/20 text-cyan-300">
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <div className="text-sm font-semibold text-white/90">{title}</div>
-          <div className="mt-2 text-sm text-white/55 leading-relaxed">{desc}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StepRow({ n, text }: { n: number; text: string }) {
-  return (
-    <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md px-5 py-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/14 border border-cyan-400/20 text-cyan-300 font-semibold">
-        {n}
-      </div>
-      <div className="text-sm text-white/75 leading-relaxed">{text}</div>
-    </div>
-  );
-}
-
-function CompareTable() {
-  const rows = useMemo(
-    () => [
-      { left: "预测价格涨跌", right: "量化风险边界" },
-      { left: "单一指标分析", right: "多维度数据融合" },
-      { left: "滞后的历史数据", right: "实时市场结构监控" },
-      { left: "需要自己解读", right: "AI 直接给出建议" },
-    ],
-    []
-  );
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-      <div className="grid grid-cols-2">
-        <div className="px-6 py-4 text-sm font-semibold text-white/60 border-b border-white/10">
-          传统分析工具
-        </div>
-        <div className="px-6 py-4 text-sm font-semibold text-cyan-300 border-b border-white/10">
-          QSX
-        </div>
-      </div>
-
-      <div className="divide-y divide-white/10">
-        {rows.map((r, i) => (
-          <div key={i} className="grid grid-cols-2">
-            <div className="px-6 py-4 text-sm text-white/55">{r.left}</div>
-            <div className="px-6 py-4 text-sm text-white/78">{r.right}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Background() {
-  return (
-    <div className="absolute inset-0 -z-10">
-      <div className="absolute inset-0 bg-black" />
-      <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_50%_15%,rgba(34,211,238,0.14),transparent_55%),radial-gradient(900px_circle_at_10%_40%,rgba(56,189,248,0.10),transparent_55%),radial-gradient(900px_circle_at_90%_55%,rgba(99,102,241,0.10),transparent_55%)]" />
-      <div className="absolute inset-0 opacity-[0.35] bg-[url('/stars.jpg')] bg-cover bg-center" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/55 to-black/85" />
-    </div>
-  );
-}
-
-function ContentShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative z-10 w-full max-w-[1200px] xl:max-w-[1320px] mx-auto px-5 sm:px-8">
+    <div
+      className={cx(
+        "rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl",
+        "shadow-[0_12px_40px_rgba(0,0,0,0.35)]",
+        className
+      )}
+    >
       {children}
     </div>
   );
 }
 
-export default function LandingClient() {
+function PrimaryButton({
+  onClick,
+  children,
+  className,
+}: {
+  onClick?: () => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="relative min-h-screen text-white">
-      <Background />
+    <button
+      onClick={onClick}
+      className={cx(
+        "h-12 w-full rounded-xl px-5 text-[15px] font-semibold",
+        "bg-gradient-to-br from-blue-500 to-blue-700 text-white",
+        "shadow-[0_10px_30px_rgba(59,130,246,0.35)]",
+        "transition-transform duration-150 hover:scale-[1.02] active:scale-[0.99]",
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
-      <ContentShell>
-        <section className="pt-10 sm:pt-14">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-cyan-500/12 border border-cyan-400/20 flex items-center justify-center text-cyan-300 font-semibold">
+function SecondaryButton({
+  onClick,
+  children,
+  className,
+}: {
+  onClick?: () => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cx(
+        "h-12 w-full rounded-xl px-5 text-[15px] font-semibold text-white",
+        "border border-white/10 bg-white/5 backdrop-blur",
+        "transition-transform duration-150 hover:scale-[1.02] active:scale-[0.99]",
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+export default function LandingClient() {
+  const handleSignIn = () => {
+    const currentOrigin = window.location.origin;
+    const redirectUrl = encodeURIComponent(currentOrigin + "/today");
+    window.location.href = `${AUTH_ORIGIN}/sign-in?redirect_url=${redirectUrl}`;
+  };
+
+  const handleSignUp = () => {
+    const currentOrigin = window.location.origin;
+    const redirectUrl = encodeURIComponent(currentOrigin + "/today");
+    window.location.href = `${AUTH_ORIGIN}/sign-up?redirect_url=${redirectUrl}`;
+  };
+
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url(/bg-stars.jpg)" }}
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_55%),linear-gradient(to_bottom,rgba(0,0,0,0.45),rgba(0,0,0,0.75),rgba(0,0,0,0.9))]" />
+      <div className="absolute inset-0 opacity-[0.22] [background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px]" />
+
+      <header className="relative z-10">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_25px_rgba(0,0,0,0.35)] backdrop-blur">
+              <span className="text-[14px] font-extrabold tracking-wide text-cyan-300">
                 Q
-              </div>
-              <div className="text-sm font-semibold text-white/85 tracking-wide">QSX</div>
+              </span>
             </div>
-            <div className="flex items-center gap-3">
-              <ButtonLink href="/sign-in" variant="ghost" className="px-4 py-2 rounded-lg">
-                Sign In
-              </ButtonLink>
-              <ButtonLink href="/sign-up" variant="primary" className="px-4 py-2 rounded-lg">
-                Sign Up
-              </ButtonLink>
+            <div className="text-[14px] font-semibold tracking-wide text-white/85">
+              QSX
             </div>
           </div>
-        </section>
 
-        <section className="min-h-[78vh] sm:min-h-[80vh] flex items-center">
-          <div className="w-full">
-            <div className="max-w-[860px]">
-              <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white/92">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSignIn}
+              className="h-10 rounded-xl border border-white/10 bg-white/5 px-4 text-[13px] font-semibold text-white/85 backdrop-blur transition hover:bg-white/10"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={handleSignUp}
+              className="h-10 rounded-xl bg-cyan-500/90 px-4 text-[13px] font-semibold text-black transition hover:bg-cyan-400"
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="relative z-10">
+        <section className="mx-auto w-full max-w-7xl px-6 pb-14 pt-10 lg:pb-20 lg:pt-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-7">
+              <div className="flex flex-wrap items-center gap-2">
+                <Pill>全市场风险引擎</Pill>
+                <Pill>机构级数据融合</Pill>
+                <Pill>实时风险报警</Pill>
+              </div>
+
+              <h1 className="mt-6 text-[40px] font-extrabold leading-[1.05] tracking-[-0.02em] lg:text-[52px]">
                 QSX 全市场风险引擎
               </h1>
 
-              <div className="mt-5 text-base sm:text-lg text-white/70 leading-relaxed">
+              <p className="mt-5 max-w-2xl text-[16px] leading-7 text-white/70 lg:text-[17px]">
                 QSX —— 定义交易的风险边界。
-              </div>
-              <div className="mt-2 text-sm sm:text-base text-white/50">
+              </p>
+              <p className="mt-2 max-w-2xl text-[13px] leading-6 text-white/45">
                 QSX - Quantifying the Edge of Market Risk.
+              </p>
+
+              <div className="mt-8 grid w-full max-w-md grid-cols-2 gap-3">
+                <PrimaryButton onClick={handleSignUp}>免费注册</PrimaryButton>
+                <SecondaryButton onClick={handleSignIn}>继续登录</SecondaryButton>
               </div>
 
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <ButtonLink href="/sign-up" variant="primary" className="w-full sm:w-auto">
-                  免费注册
-                </ButtonLink>
-                <ButtonLink href="/sign-in" variant="ghost" className="w-full sm:w-auto">
-                  继续登录
-                </ButtonLink>
+              <div className="mt-3 text-[12px] font-medium text-white/40">
+                Invite only
               </div>
 
-              <div className="mt-4 text-xs text-white/35">Invite only</div>
+              <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
+                <GlassCard className="p-4">
+                  <div className="text-[13px] font-semibold text-cyan-300">
+                    不预测涨跌
+                  </div>
+                  <div className="mt-2 text-[13px] leading-6 text-white/65">
+                    只输出可执行的风险边界与仓位约束。
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-4">
+                  <div className="text-[13px] font-semibold text-cyan-300">
+                    多维度融合
+                  </div>
+                  <div className="mt-2 text-[13px] leading-6 text-white/65">
+                    流动性 / 衍生品 / 链上资金流统一视图。
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-4">
+                  <div className="text-[13px] font-semibold text-cyan-300">
+                    实时预警
+                  </div>
+                  <div className="mt-2 text-[13px] leading-6 text-white/65">
+                    异常波动与杠杆堆积，优先提示风险。
+                  </div>
+                </GlassCard>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="sticky top-6">
+                <GlassCard className="p-6">
+                  <div className="text-[14px] font-semibold text-white/85">
+                    3 步开始使用
+                  </div>
+                  <div className="mt-1 text-[13px] text-white/55">
+                    先理解风险，再决定仓位，最后谈策略。
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div className="grid h-8 w-8 place-items-center rounded-full bg-cyan-400 text-[13px] font-extrabold text-black">
+                        1
+                      </div>
+                      <div className="text-[13px] text-white/75">
+                        免费注册账号，无需信用卡
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div className="grid h-8 w-8 place-items-center rounded-full bg-cyan-400 text-[13px] font-extrabold text-black">
+                        2
+                      </div>
+                      <div className="text-[13px] text-white/75">
+                        查看今日市场风险评分与仓位建议
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div className="grid h-8 w-8 place-items-center rounded-full bg-cyan-400 text-[13px] font-extrabold text-black">
+                        3
+                      </div>
+                      <div className="text-[13px] text-white/75">
+                        升级 VIP/PRO 解锁完整数据与 AI 分析
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <PrimaryButton onClick={handleSignUp}>立即免费注册</PrimaryButton>
+                  </div>
+                </GlassCard>
+
+                <div className="mt-6">
+                  <GlassCard className="p-6">
+                    <div className="text-[14px] font-semibold text-white/85">
+                      QSX 与传统工具的区别
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-white/10">
+                        <div className="bg-white/5 px-4 py-3 text-[12px] font-semibold text-white/55">
+                          传统分析工具
+                        </div>
+                        <div className="bg-white/5 px-4 py-3 text-[12px] font-semibold text-cyan-300">
+                          QSX
+                        </div>
+
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/55">
+                          预测价格涨跌
+                        </div>
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/80">
+                          量化风险边界
+                        </div>
+
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/55">
+                          单一指标分析
+                        </div>
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/80">
+                          多维度数据融合
+                        </div>
+
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/55">
+                          滞后的历史数据
+                        </div>
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/80">
+                          实时市场结构监控
+                        </div>
+
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/55">
+                          需要自己解读
+                        </div>
+                        <div className="border-t border-white/10 px-4 py-3 text-[12px] text-white/80">
+                          直接给出建议
+                        </div>
+                      </div>
+
+                      <div className="text-[12px] text-white/45">
+                        注：本页仅展示“产品价值”，不暴露内部数据口径与模型细节。
+                      </div>
+                    </div>
+                  </GlassCard>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="pb-8">
-          <SectionTitle title="为什么用 QSX" subtitle="不预测涨跌，专注给出风险边界与可执行的仓位约束。" />
+        <section className="mx-auto w-full max-w-7xl px-6 pb-20">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <GlassCard className="p-6">
+              <div className="text-[14px] font-semibold text-white/85">
+                量化风险边界
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-white/65">
+                把复杂数据压缩成“可执行的风险边界”，让仓位管理变简单。
+              </div>
+            </GlassCard>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <GlassCard
-              title="量化风险边界"
-              desc="不预判涨跌，只量化当前市场的风险暴露度与结构性拐点。"
-              icon={
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 2v20M2 12h20"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              }
-            />
-            <GlassCard
-              title="机构级数据引擎"
-              desc="整合流动性、衍生品、链上资金流等多维数据，形成一致的风险视图。"
-              icon={
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M4 7h16M7 4v16M20 17H4"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              }
-            />
-            <GlassCard
-              title="实时风险报警"
-              desc="市场异常波动、杠杆堆积、流动性枯竭时第一时间推送预警。"
-              icon={
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 9v4m0 4h.01M10.3 3.2l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-2.8l-8-14a2 2 0 0 0-3.4 0Z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              }
-            />
+            <GlassCard className="p-6">
+              <div className="text-[14px] font-semibold text-white/85">
+                结构性拐点提示
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-white/65">
+                关注杠杆、流动性与结构变化，而不是追逐短周期噪声。
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-6">
+              <div className="text-[14px] font-semibold text-white/85">
+                风险报警分层
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-white/65">
+                让“风险”从概念变成可见的等级与动作建议。
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="mt-10 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+            <div>
+              <div className="text-[14px] font-semibold text-white/85">
+                先注册，再看今日风险与仓位建议
+              </div>
+              <div className="mt-1 text-[13px] text-white/55">
+                免费会员即可体验核心“风险边界”输出。
+              </div>
+            </div>
+            <div className="hidden w-56 lg:block">
+              <PrimaryButton onClick={handleSignUp}>开始使用</PrimaryButton>
+            </div>
+            <div className="w-full lg:hidden">
+              <div className="mt-4">
+                <PrimaryButton onClick={handleSignUp}>开始使用</PrimaryButton>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="mt-24 pb-8">
-          <SectionTitle title="3 步开始使用" subtitle="先理解风险，再决定仓位，最后才谈策略。" />
-
-          <div className="max-w-[760px] mx-auto space-y-5">
-            <StepRow n={1} text="免费注册账号，无需信用卡" />
-            <StepRow n={2} text="查看今日市场风险评分与仓位建议" />
-            <StepRow n={3} text="升级 VIP/PRO 解锁完整数据与 AI 分析" />
+        <footer className="mx-auto w-full max-w-7xl px-6 pb-10">
+          <div className="flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
+            <div className="text-[12px] text-white/40">
+              © {new Date().getFullYear()} QSX. All rights reserved.
+            </div>
+            <div className="text-[12px] text-white/40">
+              QSX —— 定义交易的风险边界。
+            </div>
           </div>
-
-          <div className="mt-10 text-center">
-            <ButtonLink href="/sign-up" variant="primary">
-              免费注册
-            </ButtonLink>
-          </div>
-        </section>
-
-        <section className="mt-24 pb-20">
-          <SectionTitle title="QSX 与传统工具的区别" subtitle="把复杂数据压缩成“能执行的风险边界”。" />
-          <CompareTable />
-        </section>
-      </ContentShell>
+        </footer>
+      </main>
     </div>
   );
 }
