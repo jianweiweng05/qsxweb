@@ -1,6 +1,5 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { VIPGate, ProGate } from "@/app/lib/gate";
-import { AIInput } from "./ai-input";
 
 export const dynamic = "force-dynamic";
 
@@ -84,9 +83,6 @@ export default async function TodayPage() {
           </ProGate>
         </div>
       </div>
-
-      {/* AI 输入 */}
-      <AIInput />
 
       {/* AI 解读区 - 独立一块，中性背景 */}
       <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">

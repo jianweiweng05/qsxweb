@@ -4,6 +4,34 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChatPanel } from "./ai/chat-panel";
 
+const PAGE_SUGGESTIONS: Record<string, string[]> = {
+  today: [
+    "今天的建议仓位是多少？为什么？",
+    "当前市场状态下应该采取什么策略？",
+    "多空信号分别指向什么？"
+  ],
+  radar: [
+    "如何解读当前的市场数据？",
+    "哪些指标值得重点关注？",
+    "数据显示的趋势是什么？"
+  ],
+  toolbox: [
+    "今日相似度分析说明了什么？",
+    "策略指引建议如何操作？",
+    "如何使用这些工具优化决策？"
+  ],
+  alerts: [
+    "当前有哪些重要的风险信号？",
+    "报警级别如何判断？",
+    "历史报警数据显示什么规律？"
+  ],
+  ai: [
+    "如何分析当前市场环境？",
+    "有什么投资建议？",
+    "风险点在哪里？"
+  ]
+};
+
 export function FloatingAIBubble({
   messages,
   setMessages,
@@ -17,19 +45,44 @@ export function FloatingAIBubble({
   const getContext = () => {
     const parts = pathname.split("/").filter(Boolean);
     const page = parts[parts.length - 1] || "today";
-    return { from: `/${page}` };
+    return { from: `/${page}`, suggestions: PAGE_SUGGESTIONS[page] || PAGE_SUGGESTIONS.today };
   };
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed z-40 w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 hover:from-cyan-500/30 hover:to-blue-600/30 transition-all shadow-lg"
-        style={{ bottom: "calc(72px + env(safe-area-inset-bottom) + 16px)", right: "16px" }}
+        className="fixed z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg"
+        style={{
+          bottom: "calc(72px + env(safe-area-inset-bottom) + 16px)",
+          right: "16px",
+          background: "rgba(10,14,20,0.6)",
+          backdropFilter: "blur(8px)",
+          border: "1px solid rgba(0,229,255,0.3)"
+        }}
         aria-label="AI助手"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+          {/* 外层能量环 */}
+          <circle cx="16" cy="16" r="14" stroke="url(#grad1)" strokeWidth="0.5" opacity="0.4" />
+          <circle cx="16" cy="16" r="12" stroke="url(#grad1)" strokeWidth="0.5" opacity="0.6" />
+
+          {/* 中心核心 */}
+          <circle cx="16" cy="16" r="6" fill="url(#grad2)" opacity="0.9" />
+          <circle cx="16" cy="16" r="4" fill="#00E5FF" opacity="0.6" />
+          <circle cx="16" cy="16" r="2" fill="#fff" opacity="0.8" />
+
+          {/* 渐变定义 */}
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00E5FF" />
+              <stop offset="100%" stopColor="#4F9CFF" />
+            </linearGradient>
+            <radialGradient id="grad2">
+              <stop offset="0%" stopColor="#00E5FF" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#4F9CFF" stopOpacity="0.3" />
+            </radialGradient>
+          </defs>
         </svg>
       </button>
 

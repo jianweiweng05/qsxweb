@@ -66,7 +66,7 @@ export function ChatPanel({
 }: {
   messages: Message[];
   setMessages: (msgs: Message[] | ((prev: Message[]) => Message[])) => void;
-  context?: { from?: string; symbol?: string };
+  context?: { from?: string; symbol?: string; suggestions?: string[] };
 }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -156,6 +156,7 @@ export function ChatPanel({
 
   const disabled = loading || streaming;
   const showSuggestions = messages.length === 0 && !input;
+  const suggestions = context?.suggestions || SUGGESTIONS;
 
   return (
     <div className="flex flex-col h-full">
@@ -232,7 +233,7 @@ export function ChatPanel({
 
       {showSuggestions && (
         <div className="flex gap-2 mt-4 flex-wrap">
-          {SUGGESTIONS.map((s) => (
+          {suggestions.map((s) => (
             <button
               key={s}
               onClick={() => handleAsk(s)}
