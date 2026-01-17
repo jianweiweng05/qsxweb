@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { ChatPanel } from "../ai/chat-panel";
+import { ChatPanel } from "./ai/chat-panel";
 
 export function FloatingAIBubble({
   messages,
