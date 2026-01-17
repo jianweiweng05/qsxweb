@@ -318,7 +318,9 @@ export default function RadarClient() {
       metrics: ctLayer.items
         .filter(item => {
           const name = item.display_name || '';
-          return !name.includes('观望') && !name.includes('结构') && !name.includes('震荡');
+          return !name.includes('观望') && !name.includes('结构') && !name.includes('震荡')
+            && !name.includes('比特币现价') && !name.includes('以太坊现价')
+            && !name.includes('ETH/USDT 4H Open') && !name.includes('ETH 合约标的');
         })
         .map(item => ({
           label: item.display_name,
