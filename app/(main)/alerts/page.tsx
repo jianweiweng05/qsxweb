@@ -23,21 +23,9 @@ export default function AlertsPage() {
         requiredTier="PRO"
         title={t.alerts}
         unlockConfig={{
-          title: lang === "zh" ? "实时报警系统" : "Real-time Alert System",
-          description: lang === "zh"
-            ? "7x24 小时监控市场异常信号，第一时间发现风险和机会。"
-            : "24/7 market anomaly monitoring, detect risks and opportunities in real-time.",
-          features: lang === "zh"
-            ? [
-                "多层级风险监控",
-                "历史报警回溯分析",
-                "关键指标异常提醒"
-              ]
-            : [
-                "Multi-level risk monitoring",
-                "Historical alert analysis",
-                "Key indicator alerts"
-              ]
+          title: t.alertSystemTitle,
+          description: t.alertSystemDesc,
+          features: [t.alertFeature1, t.alertFeature2, t.alertFeature3]
         }}
       >
         <></>

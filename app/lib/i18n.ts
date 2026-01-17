@@ -48,6 +48,23 @@ export const translations = {
     confirm: "确认",
     unknown: "未知",
 
+    // Features
+    aiMarketAnalysis: "AI 市场解读",
+    longShortSignal: "多空信号分析",
+    unlimitedAiChat: "无限次 AI 对话",
+    allVipFeatures: "包含所有 VIP 功能",
+    realtimeAlertSystem: "实时报警系统",
+    volatilityMonitoring: "波动状态监控 (Gamma)",
+    professionalStrategy: "专业策略建议",
+    historicalAlertReview: "历史报警回溯",
+
+    // Alert page unlock
+    alertSystemTitle: "实时报警系统",
+    alertSystemDesc: "7x24 小时监控市场异常信号，第一时间发现风险和机会。",
+    alertFeature1: "多层级风险监控",
+    alertFeature2: "历史报警回溯分析",
+    alertFeature3: "关键指标异常提醒",
+
     // Risk disclaimer
     riskDisclaimer: "本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。",
   },
@@ -95,6 +112,23 @@ export const translations = {
     cancel: "Cancel",
     confirm: "Confirm",
     unknown: "Unknown",
+
+    // Features
+    aiMarketAnalysis: "AI Market Analysis",
+    longShortSignal: "Long/Short Signal Analysis",
+    unlimitedAiChat: "Unlimited AI Chat",
+    allVipFeatures: "All VIP Features",
+    realtimeAlertSystem: "Real-time Alert System",
+    volatilityMonitoring: "Volatility Monitoring (Gamma)",
+    professionalStrategy: "Professional Strategy Advice",
+    historicalAlertReview: "Historical Alert Review",
+
+    // Alert page unlock
+    alertSystemTitle: "Real-time Alert System",
+    alertSystemDesc: "24/7 market anomaly monitoring, detect risks and opportunities in real-time.",
+    alertFeature1: "Multi-level risk monitoring",
+    alertFeature2: "Historical alert analysis",
+    alertFeature3: "Key indicator alerts",
 
     // Risk disclaimer
     riskDisclaimer: "This system is a research-oriented market risk analysis tool that provides risk environment references based on multi-dimensional historical data and structured models. It does not constitute investment advice or profit guarantees. All decisions and risks are borne by users.",

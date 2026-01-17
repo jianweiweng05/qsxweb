@@ -80,9 +80,9 @@ export default function AccountPage() {
               )}
             </div>
             <ul className="space-y-2 text-sm text-white/70">
-              <li>• {lang === "zh" ? "AI 市场解读" : "AI Market Analysis"}</li>
-              <li>• {lang === "zh" ? "多空信号分析" : "Long/Short Signal Analysis"}</li>
-              <li>• {lang === "zh" ? "无限次 AI 对话" : "Unlimited AI Chat"}</li>
+              <li>• {t.aiMarketAnalysis}</li>
+              <li>• {t.longShortSignal}</li>
+              <li>• {t.unlimitedAiChat}</li>
             </ul>
           </div>
 
@@ -97,11 +97,11 @@ export default function AccountPage() {
               )}
             </div>
             <ul className="space-y-2 text-sm text-white/70">
-              <li>• {lang === "zh" ? "包含所有 VIP 功能" : "All VIP Features"}</li>
-              <li>• {lang === "zh" ? "实时报警系统" : "Real-time Alert System"}</li>
-              <li>• {lang === "zh" ? "波动状态监控 (Gamma)" : "Volatility Monitoring (Gamma)"}</li>
-              <li>• {lang === "zh" ? "专业策略建议" : "Professional Strategy Advice"}</li>
-              <li>• {lang === "zh" ? "历史报警回溯" : "Historical Alert Review"}</li>
+              <li>• {t.allVipFeatures}</li>
+              <li>• {t.realtimeAlertSystem}</li>
+              <li>• {t.volatilityMonitoring}</li>
+              <li>• {t.professionalStrategy}</li>
+              <li>• {t.historicalAlertReview}</li>
             </ul>
           </div>
         </div>
