@@ -52,29 +52,27 @@ export function FloatingAIBubble({
 
   return (
     <>
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @keyframes breathe {
           0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.3), 0 0 16px rgba(0, 229, 255, 0.15); }
           50% { box-shadow: 0 0 12px rgba(0, 229, 255, 0.5), 0 0 24px rgba(0, 229, 255, 0.25); }
         }
         .ai-bubble {
           animation: breathe 3.5s ease-in-out infinite;
+          bottom: calc(72px + env(safe-area-inset-bottom) + 16px);
+          right: 16px;
+          background: rgba(10, 20, 30, 0.65);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(0, 229, 255, 0.6);
         }
         .ai-bubble:hover {
           transform: scale(1.05);
           box-shadow: 0 0 16px rgba(0, 229, 255, 0.6), 0 0 32px rgba(0, 229, 255, 0.3) !important;
         }
-      `}</style>
+      `}} />
       <button
         onClick={() => setOpen(true)}
         className="ai-bubble fixed z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all"
-        style={{
-          bottom: "calc(72px + env(safe-area-inset-bottom) + 16px)",
-          right: "16px",
-          background: "rgba(10, 20, 30, 0.65)",
-          backdropFilter: "blur(8px)",
-          border: "1px solid rgba(0, 229, 255, 0.6)"
-        }}
         aria-label="AI助手"
       >
         <span className="text-cyan-400 text-xl font-semibold tracking-tight" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
