@@ -1,6 +1,5 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { getUserTier } from "@/app/lib/entitlements";
-import { SharedAIInput } from "../shared-ai-input";
 import { ProGate } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
 
@@ -21,8 +20,6 @@ export default async function ToolboxPage() {
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-4">PRO 工具箱</h1>
-
-      <SharedAIInput />
 
       {/* 左右布局 */}
       <div className="grid lg:grid-cols-2 gap-4 mt-6">

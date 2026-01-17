@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, Radar, Bell, Wrench, User } from "lucide-react";
+import { FloatingAIBubble } from "./floating-ai-bubble";
 
 const tabs = [
   { key: "/today", title: "今日", Icon: Activity },
@@ -26,6 +28,7 @@ export default function MainLayout({
   const pathname = usePathname();
   const router = useRouter();
   const activeKey = mapActiveKey(pathname);
+  const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
 
   const unreadAlerts = 3;
 
@@ -103,6 +106,8 @@ export default function MainLayout({
           })}
         </div>
       </nav>
+
+      <FloatingAIBubble messages={messages} setMessages={setMessages} />
     </div>
   );
 }
