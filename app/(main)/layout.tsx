@@ -36,7 +36,7 @@ export default function MainLayout({
     <div className="min-h-screen flex flex-col bg-black">
       {/* 顶部导航栏 */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-sm">
-        <div className="mx-auto max-w-[1200px] h-14 flex items-center justify-between px-4">
+        <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-between px-4 lg:px-6">
           <button
             onClick={() => router.push("/account")}
             className={`flex items-center gap-2 transition-colors ${
@@ -66,14 +66,14 @@ export default function MainLayout({
 
       {/* 内容区 */}
       <main className="flex-1 flex justify-center pt-14 pb-14">
-        <div className="w-full max-w-[1200px] px-4">
+        <div className="w-full max-w-[1600px] 2xl:max-w-[1760px] px-4 lg:px-6">
           {children}
         </div>
       </main>
 
       {/* 底部导航 */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/90 backdrop-blur-sm">
-        <div className="mx-auto max-w-[1200px] h-14 flex items-center justify-around px-2">
+        <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-around px-2">
           {tabs.map((tab) => {
             const isActive = activeKey === tab.key;
 
