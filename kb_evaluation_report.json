@@ -1,0 +1,1982 @@
+{
+  "summary": {
+    "totalQuestions": 270,
+    "totalMatched": 184,
+    "totalHighConfidence": 184,
+    "matchRate": "68.1%",
+    "highConfidenceRate": "68.1%"
+  },
+  "byCategory": {
+    "市场状态与风险": {
+      "total": 30,
+      "matched": 23,
+      "highConfidence": 23,
+      "matchRate": "76.7%",
+      "highConfidenceRate": "76.7%",
+      "details": [
+        {
+          "question": "现在市场怎么样？",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "市场状态是什么",
+          "matched": true,
+          "score": "0.571",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "今天市场偏多还是偏空",
+          "matched": true,
+          "score": "0.600",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "当前是牛市还是熊市",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "市场震荡吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "现在适合进攻吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "市场方向不明怎么办",
+          "matched": true,
+          "score": "0.444",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "整体状态如何",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "今天市场趋势",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "market_status",
+          "category": "Status"
+        },
+        {
+          "question": "当前风险大吗",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "会不会大跌",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "最大的风险是什么",
+          "matched": true,
+          "score": "0.625",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "系统性风险高吗",
+          "matched": true,
+          "score": "0.714",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "暴跌风险",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "需要警惕什么",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "最怕什么风险",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "risk_now",
+          "category": "Status"
+        },
+        {
+          "question": "风险在哪",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "环境风险",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "杠杆风险大吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "结构性风险",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "现在有多确定",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "判断准不准",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "靠谱吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "会不会错",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "确定性高吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "容易被打脸吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "你有多确定",
+          "matched": true,
+          "score": "0.800",
+          "matchedEntry": "confidence",
+          "category": "Status"
+        },
+        {
+          "question": "这个判断可信吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "准确率多少",
+          "matched": true,
+          "score": "0.600",
+          "matchedEntry": "not_prediction_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "胜率怎么样",
+          "matched": true,
+          "score": "0.600",
+          "matchedEntry": "advantage",
+          "category": "System"
+        }
+      ]
+    },
+    "仓位控制": {
+      "total": 30,
+      "matched": 19,
+      "highConfidence": 19,
+      "matchRate": "63.3%",
+      "highConfidenceRate": "63.3%",
+      "details": [
+        {
+          "question": "仓位怎么控制",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "建议仓位多少",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "现在仓位",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "可以加仓吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "要不要减仓",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "轻仓是多少",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "满仓合适吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
+        },
+        {
+          "question": "仓位上限",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "Risk Cap怎么用",
+          "matched": true,
+          "score": "0.727",
+          "matchedEntry": "risk_cap",
+          "category": "Risk"
+        },
+        {
+          "question": "20%是让我开20%吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "仓位红线",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "riskcap_is_cap_not_target",
+          "category": "Constitution"
+        },
+        {
+          "question": "该开多少仓",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "riskcap_is_cap_not_target",
+          "category": "Constitution"
+        },
+        {
+          "question": "仓位比例",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "风险预算",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "仓位规则",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "怎么配置仓位",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "仓位怎么算",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "加仓策略",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "减仓策略",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "分批加仓",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
+        },
+        {
+          "question": "仓位管理",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "持仓比例",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "风险暴露",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "最大仓位",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "安全仓位",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "仓位控制原则",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "动态仓位",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "仓位调整",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "仓位分配",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "合理仓位",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    },
+    "交易决策": {
+      "total": 30,
+      "matched": 25,
+      "highConfidence": 25,
+      "matchRate": "83.3%",
+      "highConfidenceRate": "83.3%",
+      "details": [
+        {
+          "question": "现在能交易吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "适合观望吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "还能不能参与",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "现在能不能做",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "适合短线吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "要不要试错",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "顺势交易",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "逆势抄底",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "can_trade",
+          "category": "Status"
+        },
+        {
+          "question": "现在该做什么",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "能不能开仓",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "买不买",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "该不该买",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "该不该卖",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "给点位",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "止盈止损",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_timing_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "目标价",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "什么时候平仓",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "抄底时机",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "做多还是做空",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "no_trade_instruction",
+          "category": "Rules"
+        },
+        {
+          "question": "交易方向",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "入场时机",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_timing_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "出场时机",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_timing_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "持仓还是平仓",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "追涨杀跌",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "高抛低吸",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "波段操作",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "日内交易",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "长线持有",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "短线进出",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        },
+        {
+          "question": "网格交易",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "trading_style_principle",
+          "category": "Rules"
+        }
+      ]
+    },
+    "信号冲突与层级": {
+      "total": 30,
+      "matched": 21,
+      "highConfidence": 21,
+      "matchRate": "70.0%",
+      "highConfidenceRate": "70.0%",
+      "details": [
+        {
+          "question": "信号冲突怎么办",
+          "matched": true,
+          "score": "0.571",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "信号打架",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "互相矛盾",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "不一致",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "分歧很大",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "到底听谁的",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "L1看多L3看空",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "六层不共振",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "为什么一会这样一会那样",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
+        },
+        {
+          "question": "层级优先级",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "L1是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l1",
+          "category": "Layers"
+        },
+        {
+          "question": "L2是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l2",
+          "category": "Layers"
+        },
+        {
+          "question": "L3是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l3",
+          "category": "Layers"
+        },
+        {
+          "question": "L4是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l4",
+          "category": "Layers"
+        },
+        {
+          "question": "L5是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l5",
+          "category": "Layers"
+        },
+        {
+          "question": "L6是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l6",
+          "category": "Layers"
+        },
+        {
+          "question": "环境层",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "资金层",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l2",
+          "category": "Layers"
+        },
+        {
+          "question": "衍生品层",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l3",
+          "category": "Layers"
+        },
+        {
+          "question": "链上层",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l4",
+          "category": "Layers"
+        },
+        {
+          "question": "情绪层",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l5",
+          "category": "Layers"
+        },
+        {
+          "question": "结构层",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "l6",
+          "category": "Layers"
+        },
+        {
+          "question": "六层怎么看",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "层级权重",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "non_decomposable_policy",
+          "category": "Rules"
+        },
+        {
+          "question": "哪层最重要",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "多层分析",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "层级裁决",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "共振信号",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "背离信号",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "层级冲突",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    },
+    "指标与数据": {
+      "total": 30,
+      "matched": 17,
+      "highConfidence": 17,
+      "matchRate": "56.7%",
+      "highConfidenceRate": "56.7%",
+      "details": [
+        {
+          "question": "RR25是什么",
+          "matched": true,
+          "score": "0.571",
+          "matchedEntry": "rr25",
+          "category": "Indicators"
+        },
+        {
+          "question": "资金费率",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "funding",
+          "category": "Indicators"
+        },
+        {
+          "question": "Funding",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "funding",
+          "category": "Indicators"
+        },
+        {
+          "question": "多空比",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "ls_ratio",
+          "category": "Indicators"
+        },
+        {
+          "question": "LS",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "ls_ratio",
+          "category": "Indicators"
+        },
+        {
+          "question": "ETF净流入",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "etf_d",
+          "category": "Indicators"
+        },
+        {
+          "question": "ETF_D",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "etf_d",
+          "category": "Indicators"
+        },
+        {
+          "question": "ETF_7DMA",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "etf_7dma",
+          "category": "Indicators"
+        },
+        {
+          "question": "恐惧贪婪指数",
+          "matched": true,
+          "score": "0.667",
+          "matchedEntry": "fgi",
+          "category": "Indicators"
+        },
+        {
+          "question": "FGI",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "fgi",
+          "category": "Indicators"
+        },
+        {
+          "question": "波动状态",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "Gamma",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "MVRV",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "SOPR",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "持仓量",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "OI",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "隐含波动率",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "IV",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "成本区",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "链上数据",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "实时吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_delay_asof",
+          "category": "Rules"
+        },
+        {
+          "question": "数据延迟",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "data_delay_asof",
+          "category": "Rules"
+        },
+        {
+          "question": "asof",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_delay_asof",
+          "category": "Rules"
+        },
+        {
+          "question": "更新频率",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "update_freq",
+          "category": "System"
+        },
+        {
+          "question": "多久更新",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "update_freq",
+          "category": "System"
+        },
+        {
+          "question": "数据源",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "数据准确吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "时间戳",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_delay_asof",
+          "category": "Rules"
+        },
+        {
+          "question": "数据滞后",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "不是最新",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_delay_asof",
+          "category": "Rules"
+        }
+      ]
+    },
+    "历史相似性": {
+      "total": 30,
+      "matched": 15,
+      "highConfidence": 15,
+      "matchRate": "50.0%",
+      "highConfidenceRate": "50.0%",
+      "details": [
+        {
+          "question": "历史相似度",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_is_env_not_prediction",
+          "category": "Constitution"
+        },
+        {
+          "question": "相似性",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "相似度怎么用",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "80%相似",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_is_env_not_prediction",
+          "category": "Constitution"
+        },
+        {
+          "question": "像哪次行情",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "历史对比",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "相似案例",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "HCRI",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "top3相似",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "hcri_similarity",
+          "category": "Core"
+        },
+        {
+          "question": "历史复刻",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "会不会复制历史",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_is_env_not_prediction",
+          "category": "Constitution"
+        },
+        {
+          "question": "相似度是预测吗",
+          "matched": true,
+          "score": "0.429",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "相似环境",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "历史参考",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "相似度高",
+          "matched": true,
+          "score": "0.750",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "历史回溯",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "过往案例",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "类似行情",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "历史重演",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "相似阶段",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "环境识别",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "历史匹配",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "相似度分析",
+          "matched": true,
+          "score": "0.600",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "历史对标",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "参考案例",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "历史经验",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "相似度意义",
+          "matched": true,
+          "score": "0.600",
+          "matchedEntry": "similarity_boundary",
+          "category": "Rules"
+        },
+        {
+          "question": "历史借鉴",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "案例研究",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "历史规律",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    },
+    "报警系统": {
+      "total": 30,
+      "matched": 21,
+      "highConfidence": 21,
+      "matchRate": "70.0%",
+      "highConfidenceRate": "70.0%",
+      "details": [
+        {
+          "question": "报警是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "红色报警",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "黄色报警",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警怎么理解",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "红警怎么办",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "报警是信号吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_not_trade_signal",
+          "category": "Rules"
+        },
+        {
+          "question": "报警要不要做空",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "报警要不要平仓",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "报警数量",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_is_warning_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "报警层级",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_priority_handling",
+          "category": "Rules"
+        },
+        {
+          "question": "报警原因",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警触发",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警处理",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警响应",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "多个报警",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_many_action",
+          "category": "Rules"
+        },
+        {
+          "question": "报警优先级",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_priority_handling",
+          "category": "Rules"
+        },
+        {
+          "question": "报警严重吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_priority_handling",
+          "category": "Rules"
+        },
+        {
+          "question": "报警频繁",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_history_analysis",
+          "category": "Rules"
+        },
+        {
+          "question": "报警消除",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警持续",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_history_analysis",
+          "category": "Rules"
+        },
+        {
+          "question": "报警历史",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_history_analysis",
+          "category": "Rules"
+        },
+        {
+          "question": "报警趋势",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_history_analysis",
+          "category": "Rules"
+        },
+        {
+          "question": "报警分析",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_history_analysis",
+          "category": "Rules"
+        },
+        {
+          "question": "报警意义",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警机制",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_trigger_logic",
+          "category": "Rules"
+        },
+        {
+          "question": "报警阈值",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_trigger_logic",
+          "category": "Rules"
+        },
+        {
+          "question": "报警规则",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_trigger_logic",
+          "category": "Rules"
+        },
+        {
+          "question": "报警逻辑",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "alert_trigger_logic",
+          "category": "Rules"
+        },
+        {
+          "question": "报警准确吗",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "报警误报",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    },
+    "系统理解": {
+      "total": 30,
+      "matched": 21,
+      "highConfidence": 21,
+      "matchRate": "70.0%",
+      "highConfidenceRate": "70.0%",
+      "details": [
+        {
+          "question": "系统是什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "what_is_system",
+          "category": "Constitution"
+        },
+        {
+          "question": "QSX",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "what_is_system",
+          "category": "Constitution"
+        },
+        {
+          "question": "这是啥",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "what_is_system",
+          "category": "Constitution"
+        },
+        {
+          "question": "干什么的",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "what_is_system",
+          "category": "Constitution"
+        },
+        {
+          "question": "怎么用",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "what_is_system",
+          "category": "Constitution"
+        },
+        {
+          "question": "能预测吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "not_prediction_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "会涨吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "not_prediction_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "会跌吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "not_prediction_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "准确率",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "not_prediction_not_signal",
+          "category": "Constitution"
+        },
+        {
+          "question": "系统优势",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "好在哪",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "值吗",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "凭什么",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "牛在哪",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "怎么样",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "advantage",
+          "category": "System"
+        },
+        {
+          "question": "权重怎么来的",
+          "matched": true,
+          "score": "0.333",
+          "matchedEntry": "non_decomposable_policy",
+          "category": "Rules"
+        },
+        {
+          "question": "算法",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "模型细节",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "non_decomposable_policy",
+          "category": "Rules"
+        },
+        {
+          "question": "公式",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "参数",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "内部逻辑",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "计算方法",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "为什么这样算",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "依据是什么",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "原理",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "免责声明",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "disclaimer",
+          "category": "Legal"
+        },
+        {
+          "question": "风险提示",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "disclaimer",
+          "category": "Legal"
+        },
+        {
+          "question": "不构成投资建议",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "disclaimer",
+          "category": "Legal"
+        },
+        {
+          "question": "法律",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "disclaimer",
+          "category": "Legal"
+        },
+        {
+          "question": "责任",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    },
+    "会员与订阅": {
+      "total": 30,
+      "matched": 22,
+      "highConfidence": 22,
+      "matchRate": "73.3%",
+      "highConfidenceRate": "73.3%",
+      "details": [
+        {
+          "question": "会员权益",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "VIP",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "Pro",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "Free",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "权限",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "多少钱",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "价格",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "订阅",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "升级",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "付费",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "怎么买",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "开通",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "取消订阅",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_cancel",
+          "category": "System"
+        },
+        {
+          "question": "退订",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_cancel",
+          "category": "System"
+        },
+        {
+          "question": "退款",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_cancel",
+          "category": "System"
+        },
+        {
+          "question": "不想用了",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_cancel",
+          "category": "System"
+        },
+        {
+          "question": "Pro有什么用",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "pro_is_risk_tool_not_profit",
+          "category": "Constitution"
+        },
+        {
+          "question": "Pro值不值",
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "pro_is_risk_tool_not_profit",
+          "category": "Constitution"
+        },
+        {
+          "question": "VIP和Pro区别",
+          "matched": true,
+          "score": "0.333",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "买Pro好处",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "会员对比",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "tiers",
+          "category": "System"
+        },
+        {
+          "question": "套餐选择",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "订阅方式",
+          "matched": true,
+          "score": "0.500",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
+        },
+        {
+          "question": "支付方式",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "到账时间",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "续费",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "优惠",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "折扣",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "试用",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        },
+        {
+          "question": "体验",
+          "matched": false,
+          "score": "0.000",
+          "matchedEntry": "NONE",
+          "category": "N/A"
+        }
+      ]
+    }
+  }
+}
