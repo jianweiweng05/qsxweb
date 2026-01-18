@@ -25,37 +25,57 @@ export default async function ToolboxPage() {
         <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="text-sm font-medium text-white/80 mb-3">跨资产轮动分析器</div>
           <div>
-            {crossAsset.macro_summary && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">宏观结论</div>
-                <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_summary.one_liner)}</div>
-              </div>
-            )}
             {crossAsset.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
-              const green = crossAsset.asset_board.filter((x: any) => x.signal === 'GREEN').length;
-              const yellow = crossAsset.asset_board.filter((x: any) => x.signal === 'YELLOW').length;
-              const red = crossAsset.asset_board.filter((x: any) => x.signal === 'RED').length;
-              const total = green + yellow + red;
-              const greenPct = (green / total) * 100;
-              const yellowPct = (yellow / total) * 100;
+              const total = crossAsset.asset_board.length;
+              const segmentAngle = 360 / total;
+              const gap = 2;
               return (
                 <div className="mb-4">
                   <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
-                  <div className="flex items-center gap-6">
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="#ef4444" strokeWidth="20" strokeDasharray={`${(red/total)*314} 314`} transform="rotate(-90 60 60)" />
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="#eab308" strokeWidth="20" strokeDasharray={`${(yellow/total)*314} 314`} strokeDashoffset={`-${(red/total)*314}`} transform="rotate(-90 60 60)" />
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" strokeWidth="20" strokeDasharray={`${(green/total)*314} 314`} strokeDashoffset={`-${((red+yellow)/total)*314}`} transform="rotate(-90 60 60)" />
-                      <text x="60" y="55" textAnchor="middle" className="fill-white text-xs">{green}绿</text>
-                      <text x="60" y="70" textAnchor="middle" className="fill-white/60 text-[10px]">{yellow}黄 {red}红</text>
+                  <div className="flex items-start gap-6">
+                    <svg width="156" height="156" viewBox="0 0 156 156" className="flex-shrink-0">
+                      {crossAsset.asset_board.map((item: any, i: number) => {
+                        const startAngle = i * segmentAngle - 90;
+                        const endAngle = (i + 1) * segmentAngle - 90 - gap;
+                        const startRad = (startAngle * Math.PI) / 180;
+                        const endRad = (endAngle * Math.PI) / 180;
+                        const x1 = 78 + 52 * Math.cos(startRad);
+                        const y1 = 78 + 52 * Math.sin(startRad);
+                        const x2 = 78 + 52 * Math.cos(endRad);
+                        const y2 = 78 + 52 * Math.sin(endRad);
+                        const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                        const color = item.signal === 'GREEN' ? '#22c55e' : item.signal === 'YELLOW' ? '#eab308' : '#ef4444';
+                        const midAngle = (startAngle + endAngle) / 2;
+                        const midRad = (midAngle * Math.PI) / 180;
+                        const labelX = 78 + 68 * Math.cos(midRad);
+                        const labelY = 78 + 68 * Math.sin(midRad);
+                        return (
+                          <g key={i}>
+                            <path d={`M 78 78 L ${x1} ${y1} A 52 52 0 ${largeArc} 1 ${x2} ${y2} Z`} fill={color} />
+                            <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="middle" className="fill-white text-[9px] font-medium">{String(item.label)}</text>
+                          </g>
+                        );
+                      })}
                     </svg>
-                    <div className="flex-1 grid grid-cols-2 gap-1.5 text-[10px]">
-                      {crossAsset.asset_board.map((item: any, i: number) => (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className={`w-1.5 h-1.5 rounded-full ${item.signal === 'GREEN' ? 'bg-green-400' : item.signal === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
-                          <span className="text-white/70">{String(item.label)}</span>
+                    <div className="flex-1 space-y-3">
+                      {crossAsset.macro_summary && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-1">宏观结论</div>
+                          <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_summary.one_liner)}</div>
                         </div>
-                      ))}
+                      )}
+                      <div className="space-y-2">
+                        {crossAsset.asset_board.map((item: any, i: number) => (
+                          <div key={i} className="text-[10px]">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <div className={`w-1.5 h-1.5 rounded-full ${item.signal === 'GREEN' ? 'bg-green-400' : item.signal === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                              <span className="text-white/90 font-medium">{String(item.label)}</span>
+                              <span className="text-white/60">{String(item.action)}</span>
+                            </div>
+                            <div className="text-white/50 leading-tight pl-3">{String(item.one_liner)}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
