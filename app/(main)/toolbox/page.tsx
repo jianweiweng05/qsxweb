@@ -25,13 +25,31 @@ export default async function ToolboxPage() {
 
         {/* 跨资产轮动分析器 */}
         {crossAsset?.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
-          const total = crossAsset.asset_board.length;
-          const segmentAngle = 360 / total;
+          // 按信号分组
+          const green = crossAsset.asset_board.filter((x: any) => x.signal === 'GREEN');
+          const yellow = crossAsset.asset_board.filter((x: any) => x.signal === 'YELLOW');
+          const red = crossAsset.asset_board.filter((x: any) => x.signal === 'RED');
+
+          // 交错排列
+          const reordered: any[] = [];
+          const maxLen = Math.max(green.length, yellow.length, red.length);
+          for (let i = 0; i < maxLen; i++) {
+            if (i < green.length) reordered.push(green[i]);
+            if (i < yellow.length) reordered.push(yellow[i]);
+            if (i < red.length) reordered.push(red[i]);
+          }
+
+          // 权重分配角度
+          const weights = { GREEN: 3, YELLOW: 2, RED: 1 };
+          const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.signal as keyof typeof weights] || 1), 0);
           const gap = 2;
-          const outerR = 120;
-          const innerR = 72;
-          const cx = 160;
-          const cy = 160;
+
+          const outerR = 100;
+          const innerR = 60;
+          const cx = 130;
+          const cy = 130;
+
+          let currentAngle = -90;
 
           return (
             <div className="mb-8 p-4 rounded-lg bg-white/5 border border-white/10">
@@ -39,19 +57,24 @@ export default async function ToolboxPage() {
                 跨资产轮动分析器
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-center">
                 {/* 图表 */}
-                <div className="flex-shrink-0 mx-auto lg:mx-0">
-                  <div className="text-xs text-white/50 mb-3">资产红绿灯</div>
+                <div className="flex-shrink-0">
+                  <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
-                    width="320"
-                    height="320"
-                    viewBox="-40 -40 400 400"
-                    className="overflow-visible"
+                    width="260"
+                    height="260"
+                    viewBox="-20 -20 300 300"
+                    className="overflow-visible max-w-full"
                   >
-                    {crossAsset.asset_board.map((item: any, i: number) => {
-                      const startAngle = i * segmentAngle - 90;
-                      const endAngle = (i + 1) * segmentAngle - 90 - gap;
+                    {reordered.map((item: any, i: number) => {
+                      const weight = weights[item.signal as keyof typeof weights] || 1;
+                      const segmentAngle = (weight / totalWeight) * 360;
+
+                      const startAngle = currentAngle;
+                      const endAngle = currentAngle + segmentAngle - gap;
+                      currentAngle += segmentAngle;
+
                       const startRad = (startAngle * Math.PI) / 180;
                       const endRad = (endAngle * Math.PI) / 180;
 
@@ -74,8 +97,8 @@ export default async function ToolboxPage() {
 
                       const midAngle = (startAngle + endAngle) / 2;
                       const midRad = (midAngle * Math.PI) / 180;
-                      const labelX = cx + (outerR + 22) * Math.cos(midRad);
-                      const labelY = cy + (outerR + 22) * Math.sin(midRad);
+                      const labelX = cx + (outerR + 18) * Math.cos(midRad);
+                      const labelY = cy + (outerR + 18) * Math.sin(midRad);
 
                       return (
                         <g key={i}>
@@ -92,7 +115,7 @@ export default async function ToolboxPage() {
                             y={labelY}
                             textAnchor="middle"
                             dominantBaseline="middle"
-                            className="fill-white text-[11px] font-medium"
+                            className="fill-white text-[10px] font-medium"
                           >
                             {String(item.label)}
                           </text>
@@ -103,7 +126,7 @@ export default async function ToolboxPage() {
                 </div>
 
                 {/* 说明区 */}
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-3 pt-2">
                   {crossAsset.macro_summary?.one_liner && (
                     <div className="pb-3 border-b border-white/10">
                       <div className="text-sm font-medium text-white/70 mb-2">
@@ -115,29 +138,26 @@ export default async function ToolboxPage() {
                     </div>
                   )}
 
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2">
                     {crossAsset.asset_board.map((item: any, i: number) => (
-                      <div
-                        key={i}
-                        className="pb-2 border-b border-white/5 last:border-0"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
+                      <div key={i} className="pb-2 border-b border-white/5">
+                        <div className="flex items-center gap-1.5 mb-0.5">
                           <div
-                            className={`w-2 h-2 rounded-full ${item.signal === "GREEN"
+                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.signal === "GREEN"
                                 ? "bg-green-400"
                                 : item.signal === "YELLOW"
                                   ? "bg-yellow-400"
                                   : "bg-red-400"
                               }`}
                           />
-                          <span className="text-sm font-medium">
+                          <span className="text-xs font-medium">
                             {String(item.label)}
                           </span>
-                          <span className="text-xs text-white/60">
+                          <span className="text-[10px] text-white/60">
                             {String(item.action)}
                           </span>
                         </div>
-                        <div className="text-xs text-white/60 pl-4 leading-relaxed">
+                        <div className="text-[10px] text-white/60 pl-3 leading-tight">
                           {String(item.one_liner)}
                         </div>
                       </div>
