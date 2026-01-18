@@ -23,41 +23,29 @@ export default async function ToolboxPage() {
       {/* 跨资产轮动分析器 */}
       {crossAsset && (
         <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
-          <div className="text-sm font-medium text-white/80 mb-3">{String(crossAsset.title || "跨资产轮动分析器")}</div>
+          <div className="text-sm font-medium text-white/80 mb-3">跨资产轮动分析器</div>
           <div>
-            {crossAsset.macro_conclusion && (
+            {crossAsset.macro_summary && (
               <div className="mb-4">
                 <div className="text-xs text-white/50 mb-1">宏观结论</div>
-                <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_conclusion)}</div>
+                <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_summary.one_liner)}</div>
               </div>
             )}
-            {crossAsset.regime && (
+            {crossAsset.asset_board && Array.isArray(crossAsset.asset_board) && (
               <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">市场状态</div>
-                <div className="text-xs text-cyan-300/80">{String(crossAsset.regime)}</div>
-              </div>
-            )}
-            {crossAsset.assets && Array.isArray(crossAsset.assets) && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-2">8 资产红绿灯</div>
+                <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {crossAsset.assets.map((item: any, i: number) => (
+                  {crossAsset.asset_board.map((item: any, i: number) => (
                     <div key={i} className="p-2 rounded bg-white/5 border border-white/10">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <div className={`w-2 h-2 rounded-full ${item.light === 'GREEN' ? 'bg-green-400' : item.light === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
-                        <div className="text-xs font-medium text-white/90">{String(item.asset)}</div>
+                        <div className={`w-2 h-2 rounded-full ${item.signal === 'GREEN' ? 'bg-green-400' : item.signal === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                        <div className="text-xs font-medium text-white/90">{String(item.label)}</div>
                       </div>
-                      <div className="text-[10px] text-white/60 mb-1">{String(item.signal)}</div>
-                      <div className="text-[10px] text-white/50 leading-tight">{String(item.reason)}</div>
+                      <div className="text-[10px] text-white/60 mb-1">{String(item.action)}</div>
+                      <div className="text-[10px] text-white/50 leading-tight">{String(item.one_liner)}</div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-            {crossAsset.summary && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">总结</div>
-                <div className="text-xs text-yellow-300/80 leading-relaxed">{String(crossAsset.summary)}</div>
               </div>
             )}
           </div>
