@@ -9,6 +9,7 @@ const terms = JSON.parse(fs.readFileSync(path.join(kbPath, 'terms.json'), 'utf8'
 const constitution = JSON.parse(fs.readFileSync(path.join(kbPath, 'constitution.json'), 'utf8'));
 const templates = JSON.parse(fs.readFileSync(path.join(kbPath, 'templates.json'), 'utf8'));
 const p0patch = JSON.parse(fs.readFileSync(path.join(kbPath, 'kb_p0_patch.json'), 'utf8'));
+const termsSupplement = JSON.parse(fs.readFileSync(path.join(kbPath, 'terms_supplement.json'), 'utf8'));
 
 // Combine all entries
 const allEntries = [
@@ -17,7 +18,8 @@ const allEntries = [
   ...constitution.entries,
   ...templates.entries,
   ...p0patch.entries,
-  ...terms.terms.map(t => ({...t, triggers: t.triggers || []}))
+  ...terms.terms.map(t => ({...t, triggers: t.triggers || []})),
+  ...termsSupplement.terms.map(t => ({...t, triggers: t.triggers || []}))
 ];
 
 // Test questions by category

@@ -1,18 +1,18 @@
 {
   "summary": {
     "totalQuestions": 270,
-    "totalMatched": 184,
-    "totalHighConfidence": 184,
-    "matchRate": "68.1%",
-    "highConfidenceRate": "68.1%"
+    "totalMatched": 215,
+    "totalHighConfidence": 215,
+    "matchRate": "79.6%",
+    "highConfidenceRate": "79.6%"
   },
   "byCategory": {
     "市场状态与风险": {
       "total": 30,
-      "matched": 23,
-      "highConfidence": 23,
-      "matchRate": "76.7%",
-      "highConfidenceRate": "76.7%",
+      "matched": 24,
+      "highConfidence": 24,
+      "matchRate": "80.0%",
+      "highConfidenceRate": "80.0%",
       "details": [
         {
           "question": "现在市场怎么样？",
@@ -73,7 +73,7 @@
         {
           "question": "今天市场趋势",
           "matched": true,
-          "score": "0.667",
+          "score": "1.000",
           "matchedEntry": "market_status",
           "category": "Status"
         },
@@ -135,10 +135,10 @@
         },
         {
           "question": "环境风险",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_now",
+          "category": "Status"
         },
         {
           "question": "杠杆风险大吗",
@@ -213,25 +213,25 @@
         {
           "question": "准确率多少",
           "matched": true,
-          "score": "0.600",
-          "matchedEntry": "not_prediction_not_signal",
-          "category": "Constitution"
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
         },
         {
           "question": "胜率怎么样",
           "matched": true,
-          "score": "0.600",
-          "matchedEntry": "advantage",
-          "category": "System"
+          "score": "1.000",
+          "matchedEntry": "confidence",
+          "category": "Status"
         }
       ]
     },
     "仓位控制": {
       "total": 30,
-      "matched": 19,
-      "highConfidence": 19,
-      "matchRate": "63.3%",
-      "highConfidenceRate": "63.3%",
+      "matched": 25,
+      "highConfidence": 25,
+      "matchRate": "83.3%",
+      "highConfidenceRate": "83.3%",
       "details": [
         {
           "question": "仓位怎么控制",
@@ -369,9 +369,9 @@
         {
           "question": "分批加仓",
           "matched": true,
-          "score": "0.500",
-          "matchedEntry": "risk_budget_formula",
-          "category": "Rules"
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
         },
         {
           "question": "仓位管理",
@@ -382,17 +382,17 @@
         },
         {
           "question": "持仓比例",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
         },
         {
           "question": "风险暴露",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
         },
         {
           "question": "最大仓位",
@@ -403,10 +403,10 @@
         },
         {
           "question": "安全仓位",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "position_now",
+          "category": "Status"
         },
         {
           "question": "仓位控制原则",
@@ -417,10 +417,10 @@
         },
         {
           "question": "动态仓位",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
         },
         {
           "question": "仓位调整",
@@ -431,26 +431,26 @@
         },
         {
           "question": "仓位分配",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
         },
         {
           "question": "合理仓位",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "risk_budget_formula",
+          "category": "Rules"
         }
       ]
     },
     "交易决策": {
       "total": 30,
-      "matched": 25,
-      "highConfidence": 25,
-      "matchRate": "83.3%",
-      "highConfidenceRate": "83.3%",
+      "matched": 26,
+      "highConfidence": 26,
+      "matchRate": "86.7%",
+      "highConfidenceRate": "86.7%",
       "details": [
         {
           "question": "现在能交易吗",
@@ -608,10 +608,10 @@
         },
         {
           "question": "持仓还是平仓",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "0.333",
+          "matchedEntry": "oi",
+          "category": "Indicators"
         },
         {
           "question": "追涨杀跌",
@@ -666,10 +666,10 @@
     },
     "信号冲突与层级": {
       "total": 30,
-      "matched": 21,
-      "highConfidence": 21,
-      "matchRate": "70.0%",
-      "highConfidenceRate": "70.0%",
+      "matched": 25,
+      "highConfidence": 25,
+      "matchRate": "83.3%",
+      "highConfidenceRate": "83.3%",
       "details": [
         {
           "question": "信号冲突怎么办",
@@ -835,23 +835,23 @@
         {
           "question": "层级权重",
           "matched": true,
-          "score": "0.500",
-          "matchedEntry": "non_decomposable_policy",
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
           "category": "Rules"
         },
         {
           "question": "哪层最重要",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
         },
         {
           "question": "多层分析",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
         },
         {
           "question": "层级裁决",
@@ -862,17 +862,17 @@
         },
         {
           "question": "共振信号",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
         },
         {
           "question": "背离信号",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "layer_priority_veto",
+          "category": "Rules"
         },
         {
           "question": "层级冲突",
@@ -885,10 +885,10 @@
     },
     "指标与数据": {
       "total": 30,
-      "matched": 17,
-      "highConfidence": 17,
-      "matchRate": "56.7%",
-      "highConfidenceRate": "56.7%",
+      "matched": 25,
+      "highConfidence": 25,
+      "matchRate": "83.3%",
+      "highConfidenceRate": "83.3%",
       "details": [
         {
           "question": "RR25是什么",
@@ -990,45 +990,45 @@
         },
         {
           "question": "持仓量",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "oi",
+          "category": "Indicators"
         },
         {
           "question": "OI",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "oi",
+          "category": "Indicators"
         },
         {
           "question": "隐含波动率",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "iv",
+          "category": "Indicators"
         },
         {
           "question": "IV",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "iv",
+          "category": "Indicators"
         },
         {
           "question": "成本区",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "cost_basis",
+          "category": "Indicators"
         },
         {
           "question": "链上数据",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "onchain_metrics",
+          "category": "Indicators"
         },
         {
           "question": "实时吗",
@@ -1067,17 +1067,17 @@
         },
         {
           "question": "数据源",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_source_reliability",
+          "category": "System"
         },
         {
           "question": "数据准确吗",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "data_source_reliability",
+          "category": "System"
         },
         {
           "question": "时间戳",
@@ -1104,10 +1104,10 @@
     },
     "历史相似性": {
       "total": 30,
-      "matched": 15,
-      "highConfidence": 15,
-      "matchRate": "50.0%",
-      "highConfidenceRate": "50.0%",
+      "matched": 21,
+      "highConfidence": 21,
+      "matchRate": "70.0%",
+      "highConfidenceRate": "70.0%",
       "details": [
         {
           "question": "历史相似度",
@@ -1251,17 +1251,17 @@
         },
         {
           "question": "环境识别",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_methodology",
+          "category": "Rules"
         },
         {
           "question": "历史匹配",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_methodology",
+          "category": "Rules"
         },
         {
           "question": "相似度分析",
@@ -1279,10 +1279,10 @@
         },
         {
           "question": "参考案例",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_case_selection",
+          "category": "Rules"
         },
         {
           "question": "历史经验",
@@ -1300,24 +1300,24 @@
         },
         {
           "question": "历史借鉴",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_case_selection",
+          "category": "Rules"
         },
         {
           "question": "案例研究",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_case_selection",
+          "category": "Rules"
         },
         {
           "question": "历史规律",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "similarity_case_selection",
+          "category": "Rules"
         }
       ]
     },
@@ -1761,10 +1761,10 @@
     },
     "会员与订阅": {
       "total": 30,
-      "matched": 22,
-      "highConfidence": 22,
-      "matchRate": "73.3%",
-      "highConfidenceRate": "73.3%",
+      "matched": 27,
+      "highConfidence": 27,
+      "matchRate": "90.0%",
+      "highConfidenceRate": "90.0%",
       "details": [
         {
           "question": "会员权益",
@@ -1943,38 +1943,38 @@
         },
         {
           "question": "续费",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
         },
         {
           "question": "优惠",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
         },
         {
           "question": "折扣",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
         },
         {
           "question": "试用",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
         },
         {
           "question": "体验",
-          "matched": false,
-          "score": "0.000",
-          "matchedEntry": "NONE",
-          "category": "N/A"
+          "matched": true,
+          "score": "1.000",
+          "matchedEntry": "sub_upgrade",
+          "category": "System"
         }
       ]
     }
