@@ -1,12 +1,10 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
-import { getUserTier } from "@/app/lib/entitlements";
 import { ProGate } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
 
 export const dynamic = "force-dynamic";
 
 export default async function ToolboxPage() {
-  const tier = getUserTier();
   let payload: any = null;
   try {
     payload = await getReportPayload();
@@ -26,8 +24,7 @@ export default async function ToolboxPage() {
       {crossAsset && (
         <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="text-sm font-medium text-white/80 mb-3">{crossAsset.title || "跨资产结构分析器"}</div>
-          {crossAsset.pro ? (
-            <ProGate lockedMessage="升级 Pro 查看完整分析">
+          <div>
             {crossAsset.macro_background && (
               <div className="mb-4">
                 <div className="text-xs text-white/50 mb-1">宏观背景</div>
@@ -66,49 +63,7 @@ export default async function ToolboxPage() {
                 <pre className="text-xs text-white/60 whitespace-pre-wrap leading-relaxed font-mono">{JSON.stringify(crossAsset.data, null, 2)}</pre>
               </div>
             )}
-          </ProGate>
-          ) : (
-            <>
-            {crossAsset.macro_background && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">宏观背景</div>
-                <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{crossAsset.macro_background}</pre>
-              </div>
-            )}
-            {crossAsset.thermometer && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">市场温度计</div>
-                <pre className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed">{crossAsset.thermometer}</pre>
-              </div>
-            )}
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              {crossAsset.winners && (
-                <div>
-                  <div className="text-xs text-green-400 mb-1">强势资产</div>
-                  <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{crossAsset.winners}</pre>
-                </div>
-              )}
-              {crossAsset.losers && (
-                <div>
-                  <div className="text-xs text-red-400 mb-1">弱势资产</div>
-                  <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{crossAsset.losers}</pre>
-                </div>
-              )}
-            </div>
-            {crossAsset.structure_hint && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">结构提示</div>
-                <pre className="text-xs text-yellow-300/80 whitespace-pre-wrap leading-relaxed">{crossAsset.structure_hint}</pre>
-              </div>
-            )}
-            {crossAsset.data && (
-              <div>
-                <div className="text-xs text-white/50 mb-1">数据详情</div>
-                <pre className="text-xs text-white/60 whitespace-pre-wrap leading-relaxed font-mono">{JSON.stringify(crossAsset.data, null, 2)}</pre>
-              </div>
-            )}
-            </>
-          )}
+          </div>
         </div>
       )}
 
@@ -127,7 +82,7 @@ export default async function ToolboxPage() {
                     <div className="pt-2 space-y-0.5">
                       <div>• 历史相似性不代表未来价格走势复制</div>
                       <div>• 相似案例可能对应不同的涨跌结果</div>
-                      <div>• 其作用是帮助识别当前市场所处的"环境类型"</div>
+                      <div>• 其作用是帮助识别当前市场所处的&quot;环境类型&quot;</div>
                     </div>
                   </div>
                 </div>
