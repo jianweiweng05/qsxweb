@@ -13,7 +13,17 @@ function loadKB(): Record<string, KBItem[]> {
       const entries = data.entries || data.constitution || data.rules || data.terms || data.status || data.templates || data.page_guides || data.subscription;
       if (!entries) throw new Error(`No valid entries in ${fname}`);
       const cat = fname.replace('.json', '');
-      result[cat] = entries;
+
+      // kb_p0_patch: merge entries into their target categories
+      if (cat === 'kb_p0_patch') {
+        for (const item of entries) {
+          const targetCat = (item as any).cat?.toLowerCase() || 'constitution';
+          if (!result[targetCat]) result[targetCat] = [];
+          result[targetCat].push(item);
+        }
+      } else {
+        result[cat] = entries;
+      }
     } catch (e) {
       throw new Error(`Failed to load ${fname}: ${e}`);
     }

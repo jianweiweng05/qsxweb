@@ -11,7 +11,7 @@
     "priority_order": ["constitution", "rules", "terms", "templates"],
     "fallback": "llm"
   },
-  "kb_files": ["constitution.json", "rules.json", "terms.json", "status.json", "templates.json", "page_guides.json", "subscription.json"],
+  "kb_files": ["constitution.json", "rules.json", "terms.json", "status.json", "templates.json", "page_guides.json", "subscription.json", "kb_p0_patch.json"],
   "entitlement_config": {
     "enabled": true,
     "tiers": ["Free", "VIP", "Pro"],
