@@ -31,23 +31,36 @@ export default async function ToolboxPage() {
                 <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_summary.one_liner)}</div>
               </div>
             )}
-            {crossAsset.asset_board && Array.isArray(crossAsset.asset_board) && (
-              <div className="mb-4">
-                <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {crossAsset.asset_board.map((item: any, i: number) => (
-                    <div key={i} className="p-2 rounded bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <div className={`w-2 h-2 rounded-full ${item.signal === 'GREEN' ? 'bg-green-400' : item.signal === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
-                        <div className="text-xs font-medium text-white/90">{String(item.label)}</div>
-                      </div>
-                      <div className="text-[10px] text-white/60 mb-1">{String(item.action)}</div>
-                      <div className="text-[10px] text-white/50 leading-tight">{String(item.one_liner)}</div>
+            {crossAsset.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
+              const green = crossAsset.asset_board.filter((x: any) => x.signal === 'GREEN').length;
+              const yellow = crossAsset.asset_board.filter((x: any) => x.signal === 'YELLOW').length;
+              const red = crossAsset.asset_board.filter((x: any) => x.signal === 'RED').length;
+              const total = green + yellow + red;
+              const greenPct = (green / total) * 100;
+              const yellowPct = (yellow / total) * 100;
+              return (
+                <div className="mb-4">
+                  <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
+                  <div className="flex items-center gap-6">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="#ef4444" strokeWidth="20" strokeDasharray={`${(red/total)*314} 314`} transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="#eab308" strokeWidth="20" strokeDasharray={`${(yellow/total)*314} 314`} strokeDashoffset={`-${(red/total)*314}`} transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" strokeWidth="20" strokeDasharray={`${(green/total)*314} 314`} strokeDashoffset={`-${((red+yellow)/total)*314}`} transform="rotate(-90 60 60)" />
+                      <text x="60" y="55" textAnchor="middle" className="fill-white text-xs">{green}绿</text>
+                      <text x="60" y="70" textAnchor="middle" className="fill-white/60 text-[10px]">{yellow}黄 {red}红</text>
+                    </svg>
+                    <div className="flex-1 grid grid-cols-2 gap-1.5 text-[10px]">
+                      {crossAsset.asset_board.map((item: any, i: number) => (
+                        <div key={i} className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${item.signal === 'GREEN' ? 'bg-green-400' : item.signal === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                          <span className="text-white/70">{String(item.label)}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       )}
