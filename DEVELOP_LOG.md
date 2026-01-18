@@ -768,3 +768,26 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - ✅ 输出不含 HCRI/coef/锚/Anchor/MacroCoef/Gate 等内部词
 - ✅ npm run build 通过
 
+## 2026-01-18: KB Loader Migration to Manifest-Based System
+
+### Changes
+- Migrated KB loading from hardcoded imports to manifest-based dynamic loading
+- Updated manifest.json kb_files from object to array: ["constitution.json", "rules.json", "terms.json", "status.json", "templates.json", "page_guides.json", "subscription.json"]
+- Implemented loadKB() function that reads manifest.kb_files and loads each file dynamically
+- Added compatibility for both entries array and legacy top-level arrays (constitution/rules/terms/status/templates/page_guides/subscription)
+- Added formatAnswer() helper to handle both string and object answer formats
+- Removed all references to knowledge_faq.json
+- Updated all test files (test-qa-final.ts, test-100-offline.js, test-50-questions.js) to use new loader
+
+### Files Modified
+- app/lib/kb/manifest.json (1 line changed)
+- app/api/chat/route.ts (+17 lines)
+- test-qa-final.ts (+10 lines)
+- test-100-offline.js (+8 lines)
+- test-50-questions.js (+8 lines)
+
+### Verification
+- TypeScript compilation passes
+- All 7 KB files (constitution, rules, terms, status, templates, page_guides, subscription) loaded successfully
+- No knowledge_faq.json references remain in source code
+

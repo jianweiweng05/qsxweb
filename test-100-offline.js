@@ -2,22 +2,21 @@
  * 100 问离线压力测试 - 直接测试分类逻辑
  */
 
-// 清除缓存以获取最新数据
-delete require.cache[require.resolve("./app/lib/kb/status.json")];
-const status = require("./app/lib/kb/status.json");
 const manifest = require("./app/lib/kb/manifest.json");
-const constitution = require("./app/lib/kb/constitution.json");
-const rules = require("./app/lib/kb/rules.json");
-const terms = require("./app/lib/kb/terms.json");
-const templates = require("./app/lib/kb/templates.json");
 
-const KB_FILES = {
-  constitution: constitution.constitution,
-  rules: rules.rules,
-  terms: terms.terms,
-  templates: templates.templates,
-  status: status.status,
-};
+function loadKB() {
+  const result = {};
+  for (const fname of manifest.kb_files) {
+    const data = require(`./app/lib/kb/${fname}`);
+    const entries = data.entries || data.constitution || data.rules || data.terms || data.status || data.templates || data.page_guides || data.subscription;
+    if (!entries) throw new Error(`No valid entries in ${fname}`);
+    const cat = fname.replace('.json', '');
+    result[cat] = entries;
+  }
+  return result;
+}
+
+const KB_FILES = loadKB();
 
 const DECISION_WORDS = ["怎么办", "能不能", "要不要", "可以吗", "适合", "应该", "仓位", "风险", "短线", "波段", "观望", "昨天", "持续", "状态", "市场", "行情", "大跌", "加仓", "减仓", "满仓", "轻仓", "防守", "进攻", "趋势", "区间", "危险", "顺风", "逆风", "交易", "纪律", "预期", "依据", "代价", "改善", "忍耐", "行动"];
 const JUDGEMENT_WORDS = ["偏多", "偏空", "牛市", "熊市", "震荡", "反弹", "下跌", "筑底", "情绪", "基本面", "顺势", "逆势", "成功率", "靠谱", "安全", "确定", "错误", "注意", "信号", "历史", "机构", "策略", "现货", "警惕", "问题", "类似"];

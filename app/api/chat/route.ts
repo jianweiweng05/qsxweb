@@ -1,20 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserTier, UserTier } from "@/app/lib/entitlements";
 import manifest from "@/app/lib/kb/manifest.json";
-import constitution from "@/app/lib/kb/constitution.json";
-import rules from "@/app/lib/kb/rules.json";
-import terms from "@/app/lib/kb/terms.json";
-import templates from "@/app/lib/kb/templates.json";
-import status from "@/app/lib/kb/status.json";
 
-type KBItem = { id: string; triggers: string[]; a: string };
-const KB_FILES: Record<string, KBItem[]> = {
-  constitution: constitution.constitution,
-  rules: rules.rules,
-  terms: terms.terms,
-  templates: templates.templates,
-  status: status.status,
-};
+type KBItem = { id: string; triggers: string[]; a: string | object };
+type KBFile = { entries?: KBItem[]; constitution?: KBItem[]; rules?: KBItem[]; terms?: KBItem[]; status?: KBItem[]; templates?: KBItem[]; page_guides?: KBItem[]; subscription?: KBItem[] };
+
+function loadKB(): Record<string, KBItem[]> {
+  const result: Record<string, KBItem[]> = {};
+  for (const fname of manifest.kb_files) {
+    try {
+      const data: KBFile = require(`@/app/lib/kb/${fname}`);
+      const entries = data.entries || data.constitution || data.rules || data.terms || data.status || data.templates || data.page_guides || data.subscription;
+      if (!entries) throw new Error(`No valid entries in ${fname}`);
+      const cat = fname.replace('.json', '');
+      result[cat] = entries;
+    } catch (e) {
+      throw new Error(`Failed to load ${fname}: ${e}`);
+    }
+  }
+  return result;
+}
+
+const KB_FILES = loadKB();
 
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
@@ -25,6 +32,14 @@ const CONFIDENCE_WORDS = ["确定", "靠谱", "安全", "什么都不做", "不�
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
+}
+
+function formatAnswer(a: string | object): string {
+  if (typeof a === 'string') return a;
+  const obj = a as any;
+  if (obj.one_liner) return obj.one_liner;
+  if (obj.what) return obj.what;
+  return JSON.stringify(a);
 }
 
 function isInvalid(s: string): boolean {
@@ -38,7 +53,7 @@ function isInvalid(s: string): boolean {
   return false;
 }
 
-function matchKB(s: string): { id: string; a: string } | null {
+function matchKB(s: string): { id: string; a: string | object } | null {
   // 优先精确匹配（完整词）
   for (const cat of manifest.match_policy.priority_order) {
     const items = KB_FILES[cat] || [];
@@ -65,7 +80,7 @@ function matchKB(s: string): { id: string; a: string } | null {
   return null;
 }
 
-function matchStatusKB(s: string): { id: string; a: string } | null {
+function matchStatusKB(s: string): { id: string; a: string | object } | null {
   for (const item of KB_FILES.status || []) {
     for (const t of item.triggers) {
       if (s.includes(t.toLowerCase())) {
@@ -122,14 +137,14 @@ function classifyQuery(q: string, tier: UserTier): ClassifyResult {
   if (isDecisionIntent(s)) {
     const statusKb = matchStatusKB(s);
     if (statusKb) {
-      return { type: "kb", text: statusKb.a, source_id: statusKb.id };
+      return { type: "kb", text: formatAnswer(statusKb.a), source_id: statusKb.id };
     }
   }
 
   // 2. 通用 KB 匹配
   const kb = matchKB(s);
   if (kb) {
-    return { type: "kb", text: `💡 [系统百科]\n${kb.a}`, source_id: kb.id };
+    return { type: "kb", text: `💡 [系统百科]\n${formatAnswer(kb.a)}`, source_id: kb.id };
   }
 
   // 3. 裁决意图但 status KB 未命中 → LLM 放行（门槛已放宽）

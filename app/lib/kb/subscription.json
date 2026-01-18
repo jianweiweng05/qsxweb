@@ -1,0 +1,55 @@
+{
+  "version": "3.1.0",
+  "system_name": "QSX Market Risk Engine",
+  "language": "zh-CN",
+  "entries": [
+    {
+      "id": "subscription_tier_comparison",
+      "cat": "Subscription",
+      "tier": "P0",
+      "triggers": ["Free VIP Pro区别", "订阅等级对比", "如何选择订阅", "VIP和Pro差别", "买哪个", "订阅功能对比"],
+      "q": "Free、VIP、Pro 有什么区别？",
+      "a": "三档订阅差异在“解释深度与风险工具”。\n• Free：基础页面与基础解释\n• VIP：解锁深度解读与问答（例如：AI解读、多空信号解释）\n• Pro：解锁完整风险工具（报警、Gamma、工具箱、历史回溯）"
+    },
+    {
+      "id": "subscription_vip_features",
+      "cat": "Subscription",
+      "tier": "P1",
+      "triggers": ["VIP有什么功能", "VIP权益", "VIP包含什么", "AI解读是什么", "多空信号是什么"],
+      "q": "VIP 开通后有什么能力？",
+      "a": "VIP提供“更完整的解释与问答支持”，帮助你把页面结果转化为风险决策：包含更深度的解读、信号解释与系统使用问答。"
+    },
+    {
+      "id": "subscription_pro_features",
+      "cat": "Subscription",
+      "tier": "P1",
+      "triggers": ["Pro有什么功能", "Pro权益", "报警系统", "Gamma监控", "工具箱", "Pro比VIP强在哪"],
+      "q": "Pro 开通后有什么能力？",
+      "a": "Pro提供“完整风险管理工具”：报警监控与历史回溯、波动状态（Gamma）与工具箱，用于识别风险与处理风险。"
+    },
+    {
+      "id": "sub_visibility_matrix",
+      "cat": "Subscription",
+      "tier": "P0",
+      "triggers": ["为什么按钮是灰的", "看不到报警", "权限矩阵", "哪些功能需要VIP", "哪些功能需要Pro"],
+      "q": "为什么有的功能看不到或是灰的？",
+      "a": "通常是权限限制而非故障：Free/VIP/Pro 可见组件不同。请先在账户页确认订阅等级，升级后刷新页面再验证可见范围。"
+    },
+    {
+      "id": "sub_upgrade",
+      "cat": "Subscription",
+      "tier": "P0",
+      "triggers": ["升级", "订阅", "付费", "怎么买", "开通", "价格", "多少钱"],
+      "q": "如何升级/开通订阅？",
+      "a": "在账户页或 Pricing 页面选择订阅等级与周期并完成支付；支付成功后权限会立即生效（如遇缓存，刷新页面）。"
+    },
+    {
+      "id": "sub_cancel",
+      "cat": "Subscription",
+      "tier": "P1",
+      "triggers": ["取消订阅", "退订", "退款", "不想用了", "取消自动续费"],
+      "q": "如何取消订阅/自动续费？",
+      "a": "可在支付平台的订阅管理入口取消自动续费；取消后通常在当前周期结束后生效。退款与到期规则以实际订阅条款为准。"
+    }
+  ]
+}

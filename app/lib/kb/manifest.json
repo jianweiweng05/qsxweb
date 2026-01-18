@@ -1,6 +1,6 @@
 {
-  "version": "3.0.0",
-  "system_name": "L1-L6 Macro Weather System",
+  "version": "3.1.0",
+  "system_name": "QSX Market Risk Engine",
   "language": "zh-CN",
   "kb_mode": "constitution_first",
   "match_policy": {
@@ -11,33 +11,121 @@
     "priority_order": ["constitution", "rules", "terms", "templates"],
     "fallback": "llm"
   },
+  "kb_files": ["constitution.json", "rules.json", "terms.json", "status.json", "templates.json", "page_guides.json", "subscription.json"],
+  "entitlement_config": {
+    "enabled": true,
+    "tiers": ["Free", "VIP", "Pro"],
+    "default_tier": "Free",
+    "gate_strategy": "soft_intercept"
+  },
+  "vip_config": {
+    "intercept_message": "该问题需要“订阅级”的解读与问答支持。\n升级后可解锁：每日 AI 解读、多空信号解释、基于系统页面的深度问答与复盘。",
+    "vip_keywords": [
+      "AI解读",
+      "多空信号",
+      "信号怎么看",
+      "为什么是震荡市",
+      "为什么是熊市",
+      "今天怎么看",
+      "怎么理解这个结论",
+      "怎么用这个系统",
+      "解释一下",
+      "解读一下",
+      "复盘",
+      "怎么看雷达",
+      "怎么看今日页面"
+    ]
+  },
   "pro_config": {
-    "intercept_message": "该问题涉及实战执行与深度研究输出（如实时预警、历史相似性推演或策略级解读）。\n此能力仅对订阅用户开放。升级后可解锁：当日 L1–L6 全量解读、风险预算细化、历史相似性深度与实时预警。",
+    "intercept_message": "该问题涉及 Pro 级风险管理能力（例如：实时报警、Gamma 波动状态、工具箱对冲选择、历史相似度深度用法与报警回溯）。\n升级后可解锁：7x24 报警与历史回溯、Gamma/波动状态、工具箱（A/B/C 对冲）、历史相似度与当日策略指引。",
     "pro_keywords": [
-      "策略",
-      "策略建议",
-      "具体操作",
-      "买入",
-      "卖出",
-      "止盈",
-      "止损",
-      "目标价",
-      "点位",
-      "该不该买",
-      "该不该卖",
-      "什么时候平仓",
-      "带单",
-      "跟单",
       "报警",
       "预警",
-      "历史相似性推演",
+      "红色报警",
+      "黄色报警",
+      "报警怎么处理",
+      "报警阈值",
+      "历史报警",
+      "回溯",
+      "Gamma",
+      "波动状态",
+      "工具箱",
+      "对冲工具",
+      "A类",
+      "B类",
+      "C类",
+      "互斥",
+      "禁用",
+      "历史相似度",
+      "相似度",
+      "像哪个时期",
+      "相似案例",
       "相似性推演"
     ]
   },
   "llm_config": {
     "min_length": 6,
     "max_length": 2000,
-    "intent_words": ["今天", "当前", "最新", "为何", "怎么解读", "风险", "仓位", "相似性", "预警", "雷达", "现在"],
-    "anchor_words": ["l1", "l2", "l3", "l4", "l5", "l6", "macro", "rr25", "funding", "ls", "etf", "fgi", "hcri", "gamma", "risk_cap", "coef", "macrocoef"]
+    "intent_words": [
+      "今天",
+      "当前",
+      "最新",
+      "怎么解读",
+      "怎么看",
+      "怎么用",
+      "为何",
+      "原因",
+      "风险",
+      "仓位",
+      "上限",
+      "market",
+      "today",
+      "radar",
+      "alerts",
+      "toolbox",
+      "account"
+    ],
+    "anchor_words": [
+      "l1",
+      "l2",
+      "l3",
+      "l4",
+      "l5",
+      "l6",
+      "rr25",
+      "risk cap",
+      "risk_cap",
+      "gamma",
+      "funding",
+      "ls ratio",
+      "ls",
+      "etf",
+      "fgi",
+      "mvrv",
+      "sopr",
+      "oi",
+      "iv",
+      "skew",
+      "liquidation",
+      "volatility"
+    ],
+    "style_rules": {
+      "avoid_phrases": [
+        "数据缺失",
+        "暂无数据",
+        "数据有限",
+        "AI认为",
+        "模型判断",
+        "系统裁决",
+        "收益保证",
+        "胜率承诺"
+      ],
+      "required_phrases": [
+        "Risk Cap 是上限不是目标",
+        "报警是风险提示不是交易指令",
+        "相似度是环境参考不是价格预测"
+      ],
+      "etf_weekend_policy_sentence": "周末或美股休市期间 ETF 停更是正常现象，系统会沿用最近一次有效值作为参考，但不会把“没有新数据”当成利好或利空信号。"
+    }
   }
 }

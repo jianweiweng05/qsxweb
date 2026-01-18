@@ -3,18 +3,23 @@
  */
 
 import manifest from "./app/lib/kb/manifest.json";
-import constitution from "./app/lib/kb/constitution.json";
-import rules from "./app/lib/kb/rules.json";
-import terms from "./app/lib/kb/terms.json";
-import templates from "./app/lib/kb/templates.json";
 
 type KBItem = { id: string; triggers: string[]; a: string };
-const KB_FILES: Record<string, KBItem[]> = {
-  constitution: constitution.constitution,
-  rules: rules.rules,
-  terms: terms.terms,
-  templates: templates.templates,
-};
+type KBFile = { entries?: KBItem[]; constitution?: KBItem[]; rules?: KBItem[]; terms?: KBItem[]; status?: KBItem[]; templates?: KBItem[]; page_guides?: KBItem[]; subscription?: KBItem[] };
+
+function loadKB(): Record<string, KBItem[]> {
+  const result: Record<string, KBItem[]> = {};
+  for (const fname of manifest.kb_files) {
+    const data: KBFile = require(`./app/lib/kb/${fname}`);
+    const entries = data.entries || data.constitution || data.rules || data.terms || data.status || data.templates || data.page_guides || data.subscription;
+    if (!entries) throw new Error(`No valid entries in ${fname}`);
+    const cat = fname.replace('.json', '');
+    result[cat] = entries;
+  }
+  return result;
+}
+
+const KB_FILES = loadKB();
 
 const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
 const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
