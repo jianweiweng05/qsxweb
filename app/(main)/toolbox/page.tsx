@@ -25,28 +25,39 @@ export default async function ToolboxPage() {
         <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
           <div className="text-sm font-medium text-white/80 mb-3">{String(crossAsset.title || "跨资产轮动分析器")}</div>
           <div>
-            {crossAsset.macro_background && (
+            {crossAsset.macro_conclusion && (
               <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">宏观背景</div>
-                <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{String(crossAsset.macro_background)}</pre>
+                <div className="text-xs text-white/50 mb-1">宏观结论</div>
+                <div className="text-xs text-white/70 leading-relaxed">{String(crossAsset.macro_conclusion)}</div>
               </div>
             )}
-            {crossAsset.structure_hint && (
+            {crossAsset.regime && (
               <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">结构提示</div>
-                <pre className="text-xs text-yellow-300/80 whitespace-pre-wrap leading-relaxed">{String(crossAsset.structure_hint)}</pre>
+                <div className="text-xs text-white/50 mb-1">市场状态</div>
+                <div className="text-xs text-cyan-300/80">{String(crossAsset.regime)}</div>
               </div>
             )}
-            {crossAsset.thermometer && (
+            {crossAsset.assets && Array.isArray(crossAsset.assets) && (
               <div className="mb-4">
-                <div className="text-xs text-white/50 mb-1">市场温度计</div>
-                <pre className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed">{String(crossAsset.thermometer)}</pre>
+                <div className="text-xs text-white/50 mb-2">8 资产红绿灯</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {crossAsset.assets.map((item: any, i: number) => (
+                    <div key={i} className="p-2 rounded bg-white/5 border border-white/10">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <div className={`w-2 h-2 rounded-full ${item.light === 'GREEN' ? 'bg-green-400' : item.light === 'YELLOW' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                        <div className="text-xs font-medium text-white/90">{String(item.asset)}</div>
+                      </div>
+                      <div className="text-[10px] text-white/60 mb-1">{String(item.signal)}</div>
+                      <div className="text-[10px] text-white/50 leading-tight">{String(item.reason)}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-            {crossAsset.data && (
-              <div>
-                <div className="text-xs text-white/50 mb-1">数据详情</div>
-                <pre className="text-xs text-white/60 whitespace-pre-wrap leading-relaxed font-mono">{typeof crossAsset.data === 'object' ? JSON.stringify(crossAsset.data, null, 2) : String(crossAsset.data)}</pre>
+            {crossAsset.summary && (
+              <div className="mb-4">
+                <div className="text-xs text-white/50 mb-1">总结</div>
+                <div className="text-xs text-yellow-300/80 leading-relaxed">{String(crossAsset.summary)}</div>
               </div>
             )}
           </div>
