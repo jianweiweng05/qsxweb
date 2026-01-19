@@ -36,7 +36,10 @@ export function HelpButton({
             ...(alertIndicators.threshold_indicators || []),
             ...(alertIndicators.composite_events || [])
           ];
-          const item = allItems.find((x: any) => x.id === indicatorKey || x.code === indicatorKey);
+          const item = allItems.find((x: any) =>
+          x.id?.toUpperCase() === indicatorKey?.toUpperCase() ||
+          x.code?.toUpperCase() === indicatorKey?.toUpperCase()
+        );
           if (!item) {
             console.log('[HelpButton] Item not found for key:', indicatorKey);
             return null;
