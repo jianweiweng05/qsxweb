@@ -49,9 +49,9 @@ export default function ToolboxPage() {
                 <HelpButton indicatorKey="cross_asset_rotation" />
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-6">
+              <div className="grid lg:grid-cols-[320px_1fr] gap-6">
                 {/* 左侧：图表 + 资产列表 */}
-                <div className="flex-shrink-0">
+                <div>
                   <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
                     width="260"
@@ -135,7 +135,7 @@ export default function ToolboxPage() {
                 </div>
 
                 {/* 右侧：Pro 分析 */}
-                <div className="flex-1">
+                <div className="min-w-0 min-h-[280px]">
                   <ProGate lockedMessage="升级 Pro 查看深度分析">
                     <div className="space-y-4">
                       {crossAsset.public.macro_one_liner && (
