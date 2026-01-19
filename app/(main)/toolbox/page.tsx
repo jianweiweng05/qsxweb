@@ -184,7 +184,7 @@ export default function ToolboxPage() {
                           </div>
                         </div>
                       )}
-                      {crossAsset.pro?.position_caps && (
+                      {crossAsset.pro?.position_caps && crossAsset.public?.assets_8 && (
                         <div>
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] text-white/50">仓位上限计算器</span>
@@ -196,80 +196,40 @@ export default function ToolboxPage() {
                               className="h-8 w-40 px-2 text-xs font-mono rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
                             />
                           </div>
-                          <div className="space-y-1.5">
-                            {(() => {
-                              const entries = Object.entries(crossAsset.pro.position_caps);
-                              const cashEntry = entries.find(([key]) => key === 'CASH');
-                              const otherEntries = entries.filter(([key]) => key !== 'CASH');
-                              const total = parseAmount(totalAmount);
-
-                              return (
-                                <>
-                                  {cashEntry && (
-                                    <div className="bg-white/5 rounded px-2 py-1">
-                                      <div className="flex justify-between items-baseline">
-                                        <span className="text-white/60 text-xs">{cashEntry[0]}</span>
-                                        <div className="text-right">
-                                          <div className="text-white/90 font-mono text-xs">{calculateAmount(String(cashEntry[1]), total)}</div>
-                                          <div className="text-white/40 text-[10px]">{String(cashEntry[1])}</div>
-                                        </div>
-                                      </div>
+                          <button
+                            onClick={() => setCapsExpanded(!capsExpanded)}
+                            className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded text-xs text-white/50 hover:text-white/70 transition-colors"
+                          >
+                            <span>CASH</span>
+                            <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                          {capsExpanded && (
+                            <div className="mt-1 max-h-[200px] overflow-y-auto space-y-1 pr-1">
+                              {(() => {
+                                const total = parseAmount(totalAmount);
+                                const positionMap = new Map(Object.entries(crossAsset.pro.position_caps));
+                                return crossAsset.public.assets_8.map((asset: any, i: number) => {
+                                  const posKey = asset.key === 'SPX' ? 'US_EQUITY' :
+                                                 asset.key === 'GOLD' ? 'GOLD' :
+                                                 asset.key === 'BTC' ? 'BTC' :
+                                                 asset.key === 'ETH' ? 'ETH' :
+                                                 asset.key === 'CASH' ? 'CASH' : asset.key;
+                                  const posVal = positionMap.get(posKey);
+                                  if (!posVal) return null;
+                                  const amountText = calculateAmount(String(posVal), total);
+                                  return (
+                                    <div key={i} className="bg-white/5 rounded px-2 py-1.5 flex items-center justify-between gap-2">
+                                      <span className="text-white/60 text-xs flex-shrink-0">{asset.label}</span>
+                                      <span className="text-white/90 font-mono text-xs flex-shrink-0">{amountText}</span>
+                                      <span className="text-white/50 text-[10px] truncate">{asset.one_liner}</span>
                                     </div>
-                                  )}
-
-                                  {otherEntries.length > 0 && (
-                                    <div>
-                                      <button
-                                        onClick={() => setCapsExpanded(!capsExpanded)}
-                                        className="w-full flex items-center justify-between px-2 py-1 text-xs text-white/50 hover:text-white/70 transition-colors"
-                                      >
-                                        <span>其他资产 ({otherEntries.length})</span>
-                                        <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                      </button>
-                                      {capsExpanded && (
-                                        <div className="space-y-1 mt-1">
-                                          {otherEntries.map(([key, val]) => {
-                                            const amountText = calculateAmount(String(val), total);
-                                            return (
-                                              <div key={key} className="bg-white/5 rounded px-2 py-1">
-                                                <div className="flex justify-between items-baseline">
-                                                  <span className="text-white/60 text-xs">{key}</span>
-                                                  <div className="text-right">
-                                                    <div className="text-white/90 font-mono text-xs">{amountText}</div>
-                                                    <div className="text-white/40 text-[10px]">{String(val)}</div>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </>
-                              );
-                            })()}
-                            <div className="grid grid-cols-2 gap-1.5">
-                              {crossAsset.pro?.portfolio_rules?.risk_assets_max && (
-                                <div className="bg-cyan-500/10 border border-cyan-500/20 rounded px-2 py-1">
-                                  <div className="text-cyan-400/80 text-[10px] mb-0.5">风险资产上限</div>
-                                  <div className="text-cyan-400 font-mono text-xs">
-                                    {calculateAmount(String(crossAsset.pro.portfolio_rules.risk_assets_max), parseAmount(totalAmount))}
-                                  </div>
-                                </div>
-                              )}
-                              {crossAsset.pro?.portfolio_rules?.cash_min && (
-                                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded px-2 py-1">
-                                  <div className="text-yellow-400/80 text-[10px] mb-0.5">现金最低</div>
-                                  <div className="text-yellow-400 font-mono text-xs">
-                                    {calculateAmount(String(crossAsset.pro.portfolio_rules.cash_min), parseAmount(totalAmount))}
-                                  </div>
-                                </div>
-                              )}
+                                  );
+                                }).filter(Boolean);
+                              })()}
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
                       {crossAsset.pro?.portfolio_rules && (
@@ -280,33 +240,6 @@ export default function ToolboxPage() {
                               <div key={key} className="flex justify-between text-xs">
                                 <span className="text-white/60">{key}</span>
                                 <span className="text-white/90 font-mono">{String(val)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {crossAsset.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (
-                        <div>
-                          <div className="text-xs text-white/50 mb-2">资产配置理由</div>
-                          <div className="space-y-1.5">
-                            {crossAsset.public.assets_8.map((asset: any, i: number) => (
-                              <div key={i} className="flex items-start gap-2 text-xs">
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 ${
-                                    asset.action === "IN"
-                                      ? "bg-green-400"
-                                      : asset.action === "NEUTRAL"
-                                        ? "bg-yellow-400"
-                                        : "bg-red-400"
-                                  }`}
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-baseline gap-1.5">
-                                    <span className="text-white/80 font-medium">{asset.label}</span>
-                                    <span className="text-white/40 text-[10px]">{asset.action}</span>
-                                  </div>
-                                  <div className="text-white/60 text-[11px] mt-0.5">{asset.one_liner}</div>
-                                </div>
                               </div>
                             ))}
                           </div>
