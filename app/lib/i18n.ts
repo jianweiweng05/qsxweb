@@ -7,7 +7,7 @@ export const translations = {
     // Navigation
     today: "今日",
     dataCenter: "数据中心",
-    pro: "PRO",
+    pro: "工具箱",
     myAccount: "我的",
     alerts: "报警",
 
@@ -72,7 +72,7 @@ export const translations = {
     // Navigation
     today: "Today",
     dataCenter: "Data Center",
-    pro: "PRO",
+    pro: "Toolbox",
     myAccount: "My Account",
     alerts: "Alerts",
 

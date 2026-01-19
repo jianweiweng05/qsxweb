@@ -21,7 +21,7 @@ export default async function ToolboxPage() {
       {/* 页面居中容器，解决大屏偏移 */}
       <div className="mx-auto w-full max-w-6xl px-4 py-6">
 
-        <h1 className="text-xl font-bold mb-6">PRO 工具箱</h1>
+        <h1 className="text-xl font-bold mb-6">工具箱</h1>
 
         {/* 跨资产轮动分析器 */}
         {crossAsset?.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
@@ -180,9 +180,6 @@ export default async function ToolboxPage() {
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
-              <div className="absolute bottom-3 right-3">
-                <HelpButton content={<div className="text-xs text-white/70">历史相似性用于环境识别，不是预测工具。</div>} />
-              </div>
               <ProGate lockedMessage="升级 Pro 查看完整分析">
                 {similarityText ? (
                   <pre className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed">
@@ -202,9 +199,6 @@ export default async function ToolboxPage() {
               <HelpButton indicatorKey="pro_strategy" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
-              <div className="absolute bottom-3 right-3">
-                <HelpButton content={<div className="text-xs text-white/70">策略用于风险管理，不构成投资建议。</div>} />
-              </div>
               <ProGate lockedMessage="升级 Pro 查看今日策略">
                 {proStrategyText ? (
                   <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed font-mono">
