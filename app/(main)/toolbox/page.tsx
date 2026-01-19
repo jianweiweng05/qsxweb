@@ -19,9 +19,9 @@ export default function ToolboxPage() {
 
         {/* 跨资产轮动分析器 */}
         {crossAsset?.assets_8 && Array.isArray(crossAsset.assets_8) && (() => {
-          const green = crossAsset.assets_8.filter((x: any) => x.status === 'IN');
-          const yellow = crossAsset.assets_8.filter((x: any) => x.status === 'NEUTRAL');
-          const red = crossAsset.assets_8.filter((x: any) => x.status === 'OUT');
+          const green = crossAsset.assets_8.filter((x: any) => x.action === 'IN');
+          const yellow = crossAsset.assets_8.filter((x: any) => x.action === 'NEUTRAL');
+          const red = crossAsset.assets_8.filter((x: any) => x.action === 'OUT');
 
           const reordered: any[] = [];
           const maxLen = Math.max(green.length, yellow.length, red.length);
@@ -32,7 +32,7 @@ export default function ToolboxPage() {
           }
 
           const weights = { IN: 3, NEUTRAL: 2, OUT: 1 };
-          const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.status as keyof typeof weights] || 1), 0);
+          const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.action as keyof typeof weights] || 1), 0);
           const gap = 2;
 
           const outerR = 100;
@@ -59,7 +59,7 @@ export default function ToolboxPage() {
                     className="overflow-visible max-w-full"
                   >
                     {reordered.map((item: any, i: number) => {
-                      const weight = weights[item.status as keyof typeof weights] || 1;
+                      const weight = weights[item.action as keyof typeof weights] || 1;
                       const segmentAngle = (weight / totalWeight) * 360;
 
                       const startAngle = currentAngle;
@@ -80,9 +80,9 @@ export default function ToolboxPage() {
 
                       const largeArc = endAngle - startAngle > 180 ? 1 : 0;
                       const color =
-                        item.status === "IN"
+                        item.action === "IN"
                           ? "#22c55e"
-                          : item.status === "NEUTRAL"
+                          : item.action === "NEUTRAL"
                             ? "#eab308"
                             : "#ef4444";
 
@@ -108,7 +108,7 @@ export default function ToolboxPage() {
                             dominantBaseline="middle"
                             className="fill-white text-[10px] font-medium"
                           >
-                            {String(item.asset)}
+                            {String(item.key)}
                           </text>
                         </g>
                       );
@@ -134,18 +134,18 @@ export default function ToolboxPage() {
                       <div key={i} className="pb-2 border-b border-white/5">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <div
-                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.status === "IN"
+                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
                                 ? "bg-green-400"
-                                : item.status === "NEUTRAL"
+                                : item.action === "NEUTRAL"
                                   ? "bg-yellow-400"
                                   : "bg-red-400"
                               }`}
                           />
                           <span className="text-xs font-medium">
-                            {String(item.asset)}
+                            {String(item.label)}
                           </span>
                           <span className="text-[10px] text-white/60">
-                            {String(item.status)}
+                            {String(item.action)}
                           </span>
                         </div>
                         <div className="text-[10px] text-white/60 pl-3 leading-tight">
