@@ -169,31 +169,31 @@ export default function ToolboxPage() {
             </div>
             <ProGate lockedMessage="升级 Pro 查看深度分析">
               <div className="space-y-4">
-                {crossAsset.pro.risk_level && (
+                {crossAsset.pro?.risk_level && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">风险等级</div>
                     <div className="text-sm text-white/90">{crossAsset.pro.risk_level}</div>
                   </div>
                 )}
-                {crossAsset.pro.position_cap && (
+                {crossAsset.pro?.position_cap && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">仓位上限</div>
                     <div className="text-sm text-white/90">{crossAsset.pro.position_cap}</div>
                   </div>
                 )}
-                {crossAsset.pro.drawdown_range && (
+                {crossAsset.pro?.drawdown_range && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">回撤范围</div>
                     <div className="text-sm text-white/90">{crossAsset.pro.drawdown_range}</div>
                   </div>
                 )}
-                {crossAsset.pro.historical_risk_scenarios && (
+                {crossAsset.pro?.historical_risk_scenarios && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">历史风险场景</div>
                     <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{crossAsset.pro.historical_risk_scenarios}</pre>
                   </div>
                 )}
-                {crossAsset.pro.decision_hint && (
+                {crossAsset.pro?.decision_hint && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">决策提示</div>
                     <pre className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed">{crossAsset.pro.decision_hint}</pre>
