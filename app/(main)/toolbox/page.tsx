@@ -185,50 +185,50 @@ export default function ToolboxPage() {
                       )}
                       {crossAsset.pro?.position_caps && (
                         <div>
-                          <div className="text-xs text-white/50 mb-2">仓位上限计算器</div>
-                          <input
-                            type="text"
-                            value={totalAmount}
-                            onChange={(e) => setTotalAmount(e.target.value)}
-                            placeholder="输入总资产"
-                            className="w-full mb-3 px-3 py-2 bg-white/5 border border-white/10 rounded text-sm text-white/90 font-mono focus:outline-none focus:border-cyan-500/50"
-                          />
-                          <div className="space-y-2">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] text-white/50">仓位上限计算器</span>
+                            <input
+                              type="text"
+                              value={totalAmount}
+                              onChange={(e) => setTotalAmount(e.target.value)}
+                              placeholder="输入总资产"
+                              className="h-8 w-40 px-2 text-xs font-mono rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
                             {Object.entries(crossAsset.pro.position_caps).map(([key, val]) => {
                               const total = parseAmount(totalAmount);
                               const amountText = calculateAmount(String(val), total);
                               return (
-                                <div key={key} className="bg-white/5 rounded px-3 py-2">
-                                  <div className="flex justify-between items-baseline mb-1">
+                                <div key={key} className="bg-white/5 rounded px-2 py-1">
+                                  <div className="flex justify-between items-baseline">
                                     <span className="text-white/60 text-xs">{key}</span>
-                                    <span className="text-white/90 font-mono text-sm">{amountText}</span>
+                                    <div className="text-right">
+                                      <div className="text-white/90 font-mono text-xs">{amountText}</div>
+                                      <div className="text-white/40 text-[10px]">{String(val)}</div>
+                                    </div>
                                   </div>
-                                  <div className="text-white/40 text-[10px] text-right">{String(val)}</div>
                                 </div>
                               );
                             })}
-                            {crossAsset.pro?.portfolio_rules?.risk_assets_max && (
-                              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded px-3 py-2">
-                                <div className="flex justify-between items-baseline mb-1">
-                                  <span className="text-cyan-400/80 text-xs">风险资产合计上限</span>
-                                  <span className="text-cyan-400 font-mono text-sm">
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {crossAsset.pro?.portfolio_rules?.risk_assets_max && (
+                                <div className="bg-cyan-500/10 border border-cyan-500/20 rounded px-2 py-1">
+                                  <div className="text-cyan-400/80 text-[10px] mb-0.5">风险资产上限</div>
+                                  <div className="text-cyan-400 font-mono text-xs">
                                     {calculateAmount(String(crossAsset.pro.portfolio_rules.risk_assets_max), parseAmount(totalAmount))}
-                                  </span>
+                                  </div>
                                 </div>
-                                <div className="text-cyan-400/40 text-[10px] text-right">{String(crossAsset.pro.portfolio_rules.risk_assets_max)}</div>
-                              </div>
-                            )}
-                            {crossAsset.pro?.portfolio_rules?.cash_min && (
-                              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded px-3 py-2">
-                                <div className="flex justify-between items-baseline mb-1">
-                                  <span className="text-yellow-400/80 text-xs">现金最低保留</span>
-                                  <span className="text-yellow-400 font-mono text-sm">
+                              )}
+                              {crossAsset.pro?.portfolio_rules?.cash_min && (
+                                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded px-2 py-1">
+                                  <div className="text-yellow-400/80 text-[10px] mb-0.5">现金最低</div>
+                                  <div className="text-yellow-400 font-mono text-xs">
                                     {calculateAmount(String(crossAsset.pro.portfolio_rules.cash_min), parseAmount(totalAmount))}
-                                  </span>
+                                  </div>
                                 </div>
-                                <div className="text-yellow-400/40 text-[10px] text-right">{String(crossAsset.pro.portfolio_rules.cash_min)}</div>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         </div>
                       )}
