@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import indicatorHelp from "@/app/lib/kb/indicator_help.json";
+import alertIndicators from "@/app/lib/kb/alert_indicators.json";
 
 interface HelpContent {
   title: string;
@@ -12,16 +13,23 @@ interface HelpContent {
 
 export function HelpButton({
   content,
-  indicatorKey
+  indicatorKey,
+  kbFile = "indicator_help",
+  size = "md"
 }: {
   content?: React.ReactNode;
   indicatorKey?: string;
+  kbFile?: "indicator_help" | "alert_indicators";
+  size?: "xs" | "md";
 }) {
   const [open, setOpen] = useState(false);
 
+  // 根据 kbFile 选择知识库
+  const kb = kbFile === "alert_indicators" ? alertIndicators : indicatorHelp;
+
   // 如果提供了 indicatorKey，从字典加载内容
   const helpData: HelpContent | null = indicatorKey
-    ? (indicatorHelp as Record<string, HelpContent>)[indicatorKey] || null
+    ? (kb as Record<string, HelpContent>)[indicatorKey] || null
     : null;
 
   // 锁定滚动
@@ -64,10 +72,10 @@ export function HelpButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-white/40 hover:text-white/70 transition-colors flex-shrink-0"
+        className={`text-white/40 hover:text-white/70 transition-colors flex-shrink-0 ${size === 'xs' ? 'opacity-60' : ''}`}
         aria-label="查看说明"
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <svg className={size === 'xs' ? 'w-3 h-3' : 'w-4 h-4'} fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
         </svg>
       </button>

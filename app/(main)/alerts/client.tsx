@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getLanguage, translations, type Language } from '@/app/lib/i18n';
+import { HelpButton } from '../toolbox/help-modal';
 
 interface AlertItem {
   key: string;
@@ -201,7 +202,10 @@ export default function AlertsClient() {
                   <div className="flex items-center gap-3">
                     <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
                     <div>
-                      <div className="text-sm text-white">{item.display_name}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-white">{item.display_name}</span>
+                        <HelpButton indicatorKey={item.key} kbFile="alert_indicators" size="xs" />
+                      </div>
                       <div className="text-xs text-white/40">{item.layer}</div>
                     </div>
                   </div>
@@ -274,6 +278,7 @@ export default function AlertsClient() {
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500" />
                             <span className="text-xs text-white/80">{item.key}</span>
+                            <HelpButton indicatorKey={item.key} kbFile="alert_indicators" size="xs" />
                           </div>
                           <div className="text-right">
                             <span className="text-xs font-mono text-white/60">{item.value}</span>

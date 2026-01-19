@@ -1,0 +1,19 @@
+{
+  "btc_etf_net_inflow": {
+    "title": "BTC ETF 单日净流入",
+    "one_liner": "待填充",
+    "how_to_read": "待填充",
+    "notes": [
+      "待填充"
+    ]
+  },
+  "example_indicator_key": {
+    "title": "指标显示名称",
+    "one_liner": "一句话说明",
+    "how_to_read": "如何解读这个指标",
+    "notes": [
+      "注意事项1",
+      "注意事项2"
+    ]
+  }
+}
