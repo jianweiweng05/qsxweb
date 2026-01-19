@@ -52,9 +52,9 @@ function isDecisionText(text: string): boolean {
 }
 
 const SUGGESTIONS = [
-  "现在的市场状态是什么？",
-  "当前仓位应该怎么控制？",
-  "有没有需要特别注意的风险？",
+  "我已经看了说明，但不确定该不该执行",
+  "多个指标结论冲突时，应该信哪个",
+  "当前环境下，哪些风险说明没有覆盖",
 ];
 
 type Message = { role: "user" | "ai"; text: string };
@@ -177,8 +177,9 @@ export function ChatPanel({
 
       <div ref={scrollRef} className="flex-1 overflow-auto space-y-4 pr-1">
         {messages.length === 0 ? (
-          <div className="text-white/30 text-sm py-8 text-center">
-            输入问题开始对话
+          <div className="text-white/40 text-xs py-8 px-4 text-center leading-relaxed">
+            💡 本页面的大部分指标与结论，都可以点击 ⓘ 查看说明<br />
+            如果说明仍无法解答你的问题，再向我提问
           </div>
         ) : (
           messages.map((m, i) => (
