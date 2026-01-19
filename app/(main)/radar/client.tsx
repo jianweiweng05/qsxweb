@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { HelpButton } from '../toolbox/help-modal';
 
 // 类型定义
 interface Metric {
@@ -216,11 +217,17 @@ function LayerCard({
 }: {
   layer: Layer;
 }) {
+  // 根据 layer.key 确定 indicatorKey
+  const indicatorKey = `layer_${layer.key}`;
+
   return (
     <div className="p-3 rounded-lg bg-white/8 border border-white/10 hover:border-cyan-500/30 transition-colors">
       {/* 头部 */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-white">{layer.title}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-white">{layer.title}</span>
+          <HelpButton indicatorKey={indicatorKey} />
+        </div>
         <span className={`px-2 py-0.5 text-xs rounded border ${badgeColorClass(layer.badge.color)}`}>
           {layer.badge.label}
         </span>
@@ -346,7 +353,10 @@ export default function RadarClient() {
     <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
       {/* 左列：雷达图 */}
       <div className="p-4 rounded-lg bg-white/8 border border-white/10 lg:min-h-[calc(100vh-14rem)]">
-        <h2 className="text-sm text-white/50 mb-4">六维雷达</h2>
+        <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
+          <span>六维雷达</span>
+          <HelpButton indicatorKey="radar_chart" />
+        </div>
         <GlowingRadar values={radarValues} layers={layers} />
         {breakdown && (
           <div className="mt-6 grid grid-cols-3 gap-3">

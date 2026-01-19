@@ -1,5 +1,6 @@
 import { getReportPayload } from "@/app/lib/qsx_api";
 import { VIPGate, ProGate } from "@/app/lib/gate";
+import { HelpButton } from "../toolbox/help-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,10 @@ export default async function TodayPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         {/* 市场状态 */}
         <div className="p-5 rounded-lg bg-white/5 border border-white/10">
-          <div className="text-xs text-white/40 mb-2">市场状态</div>
+          <div className="flex items-center gap-2 text-xs text-white/40 mb-2">
+            <span>市场状态</span>
+            <HelpButton indicatorKey="market_weather" />
+          </div>
           <div className="text-2xl font-semibold text-white/90">
             {weatherTitle}
           </div>
@@ -50,7 +54,10 @@ export default async function TodayPage() {
 
         {/* 建议仓位 - 唯一高亮 */}
         <div className="p-5 rounded-lg bg-cyan-500/15 border border-cyan-500/30">
-          <div className="text-xs text-white/50 mb-2">建议仓位</div>
+          <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
+            <span>建议仓位</span>
+            <HelpButton indicatorKey="risk_cap" />
+          </div>
           <div className="text-3xl font-bold text-cyan-400">
             {riskCap != null ? `≤ ${riskCap}%` : "—"}
           </div>
@@ -61,6 +68,7 @@ export default async function TodayPage() {
           <div className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
             <span>波动状态</span>
             <span className="text-[9px] text-white/30">(Gamma)</span>
+            <HelpButton indicatorKey="gamma" />
             <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
               PRO
             </span>
@@ -86,7 +94,10 @@ export default async function TodayPage() {
 
       {/* AI 解读区 - 独立一块，中性背景 */}
       <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
-        <div className="text-sm font-medium text-white/60 mb-4">机构分析师观点</div>
+        <div className="flex items-center gap-2 text-sm font-medium text-white/60 mb-4">
+          <span>机构分析师观点</span>
+          <HelpButton indicatorKey="ai_analysis" />
+        </div>
         <VIPGate
           lockedMessage="AI 解读需要 VIP 订阅"
           unlockConfig={{
@@ -114,7 +125,10 @@ export default async function TodayPage() {
       {(bearish.length > 0 || bullish.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div className="p-4 rounded-lg bg-red-500/8 border border-red-500/15">
-            <div className="text-xs text-red-400/80 mb-2">空方信号</div>
+            <div className="flex items-center gap-2 text-xs text-red-400/80 mb-2">
+              <span>空方信号</span>
+              <HelpButton indicatorKey="bearish_signals" />
+            </div>
             <VIPGate lockedMessage="VIP 可见">
               {bearish.length > 0 ? (
                 bearish.map((item: string, i: number) => (
@@ -132,7 +146,10 @@ export default async function TodayPage() {
           </div>
 
           <div className="p-4 rounded-lg bg-green-500/8 border border-green-500/15">
-            <div className="text-xs text-green-400/80 mb-2">多方信号</div>
+            <div className="flex items-center gap-2 text-xs text-green-400/80 mb-2">
+              <span>多方信号</span>
+              <HelpButton indicatorKey="bullish_signals" />
+            </div>
             <VIPGate lockedMessage="VIP 可见">
               {bullish.length > 0 ? (
                 bullish.map((item: string, i: number) => (

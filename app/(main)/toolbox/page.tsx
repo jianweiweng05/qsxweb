@@ -53,8 +53,9 @@ export default async function ToolboxPage() {
 
           return (
             <div className="mb-8 p-4 rounded-lg bg-white/5 border border-white/10">
-              <div className="text-sm font-medium text-white/80 mb-4">
-                跨资产轮动分析器
+              <div className="flex items-center gap-2 text-sm font-medium text-white/80 mb-4">
+                <span>跨资产轮动分析器</span>
+                <HelpButton indicatorKey="cross_asset_rotation" />
               </div>
 
               <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-center">
@@ -129,8 +130,9 @@ export default async function ToolboxPage() {
                 <div className="flex-1 space-y-3 pt-2">
                   {crossAsset.macro_summary?.one_liner && (
                     <div className="pb-3 border-b border-white/10">
-                      <div className="text-sm font-medium text-white/70 mb-2">
-                        宏观结论
+                      <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+                        <span>宏观结论</span>
+                        <HelpButton indicatorKey="macro_summary" />
                       </div>
                       <div className="text-sm text-white/80 leading-relaxed">
                         {String(crossAsset.macro_summary.one_liner)}
@@ -173,7 +175,10 @@ export default async function ToolboxPage() {
         <div className="grid lg:grid-cols-2 gap-6">
           {/* 左 */}
           <div className="space-y-4">
-            <div className="text-sm font-medium text-white/80">今日相似度</div>
+            <div className="flex items-center gap-2 text-sm font-medium text-white/80">
+              <span>今日相似度</span>
+              <HelpButton indicatorKey="similarity_analysis" />
+            </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
               <div className="absolute bottom-3 right-3">
                 <HelpButton content={<div className="text-xs text-white/70">历史相似性用于环境识别，不是预测工具。</div>} />
@@ -192,7 +197,10 @@ export default async function ToolboxPage() {
 
           {/* 右 */}
           <div className="space-y-4">
-            <div className="text-sm font-medium text-white/80">今日策略指引</div>
+            <div className="flex items-center gap-2 text-sm font-medium text-white/80">
+              <span>今日策略指引</span>
+              <HelpButton indicatorKey="pro_strategy" />
+            </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
               <div className="absolute bottom-3 right-3">
                 <HelpButton content={<div className="text-xs text-white/70">策略用于风险管理，不构成投资建议。</div>} />
