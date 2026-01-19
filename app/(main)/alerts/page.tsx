@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { PageGate } from "@/app/lib/gate";
 import AlertsClient from "./client";
 import { getLanguage, translations, type Language } from "@/app/lib/i18n";
+import { getUserTier } from "@/app/lib/entitlements";
 
 export default function AlertsPage() {
   const [lang, setLang] = useState<Language>("zh");
@@ -14,8 +15,7 @@ export default function AlertsPage() {
 
   const t = translations[lang];
 
-  // Mock tier - replace with actual tier logic
-  const tier = "FREE" as "FREE" | "VIP" | "PRO";
+  const tier = getUserTier();
 
   if (tier !== "PRO") {
     return (
