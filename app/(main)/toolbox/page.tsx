@@ -160,6 +160,50 @@ export default function ToolboxPage() {
           );
         })()}
 
+        {/* Pro 深度分析 */}
+        {crossAsset?.pro && (
+          <div className="mb-8 p-4 rounded-lg bg-white/5 border border-white/10">
+            <div className="flex items-center gap-2 text-sm font-medium text-white/80 mb-4">
+              <span>Pro 深度分析</span>
+              <HelpButton indicatorKey="cross_asset_pro" />
+            </div>
+            <ProGate lockedMessage="升级 Pro 查看深度分析">
+              <div className="space-y-4">
+                {crossAsset.pro.risk_level && (
+                  <div>
+                    <div className="text-xs text-white/50 mb-1">风险等级</div>
+                    <div className="text-sm text-white/90">{crossAsset.pro.risk_level}</div>
+                  </div>
+                )}
+                {crossAsset.pro.position_cap && (
+                  <div>
+                    <div className="text-xs text-white/50 mb-1">仓位上限</div>
+                    <div className="text-sm text-white/90">{crossAsset.pro.position_cap}</div>
+                  </div>
+                )}
+                {crossAsset.pro.drawdown_range && (
+                  <div>
+                    <div className="text-xs text-white/50 mb-1">回撤范围</div>
+                    <div className="text-sm text-white/90">{crossAsset.pro.drawdown_range}</div>
+                  </div>
+                )}
+                {crossAsset.pro.historical_risk_scenarios && (
+                  <div>
+                    <div className="text-xs text-white/50 mb-1">历史风险场景</div>
+                    <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">{crossAsset.pro.historical_risk_scenarios}</pre>
+                  </div>
+                )}
+                {crossAsset.pro.decision_hint && (
+                  <div>
+                    <div className="text-xs text-white/50 mb-1">决策提示</div>
+                    <pre className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed">{crossAsset.pro.decision_hint}</pre>
+                  </div>
+                )}
+              </div>
+            </ProGate>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
