@@ -1,18 +1,25 @@
-import { getReportPayload } from "@/app/lib/qsx_api";
+"use client";
+
 import { VIPGate, ProGate } from "@/app/lib/gate";
 import { HelpButton } from "../toolbox/help-modal";
+import { useReport } from "../report-provider";
 
-export const dynamic = "force-dynamic";
+export default function TodayPage() {
+  const { data: payload, isLoading } = useReport();
 
-export default async function TodayPage() {
-  let payload: any = null;
-  try {
-    payload = await getReportPayload();
-  } catch {
-    payload = null;
+  if (isLoading) {
+    return (
+      <div className="py-6 text-white">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-white/5 rounded w-32" />
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => <div key={i} className="h-24 bg-white/5 rounded" />)}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // A) Hero 字段
   const weatherTitle = payload?.weather?.title || "暂无数据";
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", {
@@ -25,7 +32,6 @@ export default async function TodayPage() {
       : null;
   const gammaTitle = payload?.gamma?.title || "暂无数据";
 
-  // B) AI 解读
   const oneLiner = payload?.ai_json?.one_liner || "暂无数据";
   const marketComment = payload?.ai_json?.market_comment || "暂无数据";
   const bearish = payload?.ai_json?.collision?.bearish_2 || [];
@@ -39,9 +45,8 @@ export default async function TodayPage() {
         <span className="text-xs text-white/40">{generatedAt}</span>
       </div>
 
-      {/* KPI Row - 第一屏：3块等高等宽，只有建议仓位高亮 */}
+      {/* KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        {/* 市场状态 */}
         <div className="p-5 rounded-lg bg-white/5 border border-white/10">
           <div className="flex items-center gap-2 text-xs text-white/40 mb-2">
             <span>市场状态</span>
@@ -52,7 +57,6 @@ export default async function TodayPage() {
           </div>
         </div>
 
-        {/* 建议仓位 - 唯一高亮 */}
         <div className="p-5 rounded-lg bg-cyan-500/15 border border-cyan-500/30">
           <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
             <span>建议仓位</span>
@@ -63,7 +67,6 @@ export default async function TodayPage() {
           </div>
         </div>
 
-        {/* 波动状态 */}
         <div className="p-5 rounded-lg bg-white/5 border border-white/10">
           <div className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
             <span>波动状态</span>
@@ -92,7 +95,7 @@ export default async function TodayPage() {
         </div>
       </div>
 
-      {/* AI 解读区 - 独立一块，中性背景 */}
+      {/* AI 解读区 */}
       <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
         <div className="flex items-center gap-2 text-sm font-medium text-white/60 mb-4">
           <span>机构分析师观点</span>
@@ -121,7 +124,7 @@ export default async function TodayPage() {
         </VIPGate>
       </div>
 
-      {/* 多空信号区 - 降低透明度 */}
+      {/* 多空信号区 */}
       {(bearish.length > 0 || bullish.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div className="p-4 rounded-lg bg-red-500/8 border border-red-500/15">

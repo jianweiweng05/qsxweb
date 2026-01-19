@@ -1,6 +1,6 @@
-import RadarClient from "./client";
+"use client";
 
-export const dynamic = "force-dynamic";
+import RadarClient from "./client";
 
 export default function RadarPage() {
   return (

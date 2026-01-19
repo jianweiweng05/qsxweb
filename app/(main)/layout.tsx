@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Activity, Radar, Bell, Wrench, User } from "lucide-react";
 import { FloatingAIBubble } from "./floating-ai-bubble";
 import { getLanguage, translations, type Language } from "@/app/lib/i18n";
+import { ReportProvider } from "./report-provider";
 
 const getTabs = (lang: Language) => [
   { key: "/today", title: translations[lang].today, Icon: Activity },
@@ -42,81 +43,83 @@ export default function MainLayout({
   const unreadAlerts = 3;
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
-      {/* 顶部导航栏 */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-sm">
-        <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-between px-4 lg:px-6">
-          <button
-            onClick={() => router.push("/account")}
-            className={`flex items-center gap-2 transition-colors ${
-              activeKey === "/account" ? "text-cyan-400" : "text-zinc-400 hover:text-zinc-300"
-            }`}
-          >
-            <User size={20} strokeWidth={1.5} />
-            <span className="text-sm">{t.myAccount}</span>
-          </button>
+    <ReportProvider>
+      <div className="min-h-screen flex flex-col bg-black">
+        {/* 顶部导航栏 */}
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-sm">
+          <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-between px-4 lg:px-6">
+            <button
+              onClick={() => router.push("/account")}
+              className={`flex items-center gap-2 transition-colors ${
+                activeKey === "/account" ? "text-cyan-400" : "text-zinc-400 hover:text-zinc-300"
+              }`}
+            >
+              <User size={20} strokeWidth={1.5} />
+              <span className="text-sm">{t.myAccount}</span>
+            </button>
 
-          <button
-            onClick={() => router.push("/alerts")}
-            className={`flex items-center gap-2 transition-colors ${
-              activeKey === "/alerts" ? "text-cyan-400" : "text-zinc-400 hover:text-zinc-300"
-            }`}
-          >
-            <span className="relative">
-              <Bell size={20} strokeWidth={1.5} />
-              {unreadAlerts > 0 && (
-                <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-              )}
-            </span>
-            <span className="text-sm">{t.alerts}</span>
-          </button>
-        </div>
-      </header>
-
-      {/* 内容区 */}
-      <main className="flex-1 flex justify-center pt-14 pb-14">
-        <div className="w-full max-w-[1600px] 2xl:max-w-[1760px] px-4 lg:px-6">
-          {children}
-        </div>
-      </main>
-
-      {/* 底部导航 */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/90 backdrop-blur-sm">
-        <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-around px-2">
-          {tabs.map((tab) => {
-            const isActive = activeKey === tab.key;
-
-            return (
-              <button
-                key={tab.key}
-                onClick={() => router.push(tab.key)}
-                className={`
-                  relative flex flex-col items-center justify-center flex-1 h-full
-                  transition-colors duration-150
-                  ${isActive ? "text-cyan-400" : "text-zinc-500 hover:text-zinc-300"}
-                `}
-              >
-                {isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-400" />
+            <button
+              onClick={() => router.push("/alerts")}
+              className={`flex items-center gap-2 transition-colors ${
+                activeKey === "/alerts" ? "text-cyan-400" : "text-zinc-400 hover:text-zinc-300"
+              }`}
+            >
+              <span className="relative">
+                <Bell size={20} strokeWidth={1.5} />
+                {unreadAlerts > 0 && (
+                  <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                 )}
+              </span>
+              <span className="text-sm">{t.alerts}</span>
+            </button>
+          </div>
+        </header>
 
-                <tab.Icon size={20} strokeWidth={1.5} />
+        {/* 内容区 */}
+        <main className="flex-1 flex justify-center pt-14 pb-14">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1760px] px-4 lg:px-6">
+            {children}
+          </div>
+        </main>
 
-                <span
+        {/* 底部导航 */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/90 backdrop-blur-sm">
+          <div className="mx-auto w-full max-w-[1600px] 2xl:max-w-[1760px] h-14 flex items-center justify-around px-2">
+            {tabs.map((tab) => {
+              const isActive = activeKey === tab.key;
+
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => router.push(tab.key)}
                   className={`
-                    mt-1 text-[10px] tracking-wide
-                    ${isActive ? "opacity-100 font-medium" : "opacity-60"}
+                    relative flex flex-col items-center justify-center flex-1 h-full
+                    transition-colors duration-150
+                    ${isActive ? "text-cyan-400" : "text-zinc-500 hover:text-zinc-300"}
                   `}
                 >
-                  {tab.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+                  {isActive && (
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-400" />
+                  )}
 
-      <FloatingAIBubble messages={messages} setMessages={setMessages} />
-    </div>
+                  <tab.Icon size={20} strokeWidth={1.5} />
+
+                  <span
+                    className={`
+                      mt-1 text-[10px] tracking-wide
+                      ${isActive ? "opacity-100 font-medium" : "opacity-60"}
+                    `}
+                  >
+                    {tab.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        <FloatingAIBubble messages={messages} setMessages={setMessages} />
+      </div>
+    </ReportProvider>
   );
 }

@@ -1,12 +1,13 @@
+"use client";
+
 import { PageGate } from "@/app/lib/gate";
 import { getUserTier } from "@/app/lib/entitlements";
-import { getReportPayload } from "@/app/lib/qsx_api";
 import SimilarityClient from "./client";
+import { useReport } from "../report-provider";
 
-export const dynamic = "force-dynamic";
-
-export default async function SimilarityPage() {
+export default function SimilarityPage() {
   const tier = getUserTier();
+  const { data: payload } = useReport();
 
   if (tier !== "PRO") {
     return (
@@ -26,13 +27,6 @@ export default async function SimilarityPage() {
         <></>
       </PageGate>
     );
-  }
-
-  let payload: any = null;
-  try {
-    payload = await getReportPayload();
-  } catch {
-    payload = null;
   }
 
   const similarityText = payload?.similarity_text;

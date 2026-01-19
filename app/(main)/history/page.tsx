@@ -1,8 +1,8 @@
+"use client";
+
 import { getUserTier } from "@/app/lib/entitlements";
 
-export const dynamic = "force-dynamic";
-
-export default async function HistoryPage() {
+export default function HistoryPage() {
   const tier = getUserTier();
 
   return (

@@ -1,16 +1,11 @@
-import { getReportPayload } from "@/app/lib/qsx_api";
+"use client";
+
 import { ProGate } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
+import { useReport } from "../report-provider";
 
-export const dynamic = "force-dynamic";
-
-export default async function ToolboxPage() {
-  let payload: any = null;
-  try {
-    payload = await getReportPayload();
-  } catch {
-    payload = null;
-  }
+export default function ToolboxPage() {
+  const { data: payload } = useReport();
 
   const proStrategyText = payload?.pro_strategy_text;
   const similarityText = payload?.similarity_text;
@@ -18,19 +13,16 @@ export default async function ToolboxPage() {
 
   return (
     <div className="min-h-full bg-black/90 text-white">
-      {/* 页面居中容器，解决大屏偏移 */}
       <div className="mx-auto w-full max-w-6xl px-4 py-6">
 
         <h1 className="text-xl font-bold mb-6">工具箱</h1>
 
         {/* 跨资产轮动分析器 */}
         {crossAsset?.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
-          // 按信号分组
           const green = crossAsset.asset_board.filter((x: any) => x.signal === 'GREEN');
           const yellow = crossAsset.asset_board.filter((x: any) => x.signal === 'YELLOW');
           const red = crossAsset.asset_board.filter((x: any) => x.signal === 'RED');
 
-          // 交错排列
           const reordered: any[] = [];
           const maxLen = Math.max(green.length, yellow.length, red.length);
           for (let i = 0; i < maxLen; i++) {
@@ -39,7 +31,6 @@ export default async function ToolboxPage() {
             if (i < red.length) reordered.push(red[i]);
           }
 
-          // 权重分配角度
           const weights = { GREEN: 3, YELLOW: 2, RED: 1 };
           const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.signal as keyof typeof weights] || 1), 0);
           const gap = 2;
@@ -59,7 +50,6 @@ export default async function ToolboxPage() {
               </div>
 
               <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-center">
-                {/* 图表 */}
                 <div className="flex-shrink-0">
                   <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
@@ -126,7 +116,6 @@ export default async function ToolboxPage() {
                   </svg>
                 </div>
 
-                {/* 说明区 */}
                 <div className="flex-1 space-y-3 pt-2">
                   {crossAsset.macro_summary?.one_liner && (
                     <div className="pb-3 border-b border-white/10">
@@ -171,9 +160,7 @@ export default async function ToolboxPage() {
           );
         })()}
 
-        {/* 下方左右结构 */}
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* 左 */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
               <span>今日相似度</span>
@@ -192,7 +179,6 @@ export default async function ToolboxPage() {
             </div>
           </div>
 
-          {/* 右 */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
               <span>今日策略指引</span>
