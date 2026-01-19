@@ -49,7 +49,8 @@ export default function ToolboxPage() {
                 <HelpButton indicatorKey="cross_asset_rotation" />
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* 左侧：图表 + 资产列表 */}
                 <div className="flex-shrink-0">
                   <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
@@ -115,19 +116,7 @@ export default function ToolboxPage() {
                     })}
                   </svg>
 
-                  {crossAsset.public.macro_one_liner && (
-                    <div className="mt-4 pt-3 border-t border-white/10">
-                      <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
-                        <span>宏观结论</span>
-                        <HelpButton indicatorKey="macro_summary" />
-                      </div>
-                      <div className="text-xs text-white/80 leading-relaxed">
-                        {String(crossAsset.public.macro_one_liner)}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-4 space-y-2">
                     {crossAsset.public.assets_8.map((item: any, i: number) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         <div
@@ -145,9 +134,21 @@ export default function ToolboxPage() {
                   </div>
                 </div>
 
+                {/* 右侧：Pro 分析 */}
                 <div className="flex-1">
                   <ProGate lockedMessage="升级 Pro 查看深度分析">
                     <div className="space-y-4">
+                      {crossAsset.public.macro_one_liner && (
+                        <div>
+                          <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
+                            <span>宏观结论</span>
+                            <HelpButton indicatorKey="macro_summary" />
+                          </div>
+                          <div className="text-xs text-white/80 leading-relaxed">
+                            {String(crossAsset.public.macro_one_liner)}
+                          </div>
+                        </div>
+                      )}
                       {crossAsset.pro?.portfolio_conclusion && (
                         <div>
                           <div className="text-xs text-white/50 mb-2">组合结论</div>
