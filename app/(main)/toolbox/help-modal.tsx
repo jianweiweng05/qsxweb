@@ -37,7 +37,10 @@ export function HelpButton({
             ...(alertIndicators.composite_events || [])
           ];
           const item = allItems.find((x: any) => x.id === indicatorKey || x.code === indicatorKey);
-          if (!item) return null;
+          if (!item) {
+            console.log('[HelpButton] Item not found for key:', indicatorKey);
+            return null;
+          }
 
           // 合并所有说明字段
           const notes = [
@@ -46,12 +49,14 @@ export function HelpButton({
             ...((item as any).caveats || [])
           ];
 
-          return {
+          const result = {
             title: item.title,
             one_liner: item.short || "",
             how_to_read: item.what_it_means || "",
             notes
           };
+          console.log('[HelpButton] Loaded data for', indicatorKey, ':', result);
+          return result;
         }
         return (kb as Record<string, HelpContent>)[indicatorKey] || null;
       })()
