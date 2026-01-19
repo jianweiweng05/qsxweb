@@ -8,6 +8,7 @@ import { useReport } from "../report-provider";
 export default function ToolboxPage() {
   const { data: payload } = useReport();
   const [totalAmount, setTotalAmount] = useState("1,000,000");
+  const [capsExpanded, setCapsExpanded] = useState(false);
 
   const proStrategyText = payload?.pro_strategy_text;
   const similarityText = payload?.similarity_text;
@@ -196,21 +197,60 @@ export default function ToolboxPage() {
                             />
                           </div>
                           <div className="space-y-1.5">
-                            {Object.entries(crossAsset.pro.position_caps).map(([key, val]) => {
+                            {(() => {
+                              const entries = Object.entries(crossAsset.pro.position_caps);
+                              const cashEntry = entries.find(([key]) => key === 'CASH');
+                              const otherEntries = entries.filter(([key]) => key !== 'CASH');
                               const total = parseAmount(totalAmount);
-                              const amountText = calculateAmount(String(val), total);
+
                               return (
-                                <div key={key} className="bg-white/5 rounded px-2 py-1">
-                                  <div className="flex justify-between items-baseline">
-                                    <span className="text-white/60 text-xs">{key}</span>
-                                    <div className="text-right">
-                                      <div className="text-white/90 font-mono text-xs">{amountText}</div>
-                                      <div className="text-white/40 text-[10px]">{String(val)}</div>
+                                <>
+                                  {cashEntry && (
+                                    <div className="bg-white/5 rounded px-2 py-1">
+                                      <div className="flex justify-between items-baseline">
+                                        <span className="text-white/60 text-xs">{cashEntry[0]}</span>
+                                        <div className="text-right">
+                                          <div className="text-white/90 font-mono text-xs">{calculateAmount(String(cashEntry[1]), total)}</div>
+                                          <div className="text-white/40 text-[10px]">{String(cashEntry[1])}</div>
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
+                                  )}
+
+                                  {otherEntries.length > 0 && (
+                                    <div>
+                                      <button
+                                        onClick={() => setCapsExpanded(!capsExpanded)}
+                                        className="w-full flex items-center justify-between px-2 py-1 text-xs text-white/50 hover:text-white/70 transition-colors"
+                                      >
+                                        <span>其他资产 ({otherEntries.length})</span>
+                                        <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                      </button>
+                                      {capsExpanded && (
+                                        <div className="space-y-1 mt-1">
+                                          {otherEntries.map(([key, val]) => {
+                                            const amountText = calculateAmount(String(val), total);
+                                            return (
+                                              <div key={key} className="bg-white/5 rounded px-2 py-1">
+                                                <div className="flex justify-between items-baseline">
+                                                  <span className="text-white/60 text-xs">{key}</span>
+                                                  <div className="text-right">
+                                                    <div className="text-white/90 font-mono text-xs">{amountText}</div>
+                                                    <div className="text-white/40 text-[10px]">{String(val)}</div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </>
                               );
-                            })}
+                            })()}
                             <div className="grid grid-cols-2 gap-1.5">
                               {crossAsset.pro?.portfolio_rules?.risk_assets_max && (
                                 <div className="bg-cyan-500/10 border border-cyan-500/20 rounded px-2 py-1">
@@ -240,6 +280,33 @@ export default function ToolboxPage() {
                               <div key={key} className="flex justify-between text-xs">
                                 <span className="text-white/60">{key}</span>
                                 <span className="text-white/90 font-mono">{String(val)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-2">资产配置理由</div>
+                          <div className="space-y-1.5">
+                            {crossAsset.public.assets_8.map((asset: any, i: number) => (
+                              <div key={i} className="flex items-start gap-2 text-xs">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 ${
+                                    asset.action === "IN"
+                                      ? "bg-green-400"
+                                      : asset.action === "NEUTRAL"
+                                        ? "bg-yellow-400"
+                                        : "bg-red-400"
+                                  }`}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-baseline gap-1.5">
+                                    <span className="text-white/80 font-medium">{asset.label}</span>
+                                    <span className="text-white/40 text-[10px]">{asset.action}</span>
+                                  </div>
+                                  <div className="text-white/60 text-[11px] mt-0.5">{asset.one_liner}</div>
+                                </div>
                               </div>
                             ))}
                           </div>
