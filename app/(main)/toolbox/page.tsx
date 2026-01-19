@@ -18,10 +18,10 @@ export default function ToolboxPage() {
         <h1 className="text-xl font-bold mb-6">工具箱</h1>
 
         {/* 跨资产轮动分析器 */}
-        {crossAsset?.assets_8 && Array.isArray(crossAsset.assets_8) && (() => {
-          const green = crossAsset.assets_8.filter((x: any) => x.action === 'IN');
-          const yellow = crossAsset.assets_8.filter((x: any) => x.action === 'NEUTRAL');
-          const red = crossAsset.assets_8.filter((x: any) => x.action === 'OUT');
+        {crossAsset?.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (() => {
+          const green = crossAsset.public.assets_8.filter((x: any) => x.action === 'IN');
+          const yellow = crossAsset.public.assets_8.filter((x: any) => x.action === 'NEUTRAL');
+          const red = crossAsset.public.assets_8.filter((x: any) => x.action === 'OUT');
 
           const reordered: any[] = [];
           const maxLen = Math.max(green.length, yellow.length, red.length);
@@ -117,20 +117,20 @@ export default function ToolboxPage() {
                 </div>
 
                 <div className="flex-1 space-y-3 pt-2">
-                  {crossAsset.macro_one_liner && (
+                  {crossAsset.public.macro_one_liner && (
                     <div className="pb-3 border-b border-white/10">
                       <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
                         <span>宏观结论</span>
                         <HelpButton indicatorKey="macro_summary" />
                       </div>
                       <div className="text-sm text-white/80 leading-relaxed">
-                        {String(crossAsset.macro_one_liner)}
+                        {String(crossAsset.public.macro_one_liner)}
                       </div>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2">
-                    {crossAsset.assets_8.map((item: any, i: number) => (
+                    {crossAsset.public.assets_8.map((item: any, i: number) => (
                       <div key={i} className="pb-2 border-b border-white/5">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <div
