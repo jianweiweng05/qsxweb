@@ -17,7 +17,7 @@ export default function ToolboxPage() {
 
         <h1 className="text-xl font-bold mb-6">工具箱</h1>
 
-        {/* 跨资产轮动分析器 */}
+        {/* 全球资产风险监控仪 */}
         {crossAsset?.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (() => {
           const green = crossAsset.public.assets_8.filter((x: any) => x.action === 'IN');
           const yellow = crossAsset.public.assets_8.filter((x: any) => x.action === 'NEUTRAL');
@@ -45,11 +45,11 @@ export default function ToolboxPage() {
           return (
             <div className="mb-8 p-4 rounded-lg bg-white/5 border border-white/10">
               <div className="flex items-center gap-2 text-sm font-medium text-white/80 mb-4">
-                <span>跨资产轮动分析器</span>
+                <span>全球资产风险监控仪</span>
                 <HelpButton indicatorKey="cross_asset_rotation" />
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-center">
+              <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
                 <div className="flex-shrink-0">
                   <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
@@ -114,106 +114,88 @@ export default function ToolboxPage() {
                       );
                     })}
                   </svg>
-                </div>
 
-                <div className="flex-1 space-y-3 pt-2">
                   {crossAsset.public.macro_one_liner && (
-                    <div className="pb-3 border-b border-white/10">
-                      <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+                    <div className="mt-4 pt-3 border-t border-white/10">
+                      <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
                         <span>宏观结论</span>
                         <HelpButton indicatorKey="macro_summary" />
                       </div>
-                      <div className="text-sm text-white/80 leading-relaxed">
+                      <div className="text-xs text-white/80 leading-relaxed">
                         {String(crossAsset.public.macro_one_liner)}
                       </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2">
+                  <div className="mt-3 space-y-2">
                     {crossAsset.public.assets_8.map((item: any, i: number) => (
-                      <div key={i} className="pb-2 border-b border-white/5">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
-                                ? "bg-green-400"
-                                : item.action === "NEUTRAL"
-                                  ? "bg-yellow-400"
-                                  : "bg-red-400"
-                              }`}
-                          />
-                          <span className="text-xs font-medium">
-                            {String(item.label)}
-                          </span>
-                          <span className="text-[10px] text-white/60">
-                            {String(item.action)}
-                          </span>
-                        </div>
-                        <div className="text-[10px] text-white/60 pl-3 leading-tight">
-                          score: {item.score}
-                        </div>
+                      <div key={i} className="flex items-center gap-2 text-xs">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
+                              ? "bg-green-400"
+                              : item.action === "NEUTRAL"
+                                ? "bg-yellow-400"
+                                : "bg-red-400"
+                            }`}
+                        />
+                        <span className="text-white/80">{String(item.label)}</span>
+                        <span className="text-white/40 text-[10px]">{String(item.action)}</span>
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <div className="flex-1">
+                  <ProGate lockedMessage="升级 Pro 查看深度分析">
+                    <div className="space-y-4">
+                      {crossAsset.pro?.portfolio_conclusion && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-2">组合结论</div>
+                          <div className="space-y-1">
+                            {crossAsset.pro.portfolio_conclusion.map((line: string, i: number) => (
+                              <div key={i} className="text-xs text-white/80 leading-relaxed">• {line}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.pro?.position_caps && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-2">仓位上限</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {Object.entries(crossAsset.pro.position_caps).map(([key, val]) => (
+                              <div key={key} className="flex justify-between text-xs bg-white/5 rounded px-2 py-1">
+                                <span className="text-white/60">{key}</span>
+                                <span className="text-white/90 font-mono">{String(val)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.pro?.portfolio_rules && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-2">组合规则</div>
+                          <div className="space-y-1">
+                            {Object.entries(crossAsset.pro.portfolio_rules).map(([key, val]) => (
+                              <div key={key} className="flex justify-between text-xs">
+                                <span className="text-white/60">{key}</span>
+                                <span className="text-white/90 font-mono">{String(val)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.pro?.methodology_note && (
+                        <div className="pt-2 border-t border-white/10">
+                          <div className="text-[10px] text-white/40 leading-relaxed">{crossAsset.pro.methodology_note}</div>
+                        </div>
+                      )}
+                    </div>
+                  </ProGate>
                 </div>
               </div>
             </div>
           );
         })()}
-
-        {/* Pro 深度分析 */}
-        {crossAsset?.pro && (
-          <div className="mb-8 p-4 rounded-lg bg-white/5 border border-white/10">
-            <div className="flex items-center gap-2 text-sm font-medium text-white/80 mb-4">
-              <span>Pro 深度分析</span>
-              <HelpButton indicatorKey="cross_asset_pro" />
-            </div>
-            <ProGate lockedMessage="升级 Pro 查看深度分析">
-              <div className="space-y-4">
-                {crossAsset.pro?.portfolio_conclusion && (
-                  <div>
-                    <div className="text-xs text-white/50 mb-2">组合结论</div>
-                    <div className="space-y-1">
-                      {crossAsset.pro.portfolio_conclusion.map((line: string, i: number) => (
-                        <div key={i} className="text-xs text-white/80 leading-relaxed">• {line}</div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {crossAsset.pro?.position_caps && (
-                  <div>
-                    <div className="text-xs text-white/50 mb-2">仓位上限</div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(crossAsset.pro.position_caps).map(([key, val]) => (
-                        <div key={key} className="flex justify-between text-xs bg-white/5 rounded px-2 py-1">
-                          <span className="text-white/60">{key}</span>
-                          <span className="text-white/90 font-mono">{String(val)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {crossAsset.pro?.portfolio_rules && (
-                  <div>
-                    <div className="text-xs text-white/50 mb-2">组合规则</div>
-                    <div className="space-y-1">
-                      {Object.entries(crossAsset.pro.portfolio_rules).map(([key, val]) => (
-                        <div key={key} className="flex justify-between text-xs">
-                          <span className="text-white/60">{key}</span>
-                          <span className="text-white/90 font-mono">{String(val)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {crossAsset.pro?.methodology_note && (
-                  <div className="pt-2 border-t border-white/10">
-                    <div className="text-[10px] text-white/40 leading-relaxed">{crossAsset.pro.methodology_note}</div>
-                  </div>
-                )}
-              </div>
-            </ProGate>
-          </div>
-        )}
 
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
