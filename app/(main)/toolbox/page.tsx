@@ -18,10 +18,10 @@ export default function ToolboxPage() {
         <h1 className="text-xl font-bold mb-6">工具箱</h1>
 
         {/* 跨资产轮动分析器 */}
-        {crossAsset?.asset_board && Array.isArray(crossAsset.asset_board) && (() => {
-          const green = crossAsset.asset_board.filter((x: any) => x.signal === 'GREEN');
-          const yellow = crossAsset.asset_board.filter((x: any) => x.signal === 'YELLOW');
-          const red = crossAsset.asset_board.filter((x: any) => x.signal === 'RED');
+        {crossAsset?.assets_8 && Array.isArray(crossAsset.assets_8) && (() => {
+          const green = crossAsset.assets_8.filter((x: any) => x.status === 'IN');
+          const yellow = crossAsset.assets_8.filter((x: any) => x.status === 'NEUTRAL');
+          const red = crossAsset.assets_8.filter((x: any) => x.status === 'OUT');
 
           const reordered: any[] = [];
           const maxLen = Math.max(green.length, yellow.length, red.length);
@@ -31,8 +31,8 @@ export default function ToolboxPage() {
             if (i < red.length) reordered.push(red[i]);
           }
 
-          const weights = { GREEN: 3, YELLOW: 2, RED: 1 };
-          const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.signal as keyof typeof weights] || 1), 0);
+          const weights = { IN: 3, NEUTRAL: 2, OUT: 1 };
+          const totalWeight = reordered.reduce((sum, item) => sum + (weights[item.status as keyof typeof weights] || 1), 0);
           const gap = 2;
 
           const outerR = 100;
@@ -59,7 +59,7 @@ export default function ToolboxPage() {
                     className="overflow-visible max-w-full"
                   >
                     {reordered.map((item: any, i: number) => {
-                      const weight = weights[item.signal as keyof typeof weights] || 1;
+                      const weight = weights[item.status as keyof typeof weights] || 1;
                       const segmentAngle = (weight / totalWeight) * 360;
 
                       const startAngle = currentAngle;
@@ -80,9 +80,9 @@ export default function ToolboxPage() {
 
                       const largeArc = endAngle - startAngle > 180 ? 1 : 0;
                       const color =
-                        item.signal === "GREEN"
+                        item.status === "IN"
                           ? "#22c55e"
-                          : item.signal === "YELLOW"
+                          : item.status === "NEUTRAL"
                             ? "#eab308"
                             : "#ef4444";
 
@@ -108,7 +108,7 @@ export default function ToolboxPage() {
                             dominantBaseline="middle"
                             className="fill-white text-[10px] font-medium"
                           >
-                            {String(item.label)}
+                            {String(item.asset)}
                           </text>
                         </g>
                       );
@@ -117,39 +117,39 @@ export default function ToolboxPage() {
                 </div>
 
                 <div className="flex-1 space-y-3 pt-2">
-                  {crossAsset.macro_summary?.one_liner && (
+                  {crossAsset.macro_one_liner && (
                     <div className="pb-3 border-b border-white/10">
                       <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
                         <span>宏观结论</span>
                         <HelpButton indicatorKey="macro_summary" />
                       </div>
                       <div className="text-sm text-white/80 leading-relaxed">
-                        {String(crossAsset.macro_summary.one_liner)}
+                        {String(crossAsset.macro_one_liner)}
                       </div>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2">
-                    {crossAsset.asset_board.map((item: any, i: number) => (
+                    {crossAsset.assets_8.map((item: any, i: number) => (
                       <div key={i} className="pb-2 border-b border-white/5">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <div
-                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.signal === "GREEN"
+                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.status === "IN"
                                 ? "bg-green-400"
-                                : item.signal === "YELLOW"
+                                : item.status === "NEUTRAL"
                                   ? "bg-yellow-400"
                                   : "bg-red-400"
                               }`}
                           />
                           <span className="text-xs font-medium">
-                            {String(item.label)}
+                            {String(item.asset)}
                           </span>
                           <span className="text-[10px] text-white/60">
-                            {String(item.action)}
+                            {String(item.status)}
                           </span>
                         </div>
                         <div className="text-[10px] text-white/60 pl-3 leading-tight">
-                          {String(item.one_liner)}
+                          score: {item.score}
                         </div>
                       </div>
                     ))}
