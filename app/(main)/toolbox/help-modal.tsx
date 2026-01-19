@@ -29,7 +29,23 @@ export function HelpButton({
 
   // 如果提供了 indicatorKey，从字典加载内容
   const helpData: HelpContent | null = indicatorKey
-    ? (kb as Record<string, HelpContent>)[indicatorKey] || null
+    ? (() => {
+        if (kbFile === "alert_indicators") {
+          // 新格式：在 threshold_indicators 和 composite_events 数组中查找
+          const allItems = [
+            ...(alertIndicators.threshold_indicators || []),
+            ...(alertIndicators.composite_events || [])
+          ];
+          const item = allItems.find((x: any) => x.id === indicatorKey || x.code === indicatorKey);
+          return item ? {
+            title: item.title,
+            one_liner: item.short || "",
+            how_to_read: item.what_it_means || "",
+            notes: item.what_can_happen || []
+          } : null;
+        }
+        return (kb as Record<string, HelpContent>)[indicatorKey] || null;
+      })()
     : null;
 
   // 锁定滚动
