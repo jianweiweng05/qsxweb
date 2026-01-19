@@ -178,13 +178,21 @@ export default function ToolboxPage() {
                 {crossAsset.pro?.position_cap && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">仓位上限</div>
-                    <div className="text-sm text-white/90">{crossAsset.pro.position_cap}</div>
+                    <div className="text-sm text-white/90">
+                      {typeof crossAsset.pro.position_cap === 'object'
+                        ? JSON.stringify(crossAsset.pro.position_cap)
+                        : crossAsset.pro.position_cap}
+                    </div>
                   </div>
                 )}
                 {crossAsset.pro?.drawdown_range && (
                   <div>
                     <div className="text-xs text-white/50 mb-1">回撤范围</div>
-                    <div className="text-sm text-white/90">{crossAsset.pro.drawdown_range}</div>
+                    <div className="text-sm text-white/90">
+                      {typeof crossAsset.pro.drawdown_range === 'object'
+                        ? JSON.stringify(crossAsset.pro.drawdown_range)
+                        : crossAsset.pro.drawdown_range}
+                    </div>
                   </div>
                 )}
                 {crossAsset.pro?.historical_risk_scenarios && (
