@@ -43,7 +43,7 @@ export function HelpButton({
           const notes = [
             ...(item.what_can_happen || []),
             ...(item.recommended_actions || []),
-            ...(item.caveats || [])
+            ...((item as any).caveats || [])
           ];
 
           return {
