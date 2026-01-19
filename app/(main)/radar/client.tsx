@@ -213,12 +213,18 @@ function GlowingRadar({
 
 // 层级卡片组件
 function LayerCard({
-  layer
+  layer,
+  breakdown
 }: {
   layer: Layer;
+  breakdown?: MacroCoefBreakdown;
 }) {
   // 根据 layer.key 确定 indicatorKey
   const indicatorKey = `layer_${layer.key}`;
+
+  // 根据 breakdown 计算颜色
+  const raw = breakdown?.[layer.key as keyof MacroCoefBreakdown] ?? 0;
+  const dotColor = raw <= -5 ? 'bg-red-400' : raw >= 5 ? 'bg-green-400' : 'bg-yellow-400';
 
   return (
     <div className="p-3 rounded-lg bg-white/8 border border-white/10 hover:border-cyan-500/30 transition-colors">
@@ -228,9 +234,7 @@ function LayerCard({
           <span className="text-sm font-medium text-white">{layer.title}</span>
           <HelpButton indicatorKey={indicatorKey} />
         </div>
-        <span className={`px-2 py-0.5 text-xs rounded border ${badgeColorClass(layer.badge.color)}`}>
-          {layer.badge.label}
-        </span>
+        <div className={`w-2 h-2 rounded-full ${dotColor}`} />
       </div>
 
       {/* metrics（显示全部） */}
@@ -424,6 +428,7 @@ export default function RadarClient() {
                 <LayerCard
                   key={key}
                   layer={layer}
+                  breakdown={breakdown}
                 />
               );
             })}
