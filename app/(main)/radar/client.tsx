@@ -470,9 +470,9 @@ export default function RadarClient() {
             ];
 
             return (
-              <div className="space-y-3 pb-4">
+              <div className="flex flex-col gap-3 h-full">
                 {oneLiner && (
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 mb-4">
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                     <div className="text-sm text-white/70 leading-relaxed">{oneLiner}</div>
                   </div>
                 )}
@@ -482,7 +482,7 @@ export default function RadarClient() {
                   const badgeClass = statusColors[status] || statusColors.NEUTRAL;
 
                   return (
-                    <div key={box.key} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div key={box.key} className="flex-1 p-3 rounded-lg bg-white/5 border border-white/10 flex flex-col">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-white/80">{box.title}</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] border ${badgeClass}`}>
