@@ -439,6 +439,8 @@ export default function RadarClient() {
         <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
           <span>机构风险内参</span>
           <span className="text-white/30 text-xs">Risk Decomposition</span>
+          <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
+          <HelpButton indicatorKey="risk_decomposition" size="xs" />
         </div>
         <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
