@@ -434,8 +434,12 @@ export default function RadarClient() {
         )}
       </div>
 
-      {/* 右列：Pro 三大证据盒 */}
-      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+      {/* 右列：机构风险内参 */}
+      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:min-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+        <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
+          <span>机构风险内参</span>
+          <span className="text-white/30 text-xs">Risk Decomposition</span>
+        </div>
         <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
             const oneLiner = data?.pro_one_liner;
@@ -463,8 +467,8 @@ export default function RadarClient() {
             return (
               <div className="space-y-3 pb-4">
                 {oneLiner && (
-                  <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mb-4">
-                    <div className="text-sm text-cyan-300/90 leading-relaxed">{oneLiner}</div>
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 mb-4">
+                    <div className="text-sm text-white/70 leading-relaxed">{oneLiner}</div>
                   </div>
                 )}
                 {boxes.map(box => {
