@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { ProGate } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
 import { useReport } from "../report-provider";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
-  const [similarityExpanded, setSimilarityExpanded] = useState(false);
 
   const proStrategyText = payload?.pro_strategy_text;
   const similarityText = payload?.similarity_text;
@@ -54,7 +52,7 @@ export default function ToolboxPage() {
               </div>
 
               <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-                {/* 左侧：图表 + 资产列表 */}
+                {/* 左侧：图表 */}
                 <div>
                   <svg
                     width="260"
@@ -118,38 +116,6 @@ export default function ToolboxPage() {
                       );
                     })}
                   </svg>
-
-                  <div className="mt-4 space-y-2">
-                    {crossAsset.public.assets_8.map((item: any, i: number) => {
-                      const posKey = item.key === 'SPX' ? 'US_EQUITY' :
-                                     item.key === 'GOLD' ? 'GOLD' :
-                                     item.key === 'BTC' ? 'BTC' :
-                                     item.key === 'ETH' ? 'ETH' :
-                                     item.key === 'CASH' ? 'CASH' : item.key;
-                      const positionCap = crossAsset.pro?.position_caps?.[posKey];
-
-                      return (
-                        <div key={i} className="flex items-center gap-2 text-xs">
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
-                                ? "bg-green-400"
-                                : item.action === "NEUTRAL"
-                                  ? "bg-yellow-400"
-                                  : "bg-red-400"
-                              }`}
-                          />
-                          <span className="text-white/80">{String(item.label)}</span>
-                          <span className="text-white/40 text-[10px]">{String(item.action)}</span>
-                          {positionCap && (
-                            <span className="text-cyan-400/70 text-[10px] ml-auto">{String(positionCap)}</span>
-                          )}
-                          {item.one_liner && (
-                            <span className="text-white/40 text-[10px] truncate max-w-[120px]">{String(item.one_liner)}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
                 </div>
 
                 {/* 右侧：Pro 分析 */}
@@ -162,18 +128,57 @@ export default function ToolboxPage() {
                             <span>宏观结论</span>
                             <HelpButton indicatorKey="macro_summary" />
                           </div>
-                          <div className="text-xs text-white/80 leading-relaxed">
+                          <div className="text-xs text-white/80 leading-relaxed mb-3">
                             {String(crossAsset.public.macro_one_liner)}
                           </div>
-                        </div>
-                      )}
-                      {crossAsset.pro?.portfolio_conclusion && (
-                        <div>
-                          <div className="text-xs text-white/50 mb-2">组合结论</div>
-                          <div className="space-y-1">
-                            {crossAsset.pro.portfolio_conclusion.map((line: string, i: number) => (
-                              <div key={i} className="text-xs text-white/80 leading-relaxed">• {line}</div>
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                              <thead>
+                                <tr className="border-b border-white/10">
+                                  <th className="text-left py-2 text-white/50 font-normal"></th>
+                                  <th className="text-left py-2 text-white/50 font-normal">资产</th>
+                                  <th className="text-left py-2 text-white/50 font-normal">状态</th>
+                                  <th className="text-left py-2 text-white/50 font-normal">说明</th>
+                                  <th className="text-right py-2 text-white/50 font-normal">
+                                    仓位
+                                    <span className="ml-1 px-1 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {crossAsset.public.assets_8.map((item: any, i: number) => {
+                                  const posKey = item.key === 'SPX' ? 'US_EQUITY' :
+                                                 item.key === 'GOLD' ? 'GOLD' :
+                                                 item.key === 'BTC' ? 'BTC' :
+                                                 item.key === 'ETH' ? 'ETH' :
+                                                 item.key === 'CASH' ? 'CASH' : item.key;
+                                  const positionCap = crossAsset.pro?.position_caps?.[posKey];
+
+                                  return (
+                                    <tr key={i} className="border-b border-white/5">
+                                      <td className="py-2">
+                                        <div
+                                          className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
+                                              ? "bg-green-400"
+                                              : item.action === "NEUTRAL"
+                                                ? "bg-yellow-400"
+                                                : "bg-red-400"
+                                            }`}
+                                        />
+                                      </td>
+                                      <td className="py-2 text-white/80">{String(item.label)}</td>
+                                      <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
+                                      <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
+                                      <td className="py-2 text-right">
+                                        <ProGate lockedMessage="">
+                                          <span className="text-cyan-400/70 text-[10px]">{positionCap || '-'}</span>
+                                        </ProGate>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       )}
@@ -198,8 +203,19 @@ export default function ToolboxPage() {
                     {similarityText}
                   </div>
                 )}
+                {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 && (
+                  <div className="space-y-3 mb-3">
+                    {similarityTop3.map((item: any, i: number) => (
+                      <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">
+                          {typeof item === 'string' ? item : JSON.stringify(item, null, 2)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {similarityProSummary && (
-                  <div className="mb-3 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
                     {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
                       line.trim() && (
                         <div key={i} className="text-xs text-white/80">
@@ -209,31 +225,7 @@ export default function ToolboxPage() {
                     ))}
                   </div>
                 )}
-                {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 && (
-                  <>
-                    <button
-                      onClick={() => setSimilarityExpanded(!similarityExpanded)}
-                      className="w-full flex items-center justify-between px-3 py-2 bg-white/5 rounded text-xs text-white/50 hover:text-white/70 transition-colors mb-2"
-                    >
-                      <span>历史结构卡片</span>
-                      <svg className={`w-3 h-3 transition-transform ${similarityExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                    {similarityExpanded && (
-                      <div className="space-y-3">
-                        {similarityTop3.map((item: any, i: number) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">
-                              {typeof item === 'string' ? item : JSON.stringify(item, null, 2)}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-                {!similarityText && !similarityProSummary && (!similarityTop3 || similarityTop3.length === 0) && (
+                {!similarityText && (!similarityTop3 || similarityTop3.length === 0) && !similarityProSummary && (
                   <div className="text-xs text-white/50">暂无历史相似性数据</div>
                 )}
               </ProGate>
