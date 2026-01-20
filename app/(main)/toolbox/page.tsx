@@ -258,24 +258,13 @@ export default function ToolboxPage() {
                 )}
                 {similarityProSummary && (
                   <div className="mb-3 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                    {similarityProSummary.structure_status && (
-                      <div className="text-xs">
-                        <span className="text-white/50">结构状态：</span>
-                        <span className="text-white/80">{similarityProSummary.structure_status}</span>
-                      </div>
-                    )}
-                    {similarityProSummary.current_attention && (
-                      <div className="text-xs">
-                        <span className="text-white/50">当前注意：</span>
-                        <span className="text-white/80">{similarityProSummary.current_attention}</span>
-                      </div>
-                    )}
-                    {similarityProSummary.future_reference && (
-                      <div className="text-xs">
-                        <span className="text-white/50">后市参考：</span>
-                        <span className="text-white/80">{similarityProSummary.future_reference}</span>
-                      </div>
-                    )}
+                    {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
+                      line.trim() && (
+                        <div key={i} className="text-xs text-white/80">
+                          {line}
+                        </div>
+                      )
+                    ))}
                   </div>
                 )}
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 && (
