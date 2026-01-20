@@ -56,7 +56,6 @@ export default function ToolboxPage() {
               <div className="grid lg:grid-cols-[320px_1fr] gap-6">
                 {/* 左侧：图表 + 资产列表 */}
                 <div>
-                  <div className="text-xs text-white/50 mb-2">资产红绿灯</div>
                   <svg
                     width="260"
                     height="260"
@@ -113,7 +112,7 @@ export default function ToolboxPage() {
                             dominantBaseline="middle"
                             className="fill-white text-[10px] font-medium"
                           >
-                            {String(item.key)}
+                            {String(item.label)}
                           </text>
                         </g>
                       );
