@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { HelpButton } from '../toolbox/help-modal';
+import { ProGate } from '@/app/lib/gate';
 
 // 类型定义
 interface Metric {
@@ -67,6 +68,23 @@ interface ReportPayload {
   ai_json?: {
     layer_notes?: LayerNotes;
     ui_text?: UIText;
+  };
+  pro_evidence_panels?: {
+    macro_gravity?: {
+      status: string;
+      conclusion: string;
+      evidences: string[];
+    };
+    smart_money_skew?: {
+      status: string;
+      conclusion: string;
+      evidences: string[];
+    };
+    liquidation_battlefield?: {
+      status: string;
+      conclusion: string;
+      evidences: string[];
+    };
   };
 }
 
@@ -415,25 +433,61 @@ export default function RadarClient() {
         )}
       </div>
 
-      {/* 右列：层级卡片 */}
+      {/* 右列：Pro 三大证据盒 */}
       <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-        <h2 className="text-sm text-white/50 mb-4">层级详情</h2>
-        {layers.length === 0 ? (
-          <div className="text-white/30 text-sm text-center py-4">暂无层级数据</div>
-        ) : (
-          <div className="space-y-3 pb-4">
-            {layers.map((layer, i) => {
-              const key = layer.key || LAYER_KEYS[i];
-              return (
-                <LayerCard
-                  key={key}
-                  layer={layer}
-                  breakdown={breakdown}
-                />
-              );
-            })}
-          </div>
-        )}
+        <ProGate lockedMessage="Pro 专属：解锁后可见">
+          {(() => {
+            const panels = data?.pro_evidence_panels;
+            if (!panels) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
+
+            const statusColors: Record<string, string> = {
+              RISK_ON: 'bg-green-500/20 text-green-400 border-green-500/30',
+              RISK_OFF: 'bg-red-500/20 text-red-400 border-red-500/30',
+              NEUTRAL: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+              OFFENSIVE: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+              DEFENSIVE: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+              CONFLICT: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+              HIGH_RISK: 'bg-red-500/20 text-red-400 border-red-500/30',
+              MEDIUM_RISK: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+              LOW_RISK: 'bg-green-500/20 text-green-400 border-green-500/30',
+            };
+
+            const boxes = [
+              { key: 'macro_gravity', title: '宏观引力场', data: panels.macro_gravity },
+              { key: 'smart_money_skew', title: '机构暗流', data: panels.smart_money_skew },
+              { key: 'liquidation_battlefield', title: '清算猎杀区', data: panels.liquidation_battlefield },
+            ];
+
+            return (
+              <div className="space-y-3 pb-4">
+                {boxes.map(box => {
+                  if (!box.data) return null;
+                  const { status, conclusion, evidences } = box.data;
+                  const badgeClass = statusColors[status] || statusColors.NEUTRAL;
+
+                  return (
+                    <div key={box.key} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-white/80">{box.title}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] border ${badgeClass}`}>
+                          {status}
+                        </span>
+                      </div>
+                      <div className="text-xs text-white/70 mb-2 leading-relaxed">{conclusion}</div>
+                      {evidences && evidences.length > 0 && (
+                        <div className="space-y-1">
+                          {evidences.map((ev: string, i: number) => (
+                            <div key={i} className="text-[10px] text-white/50 leading-relaxed">• {ev}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </ProGate>
       </div>
     </div>
   );

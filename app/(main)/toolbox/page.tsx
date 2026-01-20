@@ -159,120 +159,80 @@ export default function ToolboxPage() {
                   </div>
                 </div>
 
-                {/* 右侧：Pro 三大证据盒 */}
+                {/* 右侧：Pro 分析 */}
                 <div className="min-w-0 min-h-[280px]">
-                  <ProGate lockedMessage="Pro 专属：解锁后可见">
-                    {(() => {
-                      const panels = payload?.pro_evidence_panels;
-                      if (!panels) return null;
-
-                      const statusColors: Record<string, string> = {
-                        RISK_ON: 'bg-green-500/20 text-green-400 border-green-500/30',
-                        RISK_OFF: 'bg-red-500/20 text-red-400 border-red-500/30',
-                        NEUTRAL: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-                        OFFENSIVE: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-                        DEFENSIVE: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-                        CONFLICT: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-                        HIGH_RISK: 'bg-red-500/20 text-red-400 border-red-500/30',
-                        MEDIUM_RISK: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-                        LOW_RISK: 'bg-green-500/20 text-green-400 border-green-500/30',
-                      };
-
-                      const boxes = [
-                        { key: 'macro_gravity', title: '宏观引力场', data: panels.macro_gravity },
-                        { key: 'smart_money_skew', title: '机构暗流', data: panels.smart_money_skew },
-                        { key: 'liquidation_battlefield', title: '清算猎杀区', data: panels.liquidation_battlefield },
-                      ];
-
-                      return (
-                        <div className="space-y-3">
-                          {boxes.map(box => {
-                            if (!box.data) return null;
-                            const { status, conclusion, evidences } = box.data;
-                            const badgeClass = statusColors[status] || statusColors.NEUTRAL;
-
-                            return (
-                              <div key={box.key} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-xs font-medium text-white/80">{box.title}</span>
-                                  <span className={`px-2 py-0.5 rounded text-[10px] border ${badgeClass}`}>
-                                    {status}
-                                  </span>
-                                </div>
-                                <div className="text-xs text-white/70 mb-2 leading-relaxed">{conclusion}</div>
-                                {evidences && evidences.length > 0 && (
-                                  <div className="space-y-1">
-                                    {evidences.map((ev: string, i: number) => (
-                                      <div key={i} className="text-[10px] text-white/50 leading-relaxed">• {ev}</div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-
-                          {crossAsset.pro?.portfolio_conclusion && (
-                            <div className="pt-3 border-t border-white/10">
-                              <div className="text-xs text-white/50 mb-2">组合结论</div>
-                              <div className="space-y-1">
-                                {crossAsset.pro.portfolio_conclusion.map((line: string, i: number) => (
-                                  <div key={i} className="text-xs text-white/70 leading-relaxed">• {line}</div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {crossAsset.pro?.position_caps && crossAsset.public?.assets_8 && (
-                            <div className="pt-3 border-t border-white/10">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] text-white/50">仓位上限计算器</span>
-                                <input
-                                  type="text"
-                                  value={totalAmount}
-                                  onChange={(e) => setTotalAmount(e.target.value)}
-                                  placeholder="输入总资产"
-                                  className="h-7 w-32 px-2 text-[10px] font-mono rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
-                                />
-                              </div>
-                              <button
-                                onClick={() => setCapsExpanded(!capsExpanded)}
-                                className="w-full flex items-center justify-between px-2 py-1 bg-white/5 rounded text-[10px] text-white/50 hover:text-white/70 transition-colors"
-                              >
-                                <span>CASH</span>
-                                <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                              </button>
-                              {capsExpanded && (
-                                <div className="mt-1 max-h-[150px] overflow-y-auto space-y-1 pr-1">
-                                  {(() => {
-                                    const total = parseAmount(totalAmount);
-                                    const positionMap = new Map(Object.entries(crossAsset.pro.position_caps));
-                                    return crossAsset.public.assets_8.map((asset: any, i: number) => {
-                                      const posKey = asset.key === 'SPX' ? 'US_EQUITY' :
-                                                     asset.key === 'GOLD' ? 'GOLD' :
-                                                     asset.key === 'BTC' ? 'BTC' :
-                                                     asset.key === 'ETH' ? 'ETH' :
-                                                     asset.key === 'CASH' ? 'CASH' : asset.key;
-                                      const posVal = positionMap.get(posKey);
-                                      if (!posVal) return null;
-                                      const amountText = calculateAmount(String(posVal), total);
-                                      return (
-                                        <div key={i} className="bg-white/5 rounded px-2 py-1 flex items-center justify-between gap-2">
-                                          <span className="text-white/60 text-[10px] flex-shrink-0">{asset.label}</span>
-                                          <span className="text-white/90 font-mono text-[10px] flex-shrink-0">{amountText}</span>
-                                          <span className="text-white/50 text-[9px] truncate">{asset.one_liner}</span>
-                                        </div>
-                                      );
-                                    }).filter(Boolean);
-                                  })()}
-                                </div>
-                              )}
+                  <ProGate lockedMessage="升级 Pro 查看深度分析">
+                    <div className="space-y-4">
+                      {crossAsset.public.macro_one_liner && (
+                        <div>
+                          <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
+                            <span>宏观结论</span>
+                            <HelpButton indicatorKey="macro_summary" />
+                          </div>
+                          <div className="text-xs text-white/80 leading-relaxed">
+                            {String(crossAsset.public.macro_one_liner)}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.pro?.portfolio_conclusion && (
+                        <div>
+                          <div className="text-xs text-white/50 mb-2">组合结论</div>
+                          <div className="space-y-1">
+                            {crossAsset.pro.portfolio_conclusion.map((line: string, i: number) => (
+                              <div key={i} className="text-xs text-white/80 leading-relaxed">• {line}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {crossAsset.pro?.position_caps && crossAsset.public?.assets_8 && (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] text-white/50">仓位上限计算器</span>
+                            <input
+                              type="text"
+                              value={totalAmount}
+                              onChange={(e) => setTotalAmount(e.target.value)}
+                              placeholder="输入总资产"
+                              className="h-8 w-40 px-2 text-xs font-mono rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
+                            />
+                          </div>
+                          <button
+                            onClick={() => setCapsExpanded(!capsExpanded)}
+                            className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded text-xs text-white/50 hover:text-white/70 transition-colors"
+                          >
+                            <span>CASH</span>
+                            <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                          {capsExpanded && (
+                            <div className="mt-1 max-h-[200px] overflow-y-auto space-y-1 pr-1">
+                              {(() => {
+                                const total = parseAmount(totalAmount);
+                                const positionMap = new Map(Object.entries(crossAsset.pro.position_caps));
+                                return crossAsset.public.assets_8.map((asset: any, i: number) => {
+                                  const posKey = asset.key === 'SPX' ? 'US_EQUITY' :
+                                                 asset.key === 'GOLD' ? 'GOLD' :
+                                                 asset.key === 'BTC' ? 'BTC' :
+                                                 asset.key === 'ETH' ? 'ETH' :
+                                                 asset.key === 'CASH' ? 'CASH' : asset.key;
+                                  const posVal = positionMap.get(posKey);
+                                  if (!posVal) return null;
+                                  const amountText = calculateAmount(String(posVal), total);
+                                  return (
+                                    <div key={i} className="bg-white/5 rounded px-2 py-1.5 flex items-center justify-between gap-2">
+                                      <span className="text-white/60 text-xs flex-shrink-0">{asset.label}</span>
+                                      <span className="text-white/90 font-mono text-xs flex-shrink-0">{amountText}</span>
+                                      <span className="text-white/50 text-[10px] truncate">{asset.one_liner}</span>
+                                    </div>
+                                  );
+                                }).filter(Boolean);
+                              })()}
                             </div>
                           )}
                         </div>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </ProGate>
                 </div>
               </div>
