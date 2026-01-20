@@ -373,14 +373,16 @@ export default function RadarClient() {
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+    <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
       {/* 左列：雷达图 */}
-      <div className="p-4 rounded-lg bg-white/8 border border-white/10 lg:min-h-[calc(100vh-14rem)]">
+      <div className="h-full p-4 rounded-lg bg-white/8 border border-white/10 flex flex-col">
         <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
           <span>六维雷达</span>
           <HelpButton indicatorKey="radar_chart" />
         </div>
-        <GlowingRadar values={radarValues} layers={layers} />
+        <div className="flex justify-center">
+          <GlowingRadar values={radarValues} layers={layers} />
+        </div>
         {breakdown && (
           <div className="mt-6 grid grid-cols-3 gap-3">
             {LAYER_KEYS.map((k) => {
@@ -435,14 +437,15 @@ export default function RadarClient() {
       </div>
 
       {/* 右列：机构风险内参 */}
-      <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:min-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+      <div className="h-full mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 flex flex-col">
         <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
           <span>机构风险内参</span>
           <span className="text-white/30 text-xs">Risk Decomposition</span>
           <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
           <HelpButton indicatorKey="risk_decomposition" size="xs" />
         </div>
-        <ProGate lockedMessage="Pro 专属：解锁后可见">
+        <div className="flex-1 overflow-y-auto">
+          <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
             const oneLiner = data?.pro_one_liner;
             const panels = data?.pro_evidence_panels;
@@ -500,7 +503,8 @@ export default function RadarClient() {
               </div>
             );
           })()}
-        </ProGate>
+          </ProGate>
+        </div>
       </div>
     </div>
   );
