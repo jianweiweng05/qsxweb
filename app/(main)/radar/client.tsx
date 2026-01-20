@@ -69,6 +69,7 @@ interface ReportPayload {
     layer_notes?: LayerNotes;
     ui_text?: UIText;
   };
+  pro_one_liner?: string;
   pro_evidence_panels?: {
     macro_gravity?: {
       status: string;
@@ -437,8 +438,9 @@ export default function RadarClient() {
       <div className="mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
         <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
+            const oneLiner = data?.pro_one_liner;
             const panels = data?.pro_evidence_panels;
-            if (!panels) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
+            if (!oneLiner && !panels) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
 
             const statusColors: Record<string, string> = {
               RISK_ON: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -453,13 +455,18 @@ export default function RadarClient() {
             };
 
             const boxes = [
-              { key: 'macro_gravity', title: '宏观引力场', data: panels.macro_gravity },
-              { key: 'smart_money_skew', title: '机构暗流', data: panels.smart_money_skew },
-              { key: 'liquidation_battlefield', title: '清算猎杀区', data: panels.liquidation_battlefield },
+              { key: 'macro_gravity', title: '宏观引力场', data: panels?.macro_gravity },
+              { key: 'smart_money_skew', title: '机构暗流', data: panels?.smart_money_skew },
+              { key: 'liquidation_battlefield', title: '清算猎杀区', data: panels?.liquidation_battlefield },
             ];
 
             return (
               <div className="space-y-3 pb-4">
+                {oneLiner && (
+                  <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mb-4">
+                    <div className="text-sm text-cyan-300/90 leading-relaxed">{oneLiner}</div>
+                  </div>
+                )}
                 {boxes.map(box => {
                   if (!box.data) return null;
                   const { status, conclusion, evidences } = box.data;
