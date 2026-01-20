@@ -14,6 +14,7 @@ export default function ToolboxPage() {
   const proStrategyText = payload?.pro_strategy_text;
   const similarityText = payload?.similarity_text;
   const similarityTop3 = payload?.similarity?.top3;
+  const similarityProSummary = payload?.similarity_pro_summary;
   const crossAsset = payload?.cross_asset;
 
   const parseAmount = (input: string): number => {
@@ -255,6 +256,28 @@ export default function ToolboxPage() {
                     {similarityText}
                   </div>
                 )}
+                {similarityProSummary && (
+                  <div className="mb-3 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                    {similarityProSummary.structure_status && (
+                      <div className="text-xs">
+                        <span className="text-white/50">结构状态：</span>
+                        <span className="text-white/80">{similarityProSummary.structure_status}</span>
+                      </div>
+                    )}
+                    {similarityProSummary.current_attention && (
+                      <div className="text-xs">
+                        <span className="text-white/50">当前注意：</span>
+                        <span className="text-white/80">{similarityProSummary.current_attention}</span>
+                      </div>
+                    )}
+                    {similarityProSummary.future_reference && (
+                      <div className="text-xs">
+                        <span className="text-white/50">后市参考：</span>
+                        <span className="text-white/80">{similarityProSummary.future_reference}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 && (
                   <>
                     <button
@@ -279,7 +302,7 @@ export default function ToolboxPage() {
                     )}
                   </>
                 )}
-                {!similarityText && (!similarityTop3 || similarityTop3.length === 0) && (
+                {!similarityText && !similarityProSummary && (!similarityTop3 || similarityTop3.length === 0) && (
                   <div className="text-xs text-white/50">暂无历史相似性数据</div>
                 )}
               </ProGate>
