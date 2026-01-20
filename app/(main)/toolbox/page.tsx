@@ -8,7 +8,6 @@ export default function ToolboxPage() {
   const { data: payload } = useReport();
 
   const proStrategyText = payload?.pro_strategy_text;
-  const similarityText = payload?.similarity_text;
   const similarityTop3 = payload?.similarity?.top3;
   const similarityProSummary = payload?.similarity_pro_summary;
   const crossAsset = payload?.cross_asset;
@@ -193,39 +192,46 @@ export default function ToolboxPage() {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <span>今日相似度</span>
+              <span>历史相似度</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
               <ProGate lockedMessage="升级 Pro 查看完整分析">
-                {similarityText && (
-                  <div className="text-xs text-cyan-300/90 whitespace-pre-wrap leading-relaxed mb-3">
-                    {similarityText}
-                  </div>
-                )}
-                {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 && (
-                  <div className="space-y-3 mb-3">
-                    {similarityTop3.map((item: any, i: number) => (
-                      <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                        <div className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">
-                          {typeof item === 'string' ? item : JSON.stringify(item, null, 2)}
+                {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
+                  <>
+                    <div className="text-xs text-white/50 mb-3">相似场景 Top 3</div>
+                    <div className="space-y-3 mb-4">
+                      {similarityTop3.map((item: any, i: number) => (
+                        <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                          <div className="flex items-baseline gap-2 mb-1.5">
+                            <span className="text-white/90 font-medium">{'①②③'[i]}</span>
+                            <span className="text-white/60 text-[10px]">{item.date}</span>
+                            <span className="text-white/90 text-xs">｜{item.name}</span>
+                            <span className="text-white/40 text-[10px]">（{item.group}）</span>
+                          </div>
+                          <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{item.sim}</div>
+                          <div className="text-white/70 text-[10px] leading-relaxed">{item.what_it_is}</div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {similarityProSummary && (
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                    {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
-                      line.trim() && (
-                        <div key={i} className="text-xs text-white/80">
-                          {line}
+                      ))}
+                    </div>
+                    {similarityProSummary && (
+                      <>
+                        <div className="border-t border-white/10 my-4" />
+                        <div className="text-xs text-white/50 mb-2">Pro 结构解读</div>
+                        <div className="space-y-1.5">
+                          {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
+                            line.trim() && (
+                              <div key={i} className="text-[10px] text-white/70 leading-relaxed">
+                                {line}
+                              </div>
+                            )
+                          ))}
                         </div>
-                      )
-                    ))}
-                  </div>
-                )}
-                {!similarityText && (!similarityTop3 || similarityTop3.length === 0) && !similarityProSummary && (
+                      </>
+                    )}
+                  </>
+                ) : (
                   <div className="text-xs text-white/50">暂无历史相似性数据</div>
                 )}
               </ProGate>
