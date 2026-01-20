@@ -7,8 +7,6 @@ import { useReport } from "../report-provider";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
-  const [totalAmount, setTotalAmount] = useState("1,000,000");
-  const [capsExpanded, setCapsExpanded] = useState(false);
   const [similarityExpanded, setSimilarityExpanded] = useState(false);
 
   const proStrategyText = payload?.pro_strategy_text;
@@ -16,28 +14,6 @@ export default function ToolboxPage() {
   const similarityTop3 = payload?.similarity?.top3;
   const similarityProSummary = payload?.similarity_pro_summary;
   const crossAsset = payload?.cross_asset;
-
-  const parseAmount = (input: string): number => {
-    const num = parseFloat(input.replace(/,/g, ''));
-    return isNaN(num) ? 0 : num;
-  };
-
-  const formatAmount = (amount: number): string => {
-    return amount.toLocaleString('en-US', { maximumFractionDigits: 0 });
-  };
-
-  const parsePercentage = (text: string): { operator: string; value: number } | null => {
-    const match = text.match(/([≤≥])(\d+)%/);
-    if (!match) return null;
-    return { operator: match[1], value: parseFloat(match[2]) / 100 };
-  };
-
-  const calculateAmount = (percentText: string, total: number): string => {
-    const parsed = parsePercentage(percentText);
-    if (!parsed || total === 0) return '—';
-    const amount = total * parsed.value;
-    return `${parsed.operator}${formatAmount(amount)}`;
-  };
 
   return (
     <div className="min-h-full bg-black/90 text-white">
@@ -145,20 +121,35 @@ export default function ToolboxPage() {
                   </svg>
 
                   <div className="mt-4 space-y-2">
-                    {crossAsset.public.assets_8.map((item: any, i: number) => (
-                      <div key={i} className="flex items-center gap-2 text-xs">
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
-                              ? "bg-green-400"
-                              : item.action === "NEUTRAL"
-                                ? "bg-yellow-400"
-                                : "bg-red-400"
-                            }`}
-                        />
-                        <span className="text-white/80">{String(item.label)}</span>
-                        <span className="text-white/40 text-[10px]">{String(item.action)}</span>
-                      </div>
-                    ))}
+                    {crossAsset.public.assets_8.map((item: any, i: number) => {
+                      const posKey = item.key === 'SPX' ? 'US_EQUITY' :
+                                     item.key === 'GOLD' ? 'GOLD' :
+                                     item.key === 'BTC' ? 'BTC' :
+                                     item.key === 'ETH' ? 'ETH' :
+                                     item.key === 'CASH' ? 'CASH' : item.key;
+                      const positionCap = crossAsset.pro?.position_caps?.[posKey];
+
+                      return (
+                        <div key={i} className="flex items-center gap-2 text-xs">
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.action === "IN"
+                                ? "bg-green-400"
+                                : item.action === "NEUTRAL"
+                                  ? "bg-yellow-400"
+                                  : "bg-red-400"
+                              }`}
+                          />
+                          <span className="text-white/80">{String(item.label)}</span>
+                          <span className="text-white/40 text-[10px]">{String(item.action)}</span>
+                          {positionCap && (
+                            <span className="text-cyan-400/70 text-[10px] ml-auto">{String(positionCap)}</span>
+                          )}
+                          {item.one_liner && (
+                            <span className="text-white/40 text-[10px] truncate max-w-[120px]">{String(item.one_liner)}</span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -185,54 +176,6 @@ export default function ToolboxPage() {
                               <div key={i} className="text-xs text-white/80 leading-relaxed">• {line}</div>
                             ))}
                           </div>
-                        </div>
-                      )}
-                      {crossAsset.pro?.position_caps && crossAsset.public?.assets_8 && (
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] text-white/50">仓位上限计算器</span>
-                            <input
-                              type="text"
-                              value={totalAmount}
-                              onChange={(e) => setTotalAmount(e.target.value)}
-                              placeholder="输入总资产"
-                              className="h-8 w-40 px-2 text-xs font-mono rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-1 focus:ring-cyan-500/40"
-                            />
-                          </div>
-                          <button
-                            onClick={() => setCapsExpanded(!capsExpanded)}
-                            className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded text-xs text-white/50 hover:text-white/70 transition-colors"
-                          >
-                            <span>CASH</span>
-                            <svg className={`w-3 h-3 transition-transform ${capsExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                          {capsExpanded && (
-                            <div className="mt-1 max-h-[200px] overflow-y-auto space-y-1 pr-1">
-                              {(() => {
-                                const total = parseAmount(totalAmount);
-                                const positionMap = new Map(Object.entries(crossAsset.pro.position_caps));
-                                return crossAsset.public.assets_8.map((asset: any, i: number) => {
-                                  const posKey = asset.key === 'SPX' ? 'US_EQUITY' :
-                                                 asset.key === 'GOLD' ? 'GOLD' :
-                                                 asset.key === 'BTC' ? 'BTC' :
-                                                 asset.key === 'ETH' ? 'ETH' :
-                                                 asset.key === 'CASH' ? 'CASH' : asset.key;
-                                  const posVal = positionMap.get(posKey);
-                                  if (!posVal) return null;
-                                  const amountText = calculateAmount(String(posVal), total);
-                                  return (
-                                    <div key={i} className="bg-white/5 rounded px-2 py-1.5 flex items-center justify-between gap-2">
-                                      <span className="text-white/60 text-xs flex-shrink-0">{asset.label}</span>
-                                      <span className="text-white/90 font-mono text-xs flex-shrink-0">{amountText}</span>
-                                      <span className="text-white/50 text-[10px] truncate">{asset.one_liner}</span>
-                                    </div>
-                                  );
-                                }).filter(Boolean);
-                              })()}
-                            </div>
-                          )}
                         </div>
                       )}
                     </div>
