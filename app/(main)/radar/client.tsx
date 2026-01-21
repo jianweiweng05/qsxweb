@@ -405,19 +405,8 @@ export default function RadarClient() {
           <div className="mt-6 grid grid-cols-3 gap-4">
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
-              const conclusion = data?.ai_json?.ui_text?.[k as keyof UIText]?.conclusion || '';
-
-              // 根据结论设置指针位置：多/绿(+1), 中性/黄(0), 空/红(-1)
-              let needleValue = 0;
-              if (conclusion.includes('LONG') || conclusion.includes('多')) {
-                needleValue = 1;
-              } else if (conclusion.includes('SHORT') || conclusion.includes('空')) {
-                needleValue = -1;
-              } else {
-                needleValue = 0;
-              }
-
-              const needleAngle = -180 + (needleValue + 1) * 90;
+              const normalized = Math.min(1, Math.max(-1, raw / 15));
+              const needleAngle = -180 + (normalized + 1) * 90;
               const needleRad = (needleAngle * Math.PI) / 180;
               const cx = 150, cy = 150, outerR = 110, innerR = 85, needleLen = 80;
               const needleX = cx + needleLen * Math.cos(needleRad);
