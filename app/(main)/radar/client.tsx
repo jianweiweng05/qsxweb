@@ -217,15 +217,20 @@ function GlowingRadar({
         stroke="#22d3ee" strokeWidth="3.5" filter="url(#neonGlow)"
         className="transition-all duration-500" />
 
-      {/* 数据点 - 双层节点 */}
+      {/* 数据点 - 双层节点 + 脉冲动画 */}
       {values.map((v, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + maxR * v * Math.cos(angle);
         const y = cy - maxR * v * Math.sin(angle);
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r="8" fill="#22d3ee" opacity="0.5" filter="url(#neonGlow)" />
-            <circle cx={x} cy={y} r="3" fill="#fff" />
+            <circle cx={x} cy={y} r="8" fill="#22d3ee" opacity="0.5" filter="url(#neonGlow)">
+              <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+            </circle>
+            <circle cx={x} cy={y} r="3" fill="#fff">
+              <animate attributeName="opacity" values="1;0.6;1" dur="1.5s" repeatCount="indefinite" begin={`${i * 0.25}s`} />
+            </circle>
           </g>
         );
       })}
