@@ -471,7 +471,7 @@ export default function RadarClient() {
                       return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(0,0,0,0.6)" strokeWidth="2" />;
                     })}
                     <circle cx={cx} cy={cy} r={innerR - 5} fill="rgba(10,10,10,0.98)" />
-                    <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke={`url(#ng-${k})`} strokeWidth="5" strokeLinecap="round" filter={`url(#gg-${k})`} />
+                    <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke="rgba(180,180,180,0.9)" strokeWidth="4" strokeLinecap="round" />
                     <circle cx={cx} cy={cy} r="8" fill="rgba(150,150,150,0.5)" />
                     <circle cx={cx} cy={cy} r="5" fill="rgba(200,200,200,0.9)" />
                     <circle cx={cx} cy={cy} r="2" fill="rgba(255,255,255,0.8)" />
