@@ -177,6 +177,10 @@ function GlowingRadar({
           <stop offset="96%" stopColor="rgba(80,80,90,0.5)" />
           <stop offset="100%" stopColor="rgba(40,40,50,0.7)" />
         </radialGradient>
+        <radialGradient id="earthGradient" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(100,150,200,0.3)" />
+          <stop offset="100%" stopColor="rgba(50,100,150,0.6)" />
+        </radialGradient>
       </defs>
 
       {/* 三圈颜色区域：内红/中黄/外绿 */}
@@ -246,10 +250,68 @@ function GlowingRadar({
         );
       })}
 
-      {/* 中心准星 */}
-      <circle cx={cx} cy={cy} r="2.5" fill="rgba(0,255,100,0.7)" />
-      <line x1={cx - 6} y1={cy} x2={cx + 6} y2={cy} stroke="rgba(0,255,100,0.7)" strokeWidth="1.5" />
-      <line x1={cx} y1={cy - 6} x2={cx} y2={cy + 6} stroke="rgba(0,255,100,0.7)" strokeWidth="1.5" />
+      {/* 外圈资产色块 - 按颜色分组：红/黄/绿 */}
+      {(() => {
+        const outerR = maxR + 8;
+        const innerR = maxR + 2;
+        const gap = 3; // 色块组之间的间隙角度
+
+        // 红色资产组 (0-110度)
+        const redStart = 0;
+        const redEnd = 110;
+        const redSegments = 8;
+        const redAnglePerSeg = (redEnd - redStart - gap) / redSegments;
+
+        // 黄色资产组 (120-230度)
+        const yellowStart = 120;
+        const yellowEnd = 230;
+        const yellowSegments = 8;
+        const yellowAnglePerSeg = (yellowEnd - yellowStart - gap) / yellowSegments;
+
+        // 绿色资产组 (240-350度)
+        const greenStart = 240;
+        const greenEnd = 350;
+        const greenSegments = 8;
+        const greenAnglePerSeg = (greenEnd - greenStart - gap) / greenSegments;
+
+        const createSegments = (start: number, count: number, anglePerSeg: number, color: string) => {
+          return Array.from({length: count}).map((_, i) => {
+            const startAngle = start + i * anglePerSeg;
+            const endAngle = start + (i + 1) * anglePerSeg - 0.5;
+            const sRad = (startAngle * Math.PI) / 180;
+            const eRad = (endAngle * Math.PI) / 180;
+            const x1 = cx + outerR * Math.cos(sRad);
+            const y1 = cy + outerR * Math.sin(sRad);
+            const x2 = cx + outerR * Math.cos(eRad);
+            const y2 = cy + outerR * Math.sin(eRad);
+            const ix1 = cx + innerR * Math.cos(sRad);
+            const iy1 = cy + innerR * Math.sin(sRad);
+            const ix2 = cx + innerR * Math.cos(eRad);
+            const iy2 = cy + innerR * Math.sin(eRad);
+            const pathData = `M ${x1} ${y1} A ${outerR} ${outerR} 0 0 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerR} ${innerR} 0 0 0 ${ix1} ${iy1} Z`;
+            return <path key={`${color}-${i}`} d={pathData} fill={color} opacity="0.7" stroke="rgba(0,0,0,0.3)" strokeWidth="0.5" />;
+          });
+        };
+
+        return (
+          <>
+            {createSegments(redStart, redSegments, redAnglePerSeg, 'rgba(255,80,80,0.6)')}
+            {createSegments(yellowStart, yellowSegments, yellowAnglePerSeg, 'rgba(255,200,80,0.6)')}
+            {createSegments(greenStart, greenSegments, greenAnglePerSeg, 'rgba(80,255,120,0.6)')}
+          </>
+        );
+      })()}
+
+      {/* 中心地球 */}
+      <g>
+        <circle cx={cx} cy={cy} r="18" fill="url(#earthGradient)" stroke="rgba(100,150,200,0.4)" strokeWidth="1" />
+        {/* 简化的陆地 */}
+        <path d="M 150 135 Q 155 133 158 136 Q 160 140 157 143 Q 153 145 150 143 Z" fill="rgba(100,180,100,0.5)" />
+        <path d="M 142 138 Q 145 136 148 138 Q 149 142 146 144 Q 143 145 142 142 Z" fill="rgba(100,180,100,0.5)" />
+        <path d="M 150 148 Q 154 150 156 154 Q 155 158 151 159 Q 147 157 148 153 Z" fill="rgba(100,180,100,0.5)" />
+        <path d="M 140 150 Q 142 148 145 150 Q 146 153 143 155 Q 140 154 140 151 Z" fill="rgba(100,180,100,0.5)" />
+        <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="8s" repeatCount="indefinite" />
+      </g>
 
       {/* 金属表盘边框 */}
       <circle cx={cx} cy={cy} r={maxR + 15} fill="url(#metalBezel)" stroke="none" />
