@@ -13,8 +13,8 @@ export default function LandingClient() {
     if (lang === "en") {
       return {
         brand: "QSX",
-        title: "QSX Market Risk Engine",
-        tagline: "Define the Risk Boundary of Trading.",
+        title: "Quantscope X",
+        tagline: "QSX Market Risk Engine - Define the Risk Boundary of Trading.",
         primary: "Sign Up",
         secondary: "Sign In",
         invite: "Invite only",
@@ -59,8 +59,8 @@ export default function LandingClient() {
 
     return {
       brand: "QSX",
-      title: "QSX 全市场风险引擎",
-      tagline: "QSX —— 定义交易的风险边界。",
+      title: "Quantscope X",
+      tagline: "QSX全市场风险引擎 - 定义交易的风险边界。",
       primary: "免费注册",
       secondary: "继续登录",
       invite: "Invite only",
@@ -126,12 +126,7 @@ export default function LandingClient() {
       <div className="relative z-10">
         <header className="mx-auto w-full max-w-6xl px-6 pt-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center justify-center">
-                <span className="text-cyan-200 font-semibold">{copy.brand[0]}</span>
-              </div>
-              <div className="text-sm font-semibold tracking-wide opacity-90">{copy.brand}</div>
-            </div>
+            <div />
 
             <div className="flex items-center gap-3">
               <button
@@ -140,35 +135,21 @@ export default function LandingClient() {
               >
                 {lang === "zh" ? "EN" : "中文"}
               </button>
-
-              <button
-                onClick={handleSignIn}
-                className="h-10 px-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md text-sm font-semibold hover:bg-white/8 transition"
-              >
-                {copy.secondary}
-              </button>
-
-              <button
-                onClick={handleSignUp}
-                className="h-10 px-5 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-sm font-semibold shadow-[0_10px_30px_rgba(59,130,246,0.25)] hover:brightness-110 transition"
-              >
-                {copy.primary}
-              </button>
             </div>
           </div>
         </header>
 
         <section className="mx-auto w-full max-w-6xl px-6">
-          <div className="min-h-[78vh] flex items-center">
-            <div className="w-full">
+          <div className="min-h-[78vh] flex items-center justify-center">
+            <div className="w-full text-center">
               <h1 className="text-4xl md:text-6xl font-semibold tracking-tight">
                 {copy.title}
               </h1>
-              <p className="mt-5 text-base md:text-lg text-white/70 max-w-2xl">
+              <p className="mt-5 text-base md:text-lg text-white/70">
                 {copy.tagline}
               </p>
 
-              <div className="mt-10 flex flex-col sm:flex-row gap-3 max-w-md">
+              <div className="mt-12 flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleSignUp}
                   className="h-12 px-6 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 font-semibold shadow-[0_12px_34px_rgba(59,130,246,0.28)] hover:brightness-110 transition"
