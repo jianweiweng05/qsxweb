@@ -141,7 +141,7 @@ function badgeColorClass(color: string): string {
   }
 }
 
-// 发光雷达图组件
+// 军用雷达图组件
 function GlowingRadar({
   values
 }: {
@@ -154,101 +154,101 @@ function GlowingRadar({
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
       <defs>
-        <radialGradient id="bgGlow" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(21, 26, 31, 0.8)" />
-          <stop offset="100%" stopColor="rgba(11, 15, 20, 1)" />
+        <radialGradient id="radarBg" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(5,15,10,1)" />
+          <stop offset="100%" stopColor="rgba(0,8,5,1)" />
         </radialGradient>
-        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+        <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter id="labelGlow">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <radialGradient id="riskZoneRed" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(255,85,60,0.45)" />
-          <stop offset="100%" stopColor="rgba(220,60,60,0.18)" />
-        </radialGradient>
-        <radialGradient id="riskZoneYellow" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(255,200,60,0.35)" />
-          <stop offset="100%" stopColor="rgba(245,180,60,0.12)" />
-        </radialGradient>
-        <radialGradient id="riskZoneGreen" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(60,220,140,0.28)" />
-          <stop offset="100%" stopColor="rgba(40,180,120,0.08)" />
-        </radialGradient>
-        <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.08" />
+        <linearGradient id="sweepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="rgba(0,255,100,0)" />
+          <stop offset="50%" stopColor="rgba(0,255,100,0.4)" />
+          <stop offset="100%" stopColor="rgba(0,255,100,0)" />
+        </linearGradient>
+        <linearGradient id="dataTrail" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="rgba(0,255,100,0.3)" />
+          <stop offset="100%" stopColor="rgba(0,255,100,0.05)" />
         </linearGradient>
       </defs>
 
-      <rect width="300" height="300" fill="url(#bgGlow)" />
+      <rect width="300" height="300" fill="url(#radarBg)" />
 
-      {/* 风险分区渐变 */}
-      <polygon points={hexPoints(cx, cy, maxR * 0.33, [1,1,1,1,1,1])} fill="url(#riskZoneRed)" />
-      <polygon points={hexPoints(cx, cy, maxR * 0.66, [1,1,1,1,1,1])} fill="url(#riskZoneYellow)" />
-      <polygon points={hexPoints(cx, cy, maxR, [1,1,1,1,1,1])} fill="url(#riskZoneGreen)" />
-
-      {/* 同心六边形网格 */}
-      {[0.33, 0.66, 1.0].map((level, i) => (
-        <polygon key={i} points={hexPoints(cx, cy, maxR * level, [1,1,1,1,1,1])}
-          fill="none" stroke={i === 2 ? "rgba(60,220,140,0.5)" : "rgba(255,255,255,0.15)"}
-          strokeWidth={i === 2 ? "2" : "1"} filter={i === 2 ? "url(#neonGlow)" : undefined} />
+      {/* 同心圆网格 */}
+      {[0.25, 0.5, 0.75, 1.0].map((level, i) => (
+        <circle key={i} cx={cx} cy={cy} r={maxR * level}
+          fill="none" stroke={i === 3 ? "rgba(0,255,100,0.6)" : "rgba(0,255,100,0.25)"}
+          strokeWidth={i === 3 ? "2" : "1"} filter={i === 3 ? "url(#greenGlow)" : undefined} />
       ))}
 
-      {/* 轴线 */}
+      {/* 角度刻度线（每30度） */}
+      {Array.from({length: 12}).map((_, i) => {
+        const angle = (i * Math.PI) / 6;
+        const x2 = cx + maxR * Math.cos(angle);
+        const y2 = cy + maxR * Math.sin(angle);
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(0,255,100,0.15)" strokeWidth="1" />;
+      })}
+
+      {/* 六边形轴线（加粗） */}
       {LAYER_KEYS.map((_, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
-        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />;
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(0,255,100,0.4)" strokeWidth="2" />;
       })}
 
-      {/* 数据多边形 */}
-      <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataFill)"
-        stroke="#22d3ee" strokeWidth="3.5" filter="url(#neonGlow)"
+      {/* 扫描线动画 */}
+      <line x1={cx} y1={cy} x2={cx + maxR} y2={cy} stroke="url(#sweepGradient)" strokeWidth="2" filter="url(#greenGlow)" opacity="0.8">
+        <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="4s" repeatCount="indefinite" />
+      </line>
+
+      {/* 数据多边形（绿色磷光） */}
+      <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataTrail)"
+        stroke="rgba(0,255,100,0.9)" strokeWidth="3" filter="url(#greenGlow)"
         className="transition-all duration-500" />
 
-      {/* 数据点 - 双层节点 + 脉冲动画 */}
+      {/* 数据点 - 拖尾效果 */}
       {values.map((v, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + maxR * v * Math.cos(angle);
         const y = cy - maxR * v * Math.sin(angle);
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r="8" fill="#22d3ee" opacity="0.5" filter="url(#neonGlow)">
-              <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
-              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+            <circle cx={x} cy={y} r="10" fill="rgba(0,255,100,0.2)" filter="url(#greenGlow)">
+              <animate attributeName="r" values="10;16;10" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+              <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
             </circle>
-            <circle cx={x} cy={y} r="3" fill="#fff">
-              <animate attributeName="opacity" values="1;0.6;1" dur="1.5s" repeatCount="indefinite" begin={`${i * 0.25}s`} />
+            <circle cx={x} cy={y} r="5" fill="rgba(0,255,100,0.8)" filter="url(#greenGlow)" />
+            <circle cx={x} cy={y} r="2" fill="rgba(200,255,200,1)">
+              <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite" begin={`${i * 0.25}s`} />
             </circle>
           </g>
         );
       })}
 
-      {/* 轴标签 HUD 风格 */}
+      {/* 轴标签（军用字体风格） */}
       {LAYER_KEYS.map((label, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + (maxR + 26) * Math.cos(angle);
         const y = cy - (maxR + 26) * Math.sin(angle);
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-            className="fill-white/85 text-[10px] font-mono tracking-wider font-semibold"
-            style={{letterSpacing: '0.05em', paintOrder: 'stroke fill'}}
-            stroke="rgba(0,0,0,0.6)" strokeWidth="2" filter="url(#labelGlow)">
+            className="fill-green-400 text-[11px] font-mono tracking-widest font-bold"
+            style={{letterSpacing: '0.1em'}}
+            stroke="rgba(0,0,0,0.8)" strokeWidth="3" filter="url(#greenGlow)">
             {label}
           </text>
         );
       })}
+
+      {/* 中心十字准星 */}
+      <circle cx={cx} cy={cy} r="3" fill="rgba(0,255,100,0.8)" filter="url(#greenGlow)" />
+      <line x1={cx - 8} y1={cy} x2={cx + 8} y2={cy} stroke="rgba(0,255,100,0.8)" strokeWidth="1.5" />
+      <line x1={cx} y1={cy - 8} x2={cx} y2={cy + 8} stroke="rgba(0,255,100,0.8)" strokeWidth="1.5" />
     </svg>
   );
 }
