@@ -76,13 +76,58 @@ export default function ToolboxPage() {
 
                 <div className="grid lg:grid-cols-[320px_1fr_200px] gap-6">
                   {/* 左侧：双圈仪表 */}
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center relative">
+                    <style>{`
+                      @keyframes glow-pulse {
+                        0%, 100% { filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6)) drop-shadow(0 0 16px rgba(34, 197, 94, 0.3)); }
+                        50% { filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8)) drop-shadow(0 0 24px rgba(34, 197, 94, 0.5)); }
+                      }
+                      @keyframes glow-pulse-red {
+                        0%, 100% { filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.3)); }
+                        50% { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)) drop-shadow(0 0 24px rgba(239, 68, 68, 0.5)); }
+                      }
+                      @keyframes glow-pulse-yellow {
+                        0%, 100% { filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6)) drop-shadow(0 0 16px rgba(234, 179, 8, 0.3)); }
+                        50% { filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.8)) drop-shadow(0 0 24px rgba(234, 179, 8, 0.5)); }
+                      }
+                      @keyframes center-pulse {
+                        0%, 100% { r: 32; opacity: 0.6; }
+                        50% { r: 36; opacity: 0.9; }
+                      }
+                      @keyframes scan-line {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                      }
+                      .gauge-segment-in { animation: glow-pulse 2s ease-in-out infinite; }
+                      .gauge-segment-out { animation: glow-pulse-red 2s ease-in-out infinite; }
+                      .gauge-segment-neutral { animation: glow-pulse-yellow 2s ease-in-out infinite; }
+                      .center-indicator { animation: center-pulse 2s ease-in-out infinite; }
+                      .scan-ring { animation: scan-line 8s linear infinite; }
+                    `}</style>
                     <svg
                       width="260"
                       height="260"
                       viewBox="-20 -20 300 300"
                       className="overflow-visible max-w-full"
                     >
+                      <defs>
+                        <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="rgba(6, 182, 212, 0.2)" />
+                          <stop offset="100%" stopColor="rgba(6, 182, 212, 0.05)" />
+                        </radialGradient>
+                        <filter id="glow">
+                          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>
+
+                      {/* 背景圆环 */}
+                      <circle cx={cx} cy={cy} r={outerR + 8} fill="none" stroke="rgba(6, 182, 212, 0.15)" strokeWidth="2" opacity="0.5" />
+                      <circle cx={cx} cy={cy} r={innerR - 8} fill="none" stroke="rgba(6, 182, 212, 0.1)" strokeWidth="1" opacity="0.3" />
+
                       {/* 外圈扇区 */}
                       {reordered.map((item: any, i: number) => {
                         const weight = weights[item.action as keyof typeof weights] || 1;
@@ -114,11 +159,14 @@ export default function ToolboxPage() {
 
                         const midAngle = (startAngle + endAngle) / 2;
                         const midRad = (midAngle * Math.PI) / 180;
-                        const labelX = cx + (outerR + 18) * Math.cos(midRad);
-                        const labelY = cy + (outerR + 18) * Math.sin(midRad);
+                        const labelX = cx + (outerR + 22) * Math.cos(midRad);
+                        const labelY = cy + (outerR + 22) * Math.sin(midRad);
+
+                        const segmentClass = item.action === "IN" ? "gauge-segment-in" : item.action === "NEUTRAL" ? "gauge-segment-neutral" : "gauge-segment-out";
 
                         return (
                           <g key={i} onClick={() => setSelectedAsset(item)} style={{cursor: 'pointer'}}>
+                            {/* 外层发光边框 */}
                             <path
                               d={`M ${x1o} ${y1o}
                                   A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
@@ -126,15 +174,39 @@ export default function ToolboxPage() {
                                   A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
                                   Z`}
                               fill={color}
-                              opacity="0.8"
-                              style={{filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.1))'}}
+                              opacity="0.3"
+                              style={{filter: 'drop-shadow(0 0 12px ' + (item.action === "IN" ? 'rgba(34, 197, 94, 0.8)' : item.action === "NEUTRAL" ? 'rgba(234, 179, 8, 0.8)' : 'rgba(239, 68, 68, 0.8)') + ')'}}
+                            />
+                            {/* 主体段 */}
+                            <path
+                              d={`M ${x1o} ${y1o}
+                                  A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
+                                  L ${x2i} ${y2i}
+                                  A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
+                                  Z`}
+                              fill={color}
+                              opacity="0.9"
+                              className={segmentClass}
+                            />
+                            {/* 边框 */}
+                            <path
+                              d={`M ${x1o} ${y1o}
+                                  A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
+                                  L ${x2i} ${y2i}
+                                  A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
+                                  Z`}
+                              fill="none"
+                              stroke={color}
+                              strokeWidth="1.5"
+                              opacity="0.6"
                             />
                             <text
                               x={labelX}
                               y={labelY}
                               textAnchor="middle"
                               dominantBaseline="middle"
-                              className="fill-white text-[10px] font-medium pointer-events-none"
+                              className="fill-white text-[10px] font-bold pointer-events-none"
+                              style={{textShadow: '0 0 8px rgba(0,0,0,0.8)', filter: 'drop-shadow(0 0 2px ' + color + ')'}}
                             >
                               {String(item.label)}
                             </text>
@@ -142,12 +214,20 @@ export default function ToolboxPage() {
                         );
                       })}
 
-                      {/* 内圈指示 */}
-                      <circle cx={cx} cy={cy} r="35" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="2,2" />
-                      <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" className="fill-white/60 text-[11px] font-medium">
+                      {/* 中心背景 */}
+                      <circle cx={cx} cy={cy} r="40" fill="url(#centerGradient)" />
+
+                      {/* 内圈虚线 */}
+                      <circle cx={cx} cy={cy} r="35" fill="none" stroke="rgba(6, 182, 212, 0.3)" strokeWidth="1.5" strokeDasharray="3,3" opacity="0.7" />
+
+                      {/* 中心脉冲指示 */}
+                      <circle cx={cx} cy={cy} r="32" fill="none" stroke="rgba(6, 182, 212, 0.5)" strokeWidth="1" className="center-indicator" />
+
+                      {/* 中心文字 */}
+                      <text x={cx} y={cy - 2} textAnchor="middle" dominantBaseline="middle" className="fill-white/70 text-[11px] font-medium">
                         风险资产
                       </text>
-                      <text x={cx} y={cy + 14} textAnchor="middle" dominantBaseline="middle" className="fill-cyan-400 text-[12px] font-bold">
+                      <text x={cx} y={cy + 14} textAnchor="middle" dominantBaseline="middle" className="fill-cyan-400 text-[14px] font-bold" style={{filter: 'drop-shadow(0 0 4px rgba(6, 182, 212, 0.8))'}}>
                         ≤110%
                       </text>
                     </svg>
