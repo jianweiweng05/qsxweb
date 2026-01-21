@@ -90,19 +90,19 @@ export default function ToolboxPage() {
                         0%, 100% { filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6)) drop-shadow(0 0 16px rgba(234, 179, 8, 0.3)); }
                         50% { filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.8)) drop-shadow(0 0 24px rgba(234, 179, 8, 0.5)); }
                       }
-                      @keyframes center-pulse {
-                        0%, 100% { r: 32; opacity: 0.6; }
-                        50% { r: 36; opacity: 0.9; }
+                      @keyframes sphere-rotate {
+                        0% { transform: rotateY(0deg); }
+                        100% { transform: rotateY(360deg); }
                       }
-                      @keyframes scan-line {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
+                      @keyframes orbit-ring {
+                        0% { transform: rotateZ(0deg); }
+                        100% { transform: rotateZ(360deg); }
                       }
                       .gauge-segment-in { animation: glow-pulse 2s ease-in-out infinite; }
                       .gauge-segment-out { animation: glow-pulse-red 2s ease-in-out infinite; }
                       .gauge-segment-neutral { animation: glow-pulse-yellow 2s ease-in-out infinite; }
-                      .center-indicator { animation: center-pulse 2s ease-in-out infinite; }
-                      .scan-ring { animation: scan-line 8s linear infinite; }
+                      .sphere-3d { animation: sphere-rotate 8s linear infinite; transform-style: preserve-3d; }
+                      .orbit { animation: orbit-ring 6s linear infinite; transform-origin: center; }
                     `}</style>
                     <svg
                       width="260"
@@ -111,9 +111,15 @@ export default function ToolboxPage() {
                       className="overflow-visible max-w-full"
                     >
                       <defs>
-                        <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
-                          <stop offset="0%" stopColor="rgba(6, 182, 212, 0.2)" />
-                          <stop offset="100%" stopColor="rgba(6, 182, 212, 0.05)" />
+                        <radialGradient id="sphereGradient" cx="35%" cy="35%">
+                          <stop offset="0%" stopColor="rgba(56, 189, 248, 0.9)" />
+                          <stop offset="50%" stopColor="rgba(14, 165, 233, 0.7)" />
+                          <stop offset="100%" stopColor="rgba(2, 132, 199, 0.4)" />
+                        </radialGradient>
+                        <radialGradient id="sphereHighlight" cx="30%" cy="30%">
+                          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.6)" />
+                          <stop offset="40%" stopColor="rgba(125, 211, 252, 0.3)" />
+                          <stop offset="100%" stopColor="transparent" />
                         </radialGradient>
                         <filter id="glow">
                           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -214,22 +220,30 @@ export default function ToolboxPage() {
                         );
                       })}
 
-                      {/* 中心背景 */}
-                      <circle cx={cx} cy={cy} r="40" fill="url(#centerGradient)" />
+                      {/* 3D 球体中心 */}
+                      <g className="sphere-3d">
+                        {/* 球体主体 */}
+                        <circle cx={cx} cy={cy} r="38" fill="url(#sphereGradient)" filter="url(#glow)" />
 
-                      {/* 内圈虚线 */}
-                      <circle cx={cx} cy={cy} r="35" fill="none" stroke="rgba(6, 182, 212, 0.3)" strokeWidth="1.5" strokeDasharray="3,3" opacity="0.7" />
+                        {/* 高光 */}
+                        <circle cx={cx - 8} cy={cy - 8} r="15" fill="url(#sphereHighlight)" opacity="0.8" />
 
-                      {/* 中心脉冲指示 */}
-                      <circle cx={cx} cy={cy} r="32" fill="none" stroke="rgba(6, 182, 212, 0.5)" strokeWidth="1" className="center-indicator" />
+                        {/* 经线 */}
+                        <ellipse cx={cx} cy={cy} rx="38" ry="38" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+                        <ellipse cx={cx} cy={cy} rx="30" ry="38" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+                        <ellipse cx={cx} cy={cy} rx="20" ry="38" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                        <ellipse cx={cx} cy={cy} rx="10" ry="38" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" />
 
-                      {/* 中心文字 */}
-                      <text x={cx} y={cy - 2} textAnchor="middle" dominantBaseline="middle" className="fill-white/70 text-[11px] font-medium">
-                        风险资产
-                      </text>
-                      <text x={cx} y={cy + 14} textAnchor="middle" dominantBaseline="middle" className="fill-cyan-400 text-[14px] font-bold" style={{filter: 'drop-shadow(0 0 4px rgba(6, 182, 212, 0.8))'}}>
-                        ≤110%
-                      </text>
+                        {/* 纬线 */}
+                        <ellipse cx={cx} cy={cy - 20} rx="30" ry="8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                        <ellipse cx={cx} cy={cy} rx="38" ry="10" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+                        <ellipse cx={cx} cy={cy + 20} rx="30" ry="8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                      </g>
+
+                      {/* 轨道环 */}
+                      <g className="orbit">
+                        <ellipse cx={cx} cy={cy} rx="48" ry="12" fill="none" stroke="rgba(56, 189, 248, 0.3)" strokeWidth="1" strokeDasharray="4,4" />
+                      </g>
                     </svg>
                   </div>
 
