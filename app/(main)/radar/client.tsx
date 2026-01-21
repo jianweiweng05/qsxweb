@@ -127,8 +127,7 @@ function badgeColorClass(color: string): string {
 
 // 发光雷达图组件
 function GlowingRadar({
-  values,
-  layers
+  values
 }: {
   values: number[];
   layers: Layer[];
@@ -136,45 +135,45 @@ function GlowingRadar({
 
   const cx = 150, cy = 150, maxR = 120;
 
-  const gridLevels = [
-    { level: 0.33, color: 'rgba(200, 40, 40, 0.16)' },   // 高风险 红
-    { level: 0.66, color: 'rgba(245, 200, 60, 0.10)' }, // 中性 黄
-    { level: 1.0, color: 'rgba(60, 200, 120, 0.08)' }  // 健康 绿
-  ];
-
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
       <defs>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id="glowStrong" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="8" result="coloredBlur" />
+        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00ffff" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#0080ff" stopOpacity="0.2" />
+        <radialGradient id="riskZoneRed" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(220,60,60,0.25)" />
+          <stop offset="100%" stopColor="rgba(220,60,60,0.08)" />
+        </radialGradient>
+        <radialGradient id="riskZoneYellow" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(245,200,60,0.15)" />
+          <stop offset="100%" stopColor="rgba(245,200,60,0.05)" />
+        </radialGradient>
+        <radialGradient id="riskZoneGreen" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(60,200,120,0.12)" />
+          <stop offset="100%" stopColor="rgba(60,200,120,0.03)" />
+        </radialGradient>
+        <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#0891b2" stopOpacity="0.15" />
         </linearGradient>
       </defs>
 
-      {/* 背景风险分区 */}
-      {gridLevels.map((g, i) => (
-        <polygon
-          key={i}
-          points={hexPoints(cx, cy, maxR * g.level, [1, 1, 1, 1, 1, 1])}
-          fill={g.color}
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth="1"
-        />
+      {/* 风险分区渐变 */}
+      <polygon points={hexPoints(cx, cy, maxR * 0.33, [1,1,1,1,1,1])} fill="url(#riskZoneRed)" />
+      <polygon points={hexPoints(cx, cy, maxR * 0.66, [1,1,1,1,1,1])} fill="url(#riskZoneYellow)" />
+      <polygon points={hexPoints(cx, cy, maxR, [1,1,1,1,1,1])} fill="url(#riskZoneGreen)" />
+
+      {/* 同心六边形网格 */}
+      {[0.33, 0.66, 1.0].map((level, i) => (
+        <polygon key={i} points={hexPoints(cx, cy, maxR * level, [1,1,1,1,1,1])}
+          fill="none" stroke={i === 2 ? "rgba(60,200,120,0.25)" : "rgba(255,255,255,0.08)"}
+          strokeWidth={i === 2 ? "1.5" : "0.8"} />
       ))}
 
       {/* 轴线 */}
@@ -182,46 +181,35 @@ function GlowingRadar({
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
-        return (
-          <line key={i} x1={cx} y1={cy} x2={x2} y2={y2}
-            stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-        );
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />;
       })}
 
       {/* 数据多边形 */}
-      <polygon
-        points={hexPoints(cx, cy, maxR, values)}
-        fill="url(#radarGradient)"
-        stroke="#00ffff"
-        strokeWidth="2"
-        filter="url(#glowStrong)"
-        className="transition-all duration-500"
-      />
+      <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataFill)"
+        stroke="#06b6d4" strokeWidth="2.5" filter="url(#neonGlow)"
+        className="transition-all duration-500" />
 
-      {/* 数据点 */}
+      {/* 数据点 - 双层节点 */}
       {values.map((v, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + maxR * v * Math.cos(angle);
         const y = cy - maxR * v * Math.sin(angle);
-        const layer = layers[i];
-        const color = layer?.badge?.color === 'red' ? '#ff4444'
-          : layer?.badge?.color === 'green' ? '#e6ffff' : '#ffff44';
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r="6" fill={color} filter="url(#glow)" />
-            <circle cx={x} cy={y} r="3" fill="#fff" />
+            <circle cx={x} cy={y} r="7" fill="#06b6d4" opacity="0.6" filter="url(#neonGlow)" />
+            <circle cx={x} cy={y} r="2.5" fill="#fff" />
           </g>
         );
       })}
 
-      {/* 轴标签 */}
+      {/* 轴标签 HUD 风格 */}
       {LAYER_KEYS.map((label, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
-        const x = cx + (maxR + 22) * Math.cos(angle);
-        const y = cy - (maxR + 22) * Math.sin(angle);
+        const x = cx + (maxR + 26) * Math.cos(angle);
+        const y = cy - (maxR + 26) * Math.sin(angle);
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-            className="fill-white/85 text-[10px] font-medium">
+            className="fill-white/50 text-[9px] font-mono tracking-wider" style={{letterSpacing: '0.05em'}}>
             {label}
           </text>
         );
@@ -388,47 +376,39 @@ export default function RadarClient() {
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const absRaw = Math.abs(raw);
-              const fillPercent = Math.min(100, (absRaw / 15) * 100);
+              const normalized = Math.min(1, absRaw / 15);
               const label = raw <= -5 ? '风险' : raw >= 5 ? '偏多' : '观望';
+              const color = raw <= -5 ? '#dc3c3c' : raw >= 5 ? '#3cc878' : '#f5c83c';
+
+              const startAngle = -90;
+              const endAngle = 90;
+              const angle = startAngle + (raw > 0 ? normalized : -normalized) * (endAngle - startAngle);
+              const radius = 28;
+              const cx = 35, cy = 35;
+
+              const x1 = cx + radius * Math.cos((startAngle * Math.PI) / 180);
+              const y1 = cy + radius * Math.sin((startAngle * Math.PI) / 180);
+              const x2 = cx + radius * Math.cos((angle * Math.PI) / 180);
+              const y2 = cy + radius * Math.sin((angle * Math.PI) / 180);
+              const largeArc = Math.abs(angle - startAngle) > 180 ? 1 : 0;
 
               return (
-                <div key={k} className="bg-white/5 rounded p-3">
-                  <div className="text-white/40 text-xs text-center mb-2">{k}</div>
-
-                  <div className="relative h-3 bg-white/5 rounded-full mt-1">
-                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
-
-                    {raw > 0 && (
-                      <div
-                        className="absolute top-0 bottom-0 rounded-r-full"
-                        style={{
-                          left: '50%',
-                          width: `${fillPercent / 2}%`,
-                          background: 'rgba(60,200,120,0.9)'
-                        }}
-                      />
-                    )}
-
-                    {raw < 0 && (
-                      <div
-                        className="absolute top-0 bottom-0 rounded-l-full"
-                        style={{
-                          right: '50%',
-                          width: `${fillPercent / 2}%`,
-                          background: 'rgba(220,60,60,0.9)'
-                        }}
-                      />
-                    )}
-
-                    {raw === 0 && (
-                      <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
-                        style={{ background: 'rgba(245,200,60,0.9)' }}
-                      />
-                    )}
-                  </div>
-
-                  <div className="text-white/50 text-[10px] text-center mt-1.5">{label}</div>
+                <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
+                  <div className="text-white/40 text-[10px] mb-1">{k}</div>
+                  <svg width="70" height="42" viewBox="0 0 70 42" className="mb-1">
+                    <defs>
+                      <linearGradient id={`gauge-${k}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+                        <stop offset="100%" stopColor={color} stopOpacity="0.8" />
+                      </linearGradient>
+                    </defs>
+                    <path d={`M ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
+                      fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" strokeLinecap="round" />
+                    <path d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} ${raw > 0 ? 1 : 0} ${x2} ${y2}`}
+                      fill="none" stroke={`url(#gauge-${k})`} strokeWidth="4" strokeLinecap="round" />
+                    <circle cx={x2} cy={y2} r="2.5" fill={color} />
+                  </svg>
+                  <div className="text-white/60 text-[9px] font-medium">{label}</div>
                 </div>
               );
             })}
