@@ -397,7 +397,9 @@ export default function RadarClient() {
               const needleY = cy + needleLen * Math.sin(needleRad);
 
               const segments = 12;
-              const colors = ['#dc3c3c','#dc5c3c','#f5803c','#f5983c','#f5b03c','#f5c83c','#dbc878','#bbc878','#9bc878','#7bc878','#5bc878','#3cc878'];
+              const colors = ['#dc3c3c','#dc5c3c','#f5803c','#f5983c','#f5b03c','#f5c83c','#dbc878','#bbc878','#78b8c8','#58a8d8','#3898e8','#1888f8'];
+
+              const layerNote = data?.ai_json?.layer_notes?.[k as keyof LayerNotes] || '';
 
               return (
                 <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
@@ -447,6 +449,11 @@ export default function RadarClient() {
                     <circle cx={cx} cy={cy} r="5" fill="rgba(200,200,200,0.9)" />
                     <circle cx={cx} cy={cy} r="2" fill="rgba(255,255,255,0.8)" />
                   </svg>
+                  {layerNote && (
+                    <div className="mt-2 text-[10px] text-white/60 text-center leading-relaxed px-1">
+                      {layerNote}
+                    </div>
+                  )}
                 </div>
               );
             })}
