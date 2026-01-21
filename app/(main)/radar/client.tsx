@@ -154,12 +154,8 @@ function GlowingRadar({
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
       <defs>
-        <radialGradient id="radarBg" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(5,15,10,1)" />
-          <stop offset="100%" stopColor="rgba(0,8,5,1)" />
-        </radialGradient>
-        <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+        <filter id="metalGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
@@ -167,88 +163,96 @@ function GlowingRadar({
         </filter>
         <linearGradient id="sweepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="rgba(0,255,100,0)" />
-          <stop offset="50%" stopColor="rgba(0,255,100,0.4)" />
+          <stop offset="50%" stopColor="rgba(0,255,100,0.3)" />
           <stop offset="100%" stopColor="rgba(0,255,100,0)" />
         </linearGradient>
-        <linearGradient id="dataTrail" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="rgba(0,255,100,0.3)" />
+        <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="rgba(0,255,100,0.15)" />
           <stop offset="100%" stopColor="rgba(0,255,100,0.05)" />
         </linearGradient>
+        <radialGradient id="metalBezel" cx="50%" cy="50%">
+          <stop offset="85%" stopColor="rgba(60,60,70,0)" />
+          <stop offset="88%" stopColor="rgba(100,100,110,0.4)" />
+          <stop offset="92%" stopColor="rgba(140,140,150,0.6)" />
+          <stop offset="96%" stopColor="rgba(80,80,90,0.5)" />
+          <stop offset="100%" stopColor="rgba(40,40,50,0.7)" />
+        </radialGradient>
       </defs>
 
-      <rect width="300" height="300" fill="url(#radarBg)" />
+      {/* 三圈颜色区域：内红/中黄/外绿 */}
+      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="rgba(255,50,50,0.08)" stroke="none" />
+      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="rgba(255,200,50,0.08)" stroke="none" />
+      <circle cx={cx} cy={cy} r={maxR} fill="rgba(50,255,100,0.08)" stroke="none" />
 
-      {/* 同心圆网格 */}
-      {[0.25, 0.5, 0.75, 1.0].map((level, i) => (
-        <circle key={i} cx={cx} cy={cy} r={maxR * level}
-          fill="none" stroke={i === 3 ? "rgba(0,255,100,0.6)" : "rgba(0,255,100,0.25)"}
-          strokeWidth={i === 3 ? "2" : "1"} filter={i === 3 ? "url(#greenGlow)" : undefined} />
-      ))}
+      {/* 同心圆网格 - 三圈 */}
+      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="none" stroke="rgba(255,80,80,0.5)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="none" stroke="rgba(255,200,80,0.5)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={maxR} fill="none" stroke="rgba(80,255,120,0.6)" strokeWidth="2" filter="url(#metalGlow)" />
 
-      {/* 角度刻度线（每30度） */}
+      {/* 角度刻度线 */}
       {Array.from({length: 12}).map((_, i) => {
         const angle = (i * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy + maxR * Math.sin(angle);
-        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(0,255,100,0.15)" strokeWidth="1" />;
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(100,100,120,0.2)" strokeWidth="1" />;
       })}
 
-      {/* 六边形轴线（加粗） */}
+      {/* 六边形轴线 */}
       {LAYER_KEYS.map((_, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
-        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(0,255,100,0.4)" strokeWidth="2" />;
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(120,120,140,0.4)" strokeWidth="2" />;
       })}
 
-      {/* 扫描线动画 */}
-      <line x1={cx} y1={cy} x2={cx + maxR} y2={cy} stroke="url(#sweepGradient)" strokeWidth="2" filter="url(#greenGlow)" opacity="0.8">
+      {/* 扫描线 */}
+      <line x1={cx} y1={cy} x2={cx + maxR} y2={cy} stroke="url(#sweepGradient)" strokeWidth="2" opacity="0.6">
         <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="4s" repeatCount="indefinite" />
       </line>
 
-      {/* 数据多边形（绿色磷光） */}
-      <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataTrail)"
-        stroke="rgba(0,255,100,0.9)" strokeWidth="3" filter="url(#greenGlow)"
+      {/* 数据多边形 */}
+      <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataFill)"
+        stroke="rgba(0,255,100,0.8)" strokeWidth="2.5" filter="url(#metalGlow)"
         className="transition-all duration-500" />
 
-      {/* 数据点 - 拖尾效果 */}
+      {/* 数据点 */}
       {values.map((v, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x = cx + maxR * v * Math.cos(angle);
         const y = cy - maxR * v * Math.sin(angle);
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r="10" fill="rgba(0,255,100,0.2)" filter="url(#greenGlow)">
-              <animate attributeName="r" values="10;16;10" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
-              <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+            <circle cx={x} cy={y} r="8" fill="rgba(0,255,100,0.15)">
+              <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+              <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
             </circle>
-            <circle cx={x} cy={y} r="5" fill="rgba(0,255,100,0.8)" filter="url(#greenGlow)" />
-            <circle cx={x} cy={y} r="2" fill="rgba(200,255,200,1)">
-              <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite" begin={`${i * 0.25}s`} />
-            </circle>
+            <circle cx={x} cy={y} r="4" fill="rgba(0,255,100,0.9)" filter="url(#metalGlow)" />
+            <circle cx={x} cy={y} r="1.5" fill="rgba(200,255,200,1)" />
           </g>
         );
       })}
 
-      {/* 轴标签（军用字体风格） */}
+      {/* 轴标签 */}
       {LAYER_KEYS.map((label, i) => {
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
-        const x = cx + (maxR + 26) * Math.cos(angle);
-        const y = cy - (maxR + 26) * Math.sin(angle);
+        const x = cx + (maxR + 22) * Math.cos(angle);
+        const y = cy - (maxR + 22) * Math.sin(angle);
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-            className="fill-green-400 text-[11px] font-mono tracking-widest font-bold"
-            style={{letterSpacing: '0.1em'}}
-            stroke="rgba(0,0,0,0.8)" strokeWidth="3" filter="url(#greenGlow)">
+            className="fill-gray-300 text-[12px] font-mono font-semibold"
+            style={{letterSpacing: '0.05em'}}>
             {label}
           </text>
         );
       })}
 
-      {/* 中心十字准星 */}
-      <circle cx={cx} cy={cy} r="3" fill="rgba(0,255,100,0.8)" filter="url(#greenGlow)" />
-      <line x1={cx - 8} y1={cy} x2={cx + 8} y2={cy} stroke="rgba(0,255,100,0.8)" strokeWidth="1.5" />
-      <line x1={cx} y1={cy - 8} x2={cx} y2={cy + 8} stroke="rgba(0,255,100,0.8)" strokeWidth="1.5" />
+      {/* 中心准星 */}
+      <circle cx={cx} cy={cy} r="2.5" fill="rgba(0,255,100,0.7)" />
+      <line x1={cx - 6} y1={cy} x2={cx + 6} y2={cy} stroke="rgba(0,255,100,0.7)" strokeWidth="1.5" />
+      <line x1={cx} y1={cy - 6} x2={cx} y2={cy + 6} stroke="rgba(0,255,100,0.7)" strokeWidth="1.5" />
+
+      {/* 金属表盘边框 */}
+      <circle cx={cx} cy={cy} r={maxR + 15} fill="url(#metalBezel)" stroke="none" />
     </svg>
   );
 }
