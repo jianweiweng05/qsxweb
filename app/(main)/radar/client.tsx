@@ -386,55 +386,41 @@ export default function RadarClient() {
           <GlowingRadar values={radarValues} layers={layers} />
         </div>
         {breakdown && (
-          <div className="mt-6 grid grid-cols-2 gap-4">
+          <div className="mt-6 grid grid-cols-3 gap-4">
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const normalized = Math.min(1, Math.max(-1, raw / 15));
-              const needleAngle = -180 + (normalized + 1) * 90;
+              const needleAngle = -135 + (normalized + 1) * 67.5;
               const needleRad = (needleAngle * Math.PI) / 180;
-              const cx = 150, cy = 150, outerR = 120, innerR = 100, needleLen = 90;
+              const cx = 150, cy = 150, outerR = 110, innerR = 85, needleLen = 80;
               const needleX = cx + needleLen * Math.cos(needleRad);
               const needleY = cy + needleLen * Math.sin(needleRad);
 
+              const segments = 12;
+              const colors = ['#3cc878','#5bc878','#7bc878','#9bc878','#bbc878','#dbc878','#f5c83c','#f5b03c','#f5983c','#f5803c','#dc5c3c','#dc3c3c'];
+
               return (
-                <div key={k} className="bg-white/5 rounded-lg p-3 flex flex-col items-center">
-                  <div className="text-white/60 text-xs font-mono mb-2">{k}</div>
+                <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
+                  <div className="text-white/60 text-xs font-mono mb-1">{k}</div>
                   <svg viewBox="0 0 300 180" className="w-full" style={{aspectRatio: '300/180'}}>
                     <defs>
-                      <radialGradient id={`og-${k}`} cx="50%" cy="50%">
-                        <stop offset="0%" stopColor="rgba(200,200,200,0.3)" />
-                        <stop offset="100%" stopColor="rgba(100,100,100,0.5)" />
-                      </radialGradient>
-                      <radialGradient id={`bg-${k}`} cx="50%" cy="50%">
-                        <stop offset="0%" stopColor="rgba(30,30,30,0.8)" />
-                        <stop offset="100%" stopColor="rgba(10,10,10,1)" />
-                      </radialGradient>
-                      <linearGradient id={`cg-${k}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#3cc878" />
-                        <stop offset="50%" stopColor="#f5c83c" />
-                        <stop offset="100%" stopColor="#dc3c3c" />
-                      </linearGradient>
-                      <linearGradient id={`ng-${k}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#ff6b6b" />
-                        <stop offset="100%" stopColor="#cc0000" />
+                      <linearGradient id={`ng-${k}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#ff8866" />
+                        <stop offset="100%" stopColor="#cc3333" />
                       </linearGradient>
                       <filter id={`gg-${k}`}>
-                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
-                        <feMerge>
-                          <feMergeNode in="coloredBlur" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
+                        <feGaussianBlur stdDeviation="2" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                       </filter>
                     </defs>
-                    <circle cx={cx} cy={cy} r={outerR + 10} fill={`url(#bg-${k})`} />
-                    <circle cx={cx} cy={cy} r={outerR + 8} fill="none" stroke={`url(#og-${k})`} strokeWidth="6" opacity="0.6" />
-                    <circle cx={cx} cy={cy} r={outerR + 5} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    {[
-                      { start: -180, end: -90, color: '#3cc878' },
-                      { start: -90, end: 0, color: '#dc3c3c' }
-                    ].map((seg, idx) => {
-                      const sRad = (seg.start * Math.PI) / 180;
-                      const eRad = (seg.end * Math.PI) / 180;
+                    <circle cx={cx} cy={cy} r={outerR + 12} fill="rgba(15,15,15,0.95)" />
+                    <circle cx={cx} cy={cy} r={outerR + 10} fill="none" stroke="rgba(180,180,180,0.6)" strokeWidth="8" />
+                    <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(100,100,100,0.4)" strokeWidth="2" />
+                    {Array.from({length: segments}).map((_, i) => {
+                      const startAngle = -135 + (i * 135 / segments);
+                      const endAngle = -135 + ((i + 1) * 135 / segments) - 2;
+                      const sRad = (startAngle * Math.PI) / 180;
+                      const eRad = (endAngle * Math.PI) / 180;
                       const x1 = cx + outerR * Math.cos(sRad);
                       const y1 = cy + outerR * Math.sin(sRad);
                       const x2 = cx + outerR * Math.cos(eRad);
@@ -444,21 +430,22 @@ export default function RadarClient() {
                       const ix2 = cx + innerR * Math.cos(eRad);
                       const iy2 = cy + innerR * Math.sin(eRad);
                       const pathData = `M ${x1} ${y1} A ${outerR} ${outerR} 0 0 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerR} ${innerR} 0 0 0 ${ix1} ${iy1} Z`;
-                      return <path key={idx} d={pathData} fill={seg.color} opacity="0.7" />;
+                      return <path key={i} d={pathData} fill={colors[i]} opacity="0.85" stroke="rgba(0,0,0,0.5)" strokeWidth="1" />;
                     })}
-                    {[-180, -135, -90, -45, 0].map((angle, idx) => {
+                    {Array.from({length: segments + 1}).map((_, i) => {
+                      const angle = -135 + (i * 135 / segments);
                       const rad = (angle * Math.PI) / 180;
                       const x1 = cx + outerR * Math.cos(rad);
                       const y1 = cy + outerR * Math.sin(rad);
-                      const x2 = cx + (outerR - 8) * Math.cos(rad);
-                      const y2 = cy + (outerR - 8) * Math.sin(rad);
-                      return <line key={idx} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(0,0,0,0.4)" strokeWidth="1.5" />;
+                      const x2 = cx + (innerR - 2) * Math.cos(rad);
+                      const y2 = cy + (innerR - 2) * Math.sin(rad);
+                      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(0,0,0,0.6)" strokeWidth="2" />;
                     })}
-                    <circle cx={cx} cy={cy} r={innerR - 5} fill="rgba(20,20,20,0.9)" />
-                    <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke={`url(#ng-${k})`} strokeWidth="4" strokeLinecap="round" filter={`url(#gg-${k})`} />
-                    <circle cx={cx} cy={cy} r="6" fill={`url(#og-${k})`} />
-                    <circle cx={cx} cy={cy} r="4" fill="rgba(200,200,200,0.8)" />
-                    <circle cx={cx} cy={cy} r="2" fill="rgba(255,255,255,0.6)" />
+                    <circle cx={cx} cy={cy} r={innerR - 5} fill="rgba(10,10,10,0.98)" />
+                    <line x1={cx} y1={cy} x2={needleX} y2={needleY} stroke={`url(#ng-${k})`} strokeWidth="5" strokeLinecap="round" filter={`url(#gg-${k})`} />
+                    <circle cx={cx} cy={cy} r="8" fill="rgba(150,150,150,0.5)" />
+                    <circle cx={cx} cy={cy} r="5" fill="rgba(200,200,200,0.9)" />
+                    <circle cx={cx} cy={cy} r="2" fill="rgba(255,255,255,0.8)" />
                   </svg>
                 </div>
               );
