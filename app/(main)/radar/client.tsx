@@ -397,7 +397,7 @@ export default function RadarClient() {
               const needleY = cy + needleLen * Math.sin(needleRad);
 
               const segments = 12;
-              const colors = ['#3cc878','#5bc878','#7bc878','#9bc878','#bbc878','#dbc878','#f5c83c','#f5b03c','#f5983c','#f5803c','#dc5c3c','#dc3c3c'];
+              const colors = ['#dc3c3c','#dc5c3c','#f5803c','#f5983c','#f5b03c','#f5c83c','#dbc878','#bbc878','#9bc878','#7bc878','#5bc878','#3cc878'];
 
               return (
                 <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
