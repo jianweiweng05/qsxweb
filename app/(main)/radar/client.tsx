@@ -64,6 +64,22 @@ interface ReportPayload {
     macro_coef?: {
       breakdown?: MacroCoefBreakdown;
     };
+    structure_l6?: {
+      tv?: {
+        liq_target_up?: number;
+        liq_target_dn?: number;
+        liq_bias?: string;
+      };
+    };
+    derivatives?: {
+      ls_ratio_top?: {
+        btc?: number;
+      };
+      liquidation?: {
+        eth_long?: number;
+        eth_short?: number;
+      };
+    };
   };
   ai_json?: {
     layer_notes?: LayerNotes;
@@ -390,14 +406,14 @@ export default function RadarClient() {
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const normalized = Math.min(1, Math.max(-1, raw / 15));
-              const needleAngle = -135 + (normalized + 1) * 67.5;
+              const needleAngle = -180 + (normalized + 1) * 90;
               const needleRad = (needleAngle * Math.PI) / 180;
               const cx = 150, cy = 150, outerR = 110, innerR = 85, needleLen = 80;
               const needleX = cx + needleLen * Math.cos(needleRad);
               const needleY = cy + needleLen * Math.sin(needleRad);
 
               const segments = 12;
-              const colors = ['#dc3c3c','#dc5c3c','#f5803c','#f5983c','#f5b03c','#f5c83c','#dbc878','#bbc878','#78b8c8','#58a8d8','#3898e8','#1888f8'];
+              const colors = ['#dc2626','#dc3c3c','#ef4444','#f87171','#fca5a5','#fecaca','#d4f4dd','#a7f3d0','#6ee7b7','#34d399','#10b981','#059669'];
 
               const layerNote = data?.ai_json?.layer_notes?.[k as keyof LayerNotes] || '';
 
@@ -419,8 +435,8 @@ export default function RadarClient() {
                     <circle cx={cx} cy={cy} r={outerR + 10} fill="none" stroke="rgba(180,180,180,0.6)" strokeWidth="8" />
                     <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(100,100,100,0.4)" strokeWidth="2" />
                     {Array.from({length: segments}).map((_, i) => {
-                      const startAngle = -135 + (i * 135 / segments);
-                      const endAngle = -135 + ((i + 1) * 135 / segments) - 2;
+                      const startAngle = -180 + (i * 180 / segments);
+                      const endAngle = -180 + ((i + 1) * 180 / segments) - 1;
                       const sRad = (startAngle * Math.PI) / 180;
                       const eRad = (endAngle * Math.PI) / 180;
                       const x1 = cx + outerR * Math.cos(sRad);
@@ -435,7 +451,7 @@ export default function RadarClient() {
                       return <path key={i} d={pathData} fill={colors[i]} opacity="0.85" stroke="rgba(0,0,0,0.5)" strokeWidth="1" />;
                     })}
                     {Array.from({length: segments + 1}).map((_, i) => {
-                      const angle = -135 + (i * 135 / segments);
+                      const angle = -180 + (i * 180 / segments);
                       const rad = (angle * Math.PI) / 180;
                       const x1 = cx + outerR * Math.cos(rad);
                       const y1 = cy + outerR * Math.sin(rad);
@@ -525,6 +541,58 @@ export default function RadarClient() {
                     </div>
                   );
                 })}
+
+                {/* 清算墙 */}
+                {(() => {
+                  const liqUp = data?.macro?.structure_l6?.tv?.liq_target_up;
+                  const liqDn = data?.macro?.structure_l6?.tv?.liq_target_dn;
+                  const liqBias = data?.macro?.structure_l6?.tv?.liq_bias;
+                  const lsRatio = data?.macro?.derivatives?.ls_ratio_top?.btc;
+                  const ethLong = data?.macro?.derivatives?.liquidation?.eth_long;
+                  const ethShort = data?.macro?.derivatives?.liquidation?.eth_short;
+
+                  if (!liqUp && !liqDn) return null;
+
+                  const ratio = ethLong && ethShort ? (ethLong / ethShort).toFixed(1) : null;
+
+                  return (
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-sm font-medium text-white/80">清算墙</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400 border border-red-500/30">
+                          {liqBias || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        {(liqUp || liqDn) && (
+                          <div className="flex justify-between">
+                            <span className="text-white/50">BTC 狙击位</span>
+                            <span className="text-white/80 font-mono">
+                              {liqUp ? `↑${liqUp.toLocaleString()}` : ''} {liqDn ? `↓${liqDn.toLocaleString()}` : ''}
+                            </span>
+                          </div>
+                        )}
+                        {lsRatio && (
+                          <div className="flex justify-between">
+                            <span className="text-white/50">多空比</span>
+                            <span className="text-white/80 font-mono">{lsRatio}</span>
+                          </div>
+                        )}
+                        {(ethLong || ethShort) && (
+                          <div className="flex justify-between">
+                            <span className="text-white/50">ETH 战损</span>
+                            <span className="text-white/80 font-mono text-[10px]">
+                              多${ethLong?.toLocaleString()} 空${ethShort?.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                        {ratio && (
+                          <div className="text-[10px] text-red-400 text-right">空头的 {ratio} 倍</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             );
           })()}
