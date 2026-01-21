@@ -138,31 +138,43 @@ function GlowingRadar({
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
       <defs>
+        <radialGradient id="bgGlow" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(21, 26, 31, 0.8)" />
+          <stop offset="100%" stopColor="rgba(11, 15, 20, 1)" />
+        </radialGradient>
         <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
           <feMerge>
-            <feMergeNode in="coloredBlur" />
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        <filter id="labelGlow">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
         <radialGradient id="riskZoneRed" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(220,60,60,0.25)" />
-          <stop offset="100%" stopColor="rgba(220,60,60,0.08)" />
+          <stop offset="0%" stopColor="rgba(255,85,60,0.45)" />
+          <stop offset="100%" stopColor="rgba(220,60,60,0.18)" />
         </radialGradient>
         <radialGradient id="riskZoneYellow" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(245,200,60,0.15)" />
-          <stop offset="100%" stopColor="rgba(245,200,60,0.05)" />
+          <stop offset="0%" stopColor="rgba(255,200,60,0.35)" />
+          <stop offset="100%" stopColor="rgba(245,180,60,0.12)" />
         </radialGradient>
         <radialGradient id="riskZoneGreen" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(60,200,120,0.12)" />
-          <stop offset="100%" stopColor="rgba(60,200,120,0.03)" />
+          <stop offset="0%" stopColor="rgba(60,220,140,0.28)" />
+          <stop offset="100%" stopColor="rgba(40,180,120,0.08)" />
         </radialGradient>
         <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#0891b2" stopOpacity="0.15" />
+          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.08" />
         </linearGradient>
       </defs>
+
+      <rect width="300" height="300" fill="url(#bgGlow)" />
 
       {/* 风险分区渐变 */}
       <polygon points={hexPoints(cx, cy, maxR * 0.33, [1,1,1,1,1,1])} fill="url(#riskZoneRed)" />
@@ -172,8 +184,8 @@ function GlowingRadar({
       {/* 同心六边形网格 */}
       {[0.33, 0.66, 1.0].map((level, i) => (
         <polygon key={i} points={hexPoints(cx, cy, maxR * level, [1,1,1,1,1,1])}
-          fill="none" stroke={i === 2 ? "rgba(60,200,120,0.25)" : "rgba(255,255,255,0.08)"}
-          strokeWidth={i === 2 ? "1.5" : "0.8"} />
+          fill="none" stroke={i === 2 ? "rgba(60,220,140,0.5)" : "rgba(255,255,255,0.15)"}
+          strokeWidth={i === 2 ? "2" : "1"} filter={i === 2 ? "url(#neonGlow)" : undefined} />
       ))}
 
       {/* 轴线 */}
@@ -181,12 +193,12 @@ function GlowingRadar({
         const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
-        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />;
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />;
       })}
 
       {/* 数据多边形 */}
       <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataFill)"
-        stroke="#06b6d4" strokeWidth="2.5" filter="url(#neonGlow)"
+        stroke="#22d3ee" strokeWidth="3.5" filter="url(#neonGlow)"
         className="transition-all duration-500" />
 
       {/* 数据点 - 双层节点 */}
@@ -196,8 +208,8 @@ function GlowingRadar({
         const y = cy - maxR * v * Math.sin(angle);
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r="7" fill="#06b6d4" opacity="0.6" filter="url(#neonGlow)" />
-            <circle cx={x} cy={y} r="2.5" fill="#fff" />
+            <circle cx={x} cy={y} r="8" fill="#22d3ee" opacity="0.5" filter="url(#neonGlow)" />
+            <circle cx={x} cy={y} r="3" fill="#fff" />
           </g>
         );
       })}
@@ -209,7 +221,9 @@ function GlowingRadar({
         const y = cy - (maxR + 26) * Math.sin(angle);
         return (
           <text key={i} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-            className="fill-white/50 text-[9px] font-mono tracking-wider" style={{letterSpacing: '0.05em'}}>
+            className="fill-white/85 text-[10px] font-mono tracking-wider font-semibold"
+            style={{letterSpacing: '0.05em', paintOrder: 'stroke fill'}}
+            stroke="rgba(0,0,0,0.6)" strokeWidth="2" filter="url(#labelGlow)">
             {label}
           </text>
         );
