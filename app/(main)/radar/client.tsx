@@ -413,7 +413,7 @@ export default function RadarClient() {
               const needleY = cy + needleLen * Math.sin(needleRad);
 
               const segments = 12;
-              const colors = ['#dc2626','#dc3c3c','#ef4444','#f87171','#fca5a5','#fecaca','#d4f4dd','#a7f3d0','#6ee7b7','#34d399','#10b981','#059669'];
+              const colors = ['#dc2626','#ef4444','#f87171','#fca5a5','#fde68a','#fef08a','#fef08a','#fde68a','#a7f3d0','#6ee7b7','#34d399','#10b981'];
 
               const layerNote = data?.ai_json?.layer_notes?.[k as keyof LayerNotes] || '';
 
