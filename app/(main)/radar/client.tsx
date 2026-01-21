@@ -386,43 +386,126 @@ export default function RadarClient() {
           <GlowingRadar values={radarValues} layers={layers} />
         </div>
         {breakdown && (
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6 space-y-4">
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const absRaw = Math.abs(raw);
-              const normalized = Math.min(1, absRaw / 15);
-              const label = raw <= -5 ? '风险' : raw >= 5 ? '偏多' : '观望';
-              const color = raw <= -5 ? '#dc3c3c' : raw >= 5 ? '#3cc878' : '#f5c83c';
+              const normalized = Math.min(1, Math.max(-1, raw / 15));
 
-              const startAngle = -90;
-              const endAngle = 90;
-              const angle = startAngle + (raw > 0 ? normalized : -normalized) * (endAngle - startAngle);
-              const radius = 28;
-              const cx = 35, cy = 35;
+              // 计算针角度：-180 到 0 度（左到右的半圆）
+              const needleAngle = -180 + (normalized + 1) * 90;
+              const needleRad = (needleAngle * Math.PI) / 180;
 
-              const x1 = cx + radius * Math.cos((startAngle * Math.PI) / 180);
-              const y1 = cy + radius * Math.sin((startAngle * Math.PI) / 180);
-              const x2 = cx + radius * Math.cos((angle * Math.PI) / 180);
-              const y2 = cy + radius * Math.sin((angle * Math.PI) / 180);
-              const largeArc = Math.abs(angle - startAngle) > 180 ? 1 : 0;
+              const cx = 150, cy = 150;
+              const outerRadius = 120;
+              const innerRadius = 100;
+              const needleLength = 90;
+
+              // 针的端点
+              const needleX = cx + needleLength * Math.cos(needleRad);
+              const needleY = cy + needleLength * Math.sin(needleRad);
 
               return (
-                <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
-                  <div className="text-white/40 text-[10px] mb-1">{k}</div>
-                  <svg width="70" height="42" viewBox="0 0 70 42" className="mb-1">
+                <div key={k} className="bg-white/5 rounded-lg p-4 flex flex-col items-center">
+                  <div className="text-white/60 text-sm font-mono mb-3">{k}</div>
+
+                  <svg viewBox="0 0 300 180" className="w-full max-w-xs mb-3" style={{aspectRatio: '300/180'}}>
                     <defs>
-                      <linearGradient id={`gauge-${k}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-                        <stop offset="100%" stopColor={color} stopOpacity="0.8" />
+                      {/* 外圈渐变 - 灰色金属质感 */}
+                      <radialGradient id={`outerGlow-${k}`} cx="50%" cy="50%">
+                        <stop offset="0%" stopColor="rgba(200,200,200,0.3)" />
+                        <stop offset="100%" stopColor="rgba(100,100,100,0.5)" />
+                      </radialGradient>
+
+                      {/* 背景渐变 */}
+                      <radialGradient id={`bgGradient-${k}`} cx="50%" cy="50%">
+                        <stop offset="0%" stopColor="rgba(30,30,30,0.8)" />
+                        <stop offset="100%" stopColor="rgba(10,10,10,1)" />
+                      </radialGradient>
+
+                      {/* 绿-黄-红渐变 */}
+                      <linearGradient id={`colorGradient-${k}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#3cc878" />
+                        <stop offset="33%" stopColor="#f5c83c" />
+                        <stop offset="66%" stopColor="#ffa500" />
+                        <stop offset="100%" stopColor="#dc3c3c" />
                       </linearGradient>
+
+                      {/* 针的渐变 */}
+                      <linearGradient id={`needleGradient-${k}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#ff6b6b" />
+                        <stop offset="100%" stopColor="#cc0000" />
+                      </linearGradient>
+
+                      {/* 发光滤镜 */}
+                      <filter id={`gaugeGlow-${k}`}>
+                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                        <feMerge>
+                          <feMergeNode in="coloredBlur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
                     </defs>
-                    <path d={`M ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
-                      fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" strokeLinecap="round" />
-                    <path d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} ${raw > 0 ? 1 : 0} ${x2} ${y2}`}
-                      fill="none" stroke={`url(#gauge-${k})`} strokeWidth="4" strokeLinecap="round" />
-                    <circle cx={x2} cy={y2} r="2.5" fill={color} />
+
+                    {/* 背景圆 */}
+                    <circle cx={cx} cy={cy} r={outerRadius + 10} fill="url(#bgGradient-${k})" />
+
+                    {/* 外圈金属边框 */}
+                    <circle cx={cx} cy={cy} r={outerRadius + 8} fill="none" stroke="url(#outerGlow-${k})" strokeWidth="6" opacity="0.6" />
+                    <circle cx={cx} cy={cy} r={outerRadius + 5} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+
+                    {/* 色彩分段 - 绿黄红 */}
+                    {[
+                      { start: -180, end: -90, color: '#3cc878', label: '安全' },
+                      { start: -90, end: 0, color: '#dc3c3c', label: '风险' }
+                    ].map((segment, idx) => {
+                      const startRad = (segment.start * Math.PI) / 180;
+                      const endRad = (segment.end * Math.PI) / 180;
+
+                      const x1 = cx + outerRadius * Math.cos(startRad);
+                      const y1 = cy + outerRadius * Math.sin(startRad);
+                      const x2 = cx + outerRadius * Math.cos(endRad);
+                      const y2 = cy + outerRadius * Math.sin(endRad);
+
+                      const ix1 = cx + innerRadius * Math.cos(startRad);
+                      const iy1 = cy + innerRadius * Math.sin(startRad);
+                      const ix2 = cx + innerRadius * Math.cos(endRad);
+                      const iy2 = cy + innerRadius * Math.sin(endRad);
+
+                      const pathData = `M ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 0 0 ${ix1} ${iy1} Z`;
+
+                      return (
+                        <path key={idx} d={pathData} fill="url(#colorGradient-${k})" opacity="0.7" />
+                      );
+                    })}
+
+                    {/* 分割线 */}
+                    {[-180, -135, -90, -45, 0].map((angle, idx) => {
+                      const rad = (angle * Math.PI) / 180;
+                      const x1 = cx + outerRadius * Math.cos(rad);
+                      const y1 = cy + outerRadius * Math.sin(rad);
+                      const x2 = cx + (outerRadius - 8) * Math.cos(rad);
+                      const y2 = cy + (outerRadius - 8) * Math.sin(rad);
+                      return (
+                        <line key={idx} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(0,0,0,0.4)" strokeWidth="1.5" />
+                      );
+                    })}
+
+                    {/* 内圈背景 */}
+                    <circle cx={cx} cy={cy} r={innerRadius - 5} fill="rgba(20,20,20,0.9)" />
+
+                    {/* 针 - 红色渐变 */}
+                    <line x1={cx} y1={cy} x2={needleX} y2={needleY}
+                      stroke="url(#needleGradient-${k})" strokeWidth="4" strokeLinecap="round"
+                      filter={`url(#gaugeGlow-${k})`} />
+
+                    {/* 针的中心球 - 金属质感 */}
+                    <circle cx={cx} cy={cy} r="6" fill="url(#outerGlow-${k})" />
+                    <circle cx={cx} cy={cy} r="4" fill="rgba(200,200,200,0.8)" />
+                    <circle cx={cx} cy={cy} r="2" fill="rgba(255,255,255,0.6)" />
                   </svg>
-                  <div className="text-white/60 text-[9px] font-medium">{label}</div>
+
+                  <div className="text-white/70 text-xs font-mono">{k}</div>
                 </div>
               );
             })}
