@@ -69,15 +69,11 @@ export default function ToolboxPage() {
                       <div className="text-xs text-white/50">状态</div>
                       <div className="text-sm font-semibold text-green-400">RISK_ON</div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xs text-white/50">置信度</div>
-                      <div className="text-sm font-semibold text-cyan-400">78%</div>
-                    </div>
                     <HelpButton indicatorKey="cross_asset_rotation" />
                   </div>
                 </div>
 
-                <div className="grid lg:grid-cols-[320px_1fr_200px] gap-6">
+                <div className="grid lg:grid-cols-[420px_1fr] gap-6">
                   {/* 左侧：双圈仪表 */}
                   <div className="flex flex-col items-center relative">
                     <style>{`
@@ -103,8 +99,8 @@ export default function ToolboxPage() {
                       .sphere-3d { animation: sphere-rotate 8s linear infinite; }
                     `}</style>
                     <svg
-                      width="260"
-                      height="260"
+                      width="360"
+                      height="360"
                       viewBox="-20 -20 300 300"
                       className="overflow-visible max-w-full"
                     >
@@ -242,7 +238,7 @@ export default function ToolboxPage() {
                   </div>
 
                   {/* 中间：Pro 分析 */}
-                  <div className="min-w-0 min-h-[280px]">
+                  <div className="min-w-0 min-h-[360px]">
                     <ProGate lockedMessage="升级 Pro 查看深度分析">
                       <div className="space-y-4">
                         {crossAsset.public.macro_one_liner && (
@@ -262,44 +258,26 @@ export default function ToolboxPage() {
                                     <th className="text-left py-2 text-white/50 font-normal">资产</th>
                                     <th className="text-left py-2 text-white/50 font-normal">状态</th>
                                     <th className="text-left py-2 text-white/50 font-normal">说明</th>
-                                    <th className="text-right py-2 text-white/50 font-normal">
-                                      仓位
-                                      <span className="ml-1 px-1 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
-                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {crossAsset.public.assets_8.map((item: any, i: number) => {
-                                    const posKey = item.key === 'SPX' ? 'US_EQUITY' :
-                                                   item.key === 'GOLD' ? 'GOLD' :
-                                                   item.key === 'BTC' ? 'BTC' :
-                                                   item.key === 'ETH' ? 'ETH' :
-                                                   item.key === 'CASH' ? 'CASH' : item.key;
-                                    const positionCap = crossAsset.pro?.position_caps?.[posKey];
-
-                                    return (
-                                      <tr key={i} className="border-b border-white/5 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedAsset(item)}>
-                                        <td className="py-2">
-                                          <div
-                                            className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
-                                                ? "bg-green-400"
-                                                : item.action === "NEUTRAL"
-                                                  ? "bg-yellow-400"
-                                                  : "bg-red-400"
-                                              }`}
-                                          />
-                                        </td>
-                                        <td className="py-2 text-white/80">{String(item.label)}</td>
-                                        <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
-                                        <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
-                                        <td className="py-2 text-right">
-                                          <ProGate lockedMessage="">
-                                            <span className="text-cyan-400/70 text-[10px]">{positionCap || '-'}</span>
-                                          </ProGate>
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
+                                  {crossAsset.public.assets_8.map((item: any, i: number) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedAsset(item)}>
+                                      <td className="py-2">
+                                        <div
+                                          className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
+                                              ? "bg-green-400"
+                                              : item.action === "NEUTRAL" || item.action === "HOLD"
+                                                ? "bg-yellow-400"
+                                                : "bg-red-400"
+                                            }`}
+                                        />
+                                      </td>
+                                      <td className="py-2 text-white/80">{String(item.label)}</td>
+                                      <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
+                                      <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
+                                    </tr>
+                                  ))}
                                 </tbody>
                               </table>
                             </div>
@@ -308,72 +286,41 @@ export default function ToolboxPage() {
                       </div>
                     </ProGate>
                   </div>
-
-                  {/* 右侧：行动摘要 */}
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10 backdrop-blur-sm h-fit">
-                    <div className="text-xs text-white/50 mb-4 font-medium">行动摘要</div>
-
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="p-2 rounded bg-green-500/10 border border-green-500/20">
-                        <div className="text-[10px] text-white/50">IN</div>
-                        <div className="text-lg font-bold text-green-400">{inCount}</div>
-                      </div>
-                      <div className="p-2 rounded bg-red-500/10 border border-red-500/20">
-                        <div className="text-[10px] text-white/50">OUT</div>
-                        <div className="text-lg font-bold text-red-400">{outCount}</div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div>
-                        <div className="text-[10px] text-white/50 mb-1.5">Top IN</div>
-                        <div className="space-y-1">
-                          {topIn.map((item: any, i: number) => (
-                            <div key={i} className="flex items-center gap-2 text-[10px] cursor-pointer hover:text-green-400 transition" onClick={() => setSelectedAsset(item)}>
-                              <div className="w-1 h-1 rounded-full bg-green-400" />
-                              <span className="text-white/70">{item.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="border-t border-white/10 pt-3">
-                        <div className="text-[10px] text-white/50 mb-1.5">Top OUT</div>
-                        <div className="space-y-1">
-                          {topOut.map((item: any, i: number) => (
-                            <div key={i} className="flex items-center gap-2 text-[10px] cursor-pointer hover:text-red-400 transition" onClick={() => setSelectedAsset(item)}>
-                              <div className="w-1 h-1 rounded-full bg-red-400" />
-                              <span className="text-white/70">{item.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* 资产详情抽屉 */}
-                {selectedAsset && (
-                  <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedAsset(null)} />
-                    <div className="relative bg-black/80 border border-white/10 backdrop-blur-md rounded-lg p-4 w-full sm:w-80 sm:mr-4 mb-4 sm:mb-0 max-h-96 overflow-y-auto">
-                      <button onClick={() => setSelectedAsset(null)} className="absolute top-3 right-3 text-white/50 hover:text-white/80">✕</button>
-                      <div className="pr-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className={`w-2 h-2 rounded-full ${selectedAsset.action === "IN" ? "bg-green-400" : selectedAsset.action === "NEUTRAL" ? "bg-yellow-400" : "bg-red-400"}`} />
-                          <h3 className="text-sm font-semibold text-white">{selectedAsset.label}</h3>
+                {selectedAsset && (() => {
+                  const posKey = selectedAsset.key === 'SPX' ? 'US_EQUITY' :
+                                 selectedAsset.key === 'GOLD' ? 'GOLD' :
+                                 selectedAsset.key === 'BTC' ? 'BTC' :
+                                 selectedAsset.key === 'ETH' ? 'ETH' :
+                                 selectedAsset.key === 'CASH' ? 'CASH' : selectedAsset.key;
+                  const positionCap = crossAsset?.pro?.position_caps?.[posKey];
+                  const now = new Date();
+                  const updateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                  return (
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end">
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedAsset(null)} />
+                      <div className="relative bg-black/80 border border-white/10 backdrop-blur-md rounded-lg p-4 w-full sm:w-80 sm:mr-4 mb-4 sm:mb-0 max-h-96 overflow-y-auto">
+                        <button onClick={() => setSelectedAsset(null)} className="absolute top-3 right-3 text-white/50 hover:text-white/80">✕</button>
+                        <div className="pr-6">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className={`w-2 h-2 rounded-full ${selectedAsset.action === "IN" ? "bg-green-400" : selectedAsset.action === "NEUTRAL" || selectedAsset.action === "HOLD" ? "bg-yellow-400" : "bg-red-400"}`} />
+                            <h3 className="text-sm font-semibold text-white">{selectedAsset.label}</h3>
+                          </div>
+                          <div className="text-xs text-white/50 mb-3">{selectedAsset.action}</div>
+                          <div className="text-xs text-white/70 leading-relaxed mb-3">{selectedAsset.one_liner || '暂无说明'}</div>
+                          <ProGate lockedMessage="升级 Pro 查看仓位建议">
+                            <div className="text-xs text-cyan-400/70 mb-2">仓位上限</div>
+                            <div className="text-sm font-mono text-white/80">{positionCap || '-'}</div>
+                          </ProGate>
+                          <div className="text-[10px] text-white/40 mt-3">更新于 {updateTime}</div>
                         </div>
-                        <div className="text-xs text-white/50 mb-3">{selectedAsset.action}</div>
-                        <div className="text-xs text-white/70 leading-relaxed mb-3">{selectedAsset.one_liner || '暂无说明'}</div>
-                        <ProGate lockedMessage="">
-                          <div className="text-xs text-cyan-400/70 mb-2">仓位上限</div>
-                          <div className="text-sm font-mono text-white/80">≤35%</div>
-                        </ProGate>
-                        <div className="text-[10px] text-white/40 mt-3">更新于 2024-01-21 14:30</div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
           );
