@@ -106,9 +106,14 @@ export default function ToolboxPage() {
                       className="overflow-visible max-w-full"
                     >
                       <defs>
-                        <radialGradient id="earthGradient" cx="35%" cy="35%">
-                          <stop offset="0%" stopColor="rgba(100, 150, 200, 0.4)" />
-                          <stop offset="100%" stopColor="rgba(50, 100, 150, 0.7)" />
+                        <radialGradient id="earthGradient" cx="30%" cy="30%">
+                          <stop offset="0%" stopColor="rgba(120, 180, 240, 0.9)" />
+                          <stop offset="50%" stopColor="rgba(70, 130, 200, 0.8)" />
+                          <stop offset="100%" stopColor="rgba(30, 80, 150, 0.9)" />
+                        </radialGradient>
+                        <radialGradient id="earthHighlight" cx="25%" cy="25%">
+                          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.4)" />
+                          <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
                         </radialGradient>
                         <filter id="glow">
                           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -125,35 +130,34 @@ export default function ToolboxPage() {
 
                       {/* 外圈扇区 - 按颜色分组 */}
                       {(() => {
-                        const colorGap = 8;
                         const segmentGap = 2;
 
                         const greenAssets = reordered.filter((item: any) => item.action === 'IN');
                         const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL');
                         const redAssets = reordered.filter((item: any) => item.action === 'OUT');
 
-                        const totalAssets = greenAssets.length + yellowAssets.length + redAssets.length;
-                        const availableAngle = 360 - (colorGap * 3);
-                        const anglePerAsset = availableAngle / totalAssets;
+                        const greenAngle = 180;
+                        const redAngle = greenAngle / 4;
+                        const yellowAngle = 360 - greenAngle - redAngle - (segmentGap * 3);
+
+                        const greenAnglePerAsset = greenAssets.length > 0 ? (greenAngle - segmentGap * greenAssets.length) / greenAssets.length : 0;
+                        const yellowAnglePerAsset = yellowAssets.length > 0 ? (yellowAngle - segmentGap * yellowAssets.length) / yellowAssets.length : 0;
+                        const redAnglePerAsset = redAssets.length > 0 ? (redAngle - segmentGap * redAssets.length) / redAssets.length : 0;
 
                         let currentAngle = -90;
                         const allGroups = [
-                          { assets: greenAssets, color: '#22c55e', className: 'gauge-segment-in' },
-                          { assets: yellowAssets, color: '#eab308', className: 'gauge-segment-neutral' },
-                          { assets: redAssets, color: '#ef4444', className: 'gauge-segment-out' }
+                          { assets: greenAssets, anglePerAsset: greenAnglePerAsset, color: '#22c55e', className: 'gauge-segment-in' },
+                          { assets: yellowAssets, anglePerAsset: yellowAnglePerAsset, color: '#eab308', className: 'gauge-segment-neutral' },
+                          { assets: redAssets, anglePerAsset: redAnglePerAsset, color: '#ef4444', className: 'gauge-segment-out' }
                         ];
 
-                        return allGroups.flatMap(({ assets, color, className }) => {
+                        return allGroups.flatMap(({ assets, anglePerAsset, color, className }) => {
                           if (assets.length === 0) return [];
 
                           return assets.map((item: any, i: number) => {
                             const startAngle = currentAngle;
-                            const endAngle = currentAngle + anglePerAsset - segmentGap;
-                            currentAngle += anglePerAsset;
-
-                            if (i === assets.length - 1) {
-                              currentAngle += colorGap;
-                            }
+                            const endAngle = currentAngle + anglePerAsset;
+                            currentAngle += anglePerAsset + segmentGap;
 
                             const startRad = (startAngle * Math.PI) / 180;
                             const endRad = (endAngle * Math.PI) / 180;
@@ -226,12 +230,14 @@ export default function ToolboxPage() {
                       {/* 地球中心 */}
                       <g className="sphere-3d" style={{transformOrigin: `${cx}px ${cy}px`}}>
                         <circle cx={cx} cy={cy} r="38" fill="url(#earthGradient)" filter="url(#glow)" />
+                        <circle cx={cx} cy={cy} r="38" fill="url(#earthHighlight)" />
 
-                        {/* 简化的陆地 */}
-                        <path d="M 130 115 Q 135 113 138 116 Q 140 120 137 123 Q 133 125 130 123 Z" fill="rgba(100,180,100,0.6)" />
-                        <path d="M 122 118 Q 125 116 128 118 Q 129 122 126 124 Q 123 125 122 122 Z" fill="rgba(100,180,100,0.6)" />
-                        <path d="M 130 128 Q 134 130 136 134 Q 135 138 131 139 Q 127 137 128 133 Z" fill="rgba(100,180,100,0.6)" />
-                        <path d="M 120 130 Q 122 128 125 130 Q 126 133 123 135 Q 120 134 120 131 Z" fill="rgba(100,180,100,0.6)" />
+                        {/* 陆地形状 */}
+                        <path d="M 115 120 Q 118 115 125 116 Q 130 117 133 120 Q 135 125 132 130 Q 128 133 122 132 Q 117 130 115 125 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
+                        <path d="M 135 115 Q 140 113 145 116 Q 148 120 147 125 Q 145 128 140 128 Q 136 126 135 122 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
+                        <path d="M 110 135 Q 115 133 120 135 Q 123 138 122 143 Q 119 146 114 145 Q 110 142 110 138 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
+                        <path d="M 130 135 Q 135 133 142 135 Q 148 138 150 143 Q 149 148 143 150 Q 136 149 132 145 Q 129 140 130 137 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
+                        <path d="M 118 145 Q 122 143 127 145 Q 130 148 128 152 Q 125 154 121 153 Q 118 150 118 147 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
 
                         <animateTransform attributeName="transform" type="rotate" from="0 130 130" to="360 130 130" dur="8s" repeatCount="indefinite" />
                       </g>
