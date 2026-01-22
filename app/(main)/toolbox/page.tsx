@@ -137,24 +137,14 @@ export default function ToolboxPage() {
                         const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL' || item.action === 'HOLD');
                         const redAssets = reordered.filter((item: any) => item.action === 'OUT');
 
-                        const colorWeights = { red: 1, yellow: 2, green: 4 };
-                        const presentColors = [
-                          redAssets.length > 0 ? 'red' : null,
-                          yellowAssets.length > 0 ? 'yellow' : null,
-                          greenAssets.length > 0 ? 'green' : null
-                        ].filter(Boolean) as string[];
-
-                        const totalWeight = presentColors.reduce((sum, c) => sum + colorWeights[c as keyof typeof colorWeights], 0);
-                        const totalGaps = presentColors.length * segmentGap;
+                        const assetWeights = { red: 1, yellow: 2, green: 4 };
+                        const totalWeight = greenAssets.length * assetWeights.green + yellowAssets.length * assetWeights.yellow + redAssets.length * assetWeights.red;
+                        const totalGaps = reordered.length * segmentGap;
                         const availableAngle = 360 - totalGaps;
 
-                        const redAngle = presentColors.includes('red') ? (availableAngle * colorWeights.red / totalWeight) : 0;
-                        const yellowAngle = presentColors.includes('yellow') ? (availableAngle * colorWeights.yellow / totalWeight) : 0;
-                        const greenAngle = presentColors.includes('green') ? (availableAngle * colorWeights.green / totalWeight) : 0;
-
-                        const greenAnglePerAsset = greenAssets.length > 0 ? (greenAngle - segmentGap * greenAssets.length) / greenAssets.length : 0;
-                        const yellowAnglePerAsset = yellowAssets.length > 0 ? (yellowAngle - segmentGap * yellowAssets.length) / yellowAssets.length : 0;
-                        const redAnglePerAsset = redAssets.length > 0 ? (redAngle - segmentGap * redAssets.length) / redAssets.length : 0;
+                        const greenAnglePerAsset = totalWeight > 0 ? (availableAngle * assetWeights.green / totalWeight) : 0;
+                        const yellowAnglePerAsset = totalWeight > 0 ? (availableAngle * assetWeights.yellow / totalWeight) : 0;
+                        const redAnglePerAsset = totalWeight > 0 ? (availableAngle * assetWeights.red / totalWeight) : 0;
 
                         let currentAngle = -90;
                         const allGroups = [
@@ -166,7 +156,7 @@ export default function ToolboxPage() {
                         return allGroups.flatMap(({ assets, anglePerAsset, color, className }) => {
                           if (assets.length === 0) return [];
 
-                          const groupSegments = assets.map((item: any, i: number) => {
+                          return assets.map((item: any, i: number) => {
                             const startAngle = currentAngle;
                             const endAngle = currentAngle + anglePerAsset;
                             currentAngle += anglePerAsset + segmentGap;
@@ -236,8 +226,6 @@ export default function ToolboxPage() {
                               </g>
                             );
                           });
-                          currentAngle += segmentGap;
-                          return groupSegments;
                         });
                       })()}
 
