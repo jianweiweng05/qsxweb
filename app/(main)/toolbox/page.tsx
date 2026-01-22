@@ -136,9 +136,20 @@ export default function ToolboxPage() {
                         const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL');
                         const redAssets = reordered.filter((item: any) => item.action === 'OUT');
 
-                        const greenAngle = 180;
-                        const redAngle = greenAngle / 4;
-                        const yellowAngle = 360 - greenAngle - redAngle - (segmentGap * 3);
+                        const colorWeights = { red: 1, yellow: 2, green: 4 };
+                        const presentColors = [
+                          redAssets.length > 0 ? 'red' : null,
+                          yellowAssets.length > 0 ? 'yellow' : null,
+                          greenAssets.length > 0 ? 'green' : null
+                        ].filter(Boolean) as string[];
+
+                        const totalWeight = presentColors.reduce((sum, c) => sum + colorWeights[c as keyof typeof colorWeights], 0);
+                        const totalGaps = presentColors.length * segmentGap;
+                        const availableAngle = 360 - totalGaps;
+
+                        const redAngle = presentColors.includes('red') ? (availableAngle * colorWeights.red / totalWeight) : 0;
+                        const yellowAngle = presentColors.includes('yellow') ? (availableAngle * colorWeights.yellow / totalWeight) : 0;
+                        const greenAngle = presentColors.includes('green') ? (availableAngle * colorWeights.green / totalWeight) : 0;
 
                         const greenAnglePerAsset = greenAssets.length > 0 ? (greenAngle - segmentGap * greenAssets.length) / greenAssets.length : 0;
                         const yellowAnglePerAsset = yellowAssets.length > 0 ? (yellowAngle - segmentGap * yellowAssets.length) / yellowAssets.length : 0;
@@ -154,7 +165,7 @@ export default function ToolboxPage() {
                         return allGroups.flatMap(({ assets, anglePerAsset, color, className }) => {
                           if (assets.length === 0) return [];
 
-                          return assets.map((item: any, i: number) => {
+                          const groupSegments = assets.map((item: any, i: number) => {
                             const startAngle = currentAngle;
                             const endAngle = currentAngle + anglePerAsset;
                             currentAngle += anglePerAsset + segmentGap;
@@ -224,6 +235,8 @@ export default function ToolboxPage() {
                               </g>
                             );
                           });
+                          currentAngle += segmentGap;
+                          return groupSegments;
                         });
                       })()}
 
@@ -231,13 +244,6 @@ export default function ToolboxPage() {
                       <g className="sphere-3d" style={{transformOrigin: `${cx}px ${cy}px`}}>
                         <circle cx={cx} cy={cy} r="38" fill="url(#earthGradient)" filter="url(#glow)" />
                         <circle cx={cx} cy={cy} r="38" fill="url(#earthHighlight)" />
-
-                        {/* 陆地形状 */}
-                        <path d="M 115 120 Q 118 115 125 116 Q 130 117 133 120 Q 135 125 132 130 Q 128 133 122 132 Q 117 130 115 125 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
-                        <path d="M 135 115 Q 140 113 145 116 Q 148 120 147 125 Q 145 128 140 128 Q 136 126 135 122 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
-                        <path d="M 110 135 Q 115 133 120 135 Q 123 138 122 143 Q 119 146 114 145 Q 110 142 110 138 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
-                        <path d="M 130 135 Q 135 133 142 135 Q 148 138 150 143 Q 149 148 143 150 Q 136 149 132 145 Q 129 140 130 137 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
-                        <path d="M 118 145 Q 122 143 127 145 Q 130 148 128 152 Q 125 154 121 153 Q 118 150 118 147 Z" fill="rgba(80,150,80,0.85)" stroke="rgba(60,120,60,0.6)" strokeWidth="0.5" />
 
                         <animateTransform attributeName="transform" type="rotate" from="0 130 130" to="360 130 130" dur="8s" repeatCount="indefinite" />
                       </g>
