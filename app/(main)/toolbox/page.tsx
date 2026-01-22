@@ -22,9 +22,10 @@ export default function ToolboxPage() {
 
         {/* 全球资产风险监控仪 */}
         {crossAsset?.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (() => {
-          const green = crossAsset.public.assets_8.filter((x: any) => x.action === 'IN');
-          const yellow = crossAsset.public.assets_8.filter((x: any) => x.action === 'NEUTRAL');
-          const red = crossAsset.public.assets_8.filter((x: any) => x.action === 'OUT');
+          const allAssets = crossAsset.public.assets_8;
+          const green = allAssets.filter((x: any) => x.action === 'IN');
+          const yellow = allAssets.filter((x: any) => x.action === 'NEUTRAL' || x.action === 'HOLD');
+          const red = allAssets.filter((x: any) => x.action === 'OUT');
 
           const reordered: any[] = [];
           const maxLen = Math.max(green.length, yellow.length, red.length);
@@ -133,7 +134,7 @@ export default function ToolboxPage() {
                         const segmentGap = 2;
 
                         const greenAssets = reordered.filter((item: any) => item.action === 'IN');
-                        const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL');
+                        const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL' || item.action === 'HOLD');
                         const redAssets = reordered.filter((item: any) => item.action === 'OUT');
 
                         const colorWeights = { red: 1, yellow: 2, green: 4 };
