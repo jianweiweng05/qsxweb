@@ -1,15 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { VIPGate, ProGate } from "@/app/lib/gate";
 import { HelpButton } from "../toolbox/help-modal";
 import { useReport } from "../report-provider";
 
 export default function TodayPage() {
   const { data: payload, isLoading } = useReport();
+  const [expandComment, setExpandComment] = useState(false);
 
   if (isLoading) {
     return (
-      <div className="py-6 text-white">
+      <div className="py-8 text-white">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-white/5 rounded w-32" />
           <div className="grid grid-cols-3 gap-4">
@@ -22,14 +24,10 @@ export default function TodayPage() {
 
   const weatherTitle = payload?.weather?.title || "暂无数据";
   const generatedAt = payload?.generated_at
-    ? new Date(payload.generated_at).toLocaleString("zh-CN", {
-      timeZone: "Asia/Shanghai",
-    })
+    ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : "暂无数据";
   const riskCap =
-    payload?.risk_cap != null
-      ? Math.round(payload.risk_cap * 100 * 10) / 10
-      : null;
+    payload?.risk_cap != null ? Math.round(payload.risk_cap * 100 * 10) / 10 : null;
   const gammaTitle = payload?.gamma?.title || "暂无数据";
 
   const oneLiner = payload?.ai_json?.one_liner || "暂无数据";
@@ -38,147 +36,142 @@ export default function TodayPage() {
   const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
   return (
-    <div className="py-6 pb-24 text-white">
-      {/* Header */}
-      <div className="flex items-baseline justify-between mb-8">
-        <h1 className="text-xl font-semibold">今日概览</h1>
-        <span className="text-xs text-white/40">{generatedAt}</span>
-      </div>
+    <div className="text-white pb-28">
+      <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 py-8">
+        <div className="flex items-baseline justify-between mb-10">
+          <h1 className="text-xl font-semibold">今日概览</h1>
+          <span className="text-xs text-white/40">{generatedAt}</span>
+        </div>
 
-      {/* KPI Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <div className="p-5 rounded-lg bg-white/5 border border-white/10">
-          <div className="flex items-center gap-2 text-xs text-white/40 mb-2">
-            <span>市场状态</span>
-            <HelpButton indicatorKey="market_weather" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+          <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
+              <span>市场状态</span>
+              <HelpButton indicatorKey="market_weather" />
+            </div>
+            <div className="text-[22px] font-semibold text-white/90 leading-snug">
+              {weatherTitle}
+            </div>
           </div>
-          <div className="text-2xl font-semibold text-white/90">
-            {weatherTitle}
+
+          <div className="p-6 rounded-xl bg-cyan-500/15 border border-cyan-500/30">
+            <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
+              <span>建议仓位</span>
+              <HelpButton indicatorKey="risk_cap" />
+            </div>
+            <div className="text-4xl font-bold text-cyan-400 tracking-tight">
+              {riskCap != null ? `≤ ${riskCap}%` : "—"}
+            </div>
+          </div>
+
+          <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-1.5 text-xs text-white/40 mb-3">
+              <span>波动状态</span>
+              <span className="text-[9px] text-white/30">(Gamma)</span>
+              <HelpButton indicatorKey="gamma" />
+              <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
+                PRO
+              </span>
+            </div>
+            <ProGate
+              lockedMessage="升级 Pro 查看"
+              unlockConfig={{
+                title: "波动状态监控",
+                description: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
+                features: ["Gamma 波动率实时监控", "市场情绪波动预警", "历史波动率对比分析"]
+              }}
+            >
+              <div className="text-[22px] font-semibold text-white/90 leading-snug">
+                {gammaTitle}
+              </div>
+            </ProGate>
           </div>
         </div>
 
-        <div className="p-5 rounded-lg bg-cyan-500/15 border border-cyan-500/30">
-          <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
-            <span>建议仓位</span>
-            <HelpButton indicatorKey="risk_cap" />
+        <div className="rounded-xl bg-white/6 border border-white/10 p-6">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-white/60">
+              <span>机构分析师观点</span>
+              <HelpButton indicatorKey="ai_analysis" />
+            </div>
+            <button
+              className="text-xs text-white/50 hover:text-white/80"
+              onClick={() => setExpandComment(v => !v)}
+            >
+              {expandComment ? "收起" : "展开"}
+            </button>
           </div>
-          <div className="text-3xl font-bold text-cyan-400">
-            {riskCap != null ? `≤ ${riskCap}%` : "—"}
-          </div>
-        </div>
 
-        <div className="p-5 rounded-lg bg-white/5 border border-white/10">
-          <div className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
-            <span>波动状态</span>
-            <span className="text-[9px] text-white/30">(Gamma)</span>
-            <HelpButton indicatorKey="gamma" />
-            <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
-              PRO
-            </span>
-          </div>
-          <ProGate
-            lockedMessage="升级 Pro 查看"
+          <VIPGate
+            lockedMessage="AI 解读需要 VIP 订阅"
             unlockConfig={{
-              title: "波动状态监控",
-              description: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
-              features: [
-                "Gamma 波动率实时监控",
-                "市场情绪波动预警",
-                "历史波动率对比分析"
-              ]
+              title: "AI 市场解读",
+              description: "基于多维度数据分析，为您提供专业的市场解读和投资建议。",
+              features: ["每日市场核心观点总结", "多空信号智能识别", "关键风险点提示"]
             }}
           >
-            <div className="text-2xl font-semibold text-white/90">
-              {gammaTitle}
+            <div className="space-y-4">
+              <div className="text-sm text-white/95 font-medium leading-relaxed">
+                {oneLiner}
+              </div>
+              <div className={expandComment ? "text-sm text-white/70 leading-relaxed" : "text-sm text-white/70 leading-relaxed line-clamp-5"}>
+                {marketComment}
+              </div>
             </div>
-          </ProGate>
+          </VIPGate>
         </div>
-      </div>
 
-      {/* AI 解读区 */}
-      <div className="rounded-lg bg-white/6 border border-white/10 p-5 mt-8">
-        <div className="flex items-center gap-2 text-sm font-medium text-white/60 mb-4">
-          <span>机构分析师观点</span>
-          <HelpButton indicatorKey="ai_analysis" />
-        </div>
-        <VIPGate
-          lockedMessage="AI 解读需要 VIP 订阅"
-          unlockConfig={{
-            title: "AI 市场解读",
-            description: "基于多维度数据分析，为您提供专业的市场解读和投资建议。",
-            features: [
-              "每日市场核心观点总结",
-              "多空信号智能识别",
-              "关键风险点提示"
-            ]
-          }}
-        >
-          <div className="space-y-3">
-            <div className="text-sm text-white/95 font-medium leading-relaxed">
-              {oneLiner}
-            </div>
-            <div className="text-sm text-white/70 leading-relaxed">
-              {marketComment}
-            </div>
-          </div>
-        </VIPGate>
-      </div>
-
-      {/* 多空信号区 */}
-      {(bearish.length > 0 || bullish.length > 0) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <div className="p-4 rounded-lg bg-red-500/8 border border-red-500/15">
-            <div className="flex items-center gap-2 text-xs text-red-400/80 mb-2">
-              <span>空方信号</span>
-              <HelpButton indicatorKey="bearish_signals" />
-            </div>
-            <VIPGate lockedMessage="VIP 可见">
-              {bearish.length > 0 ? (
-                bearish.map((item: string, i: number) => (
-                  <div
-                    key={i}
-                    className="text-xs text-white/70 mb-1 leading-relaxed"
-                  >
-                    • {item}
+        {(bearish.length > 0 || bullish.length > 0) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
+            <div className="p-5 rounded-xl bg-red-500/8 border border-red-500/15">
+              <div className="flex items-center gap-2 text-xs text-red-400/80 mb-3">
+                <span>空方信号</span>
+                <HelpButton indicatorKey="bearish_signals" />
+              </div>
+              <VIPGate lockedMessage="VIP 可见">
+                {bearish.length > 0 ? (
+                  <div className="space-y-2">
+                    {bearish.map((item: string, i: number) => (
+                      <div key={i} className="text-xs text-white/70 leading-relaxed">
+                        • {item}
+                      </div>
+                    ))}
                   </div>
-                ))
-              ) : (
-                <div className="text-xs text-white/40">暂无</div>
-              )}
-            </VIPGate>
-          </div>
-
-          <div className="p-4 rounded-lg bg-green-500/8 border border-green-500/15">
-            <div className="flex items-center gap-2 text-xs text-green-400/80 mb-2">
-              <span>多方信号</span>
-              <HelpButton indicatorKey="bullish_signals" />
+                ) : (
+                  <div className="text-xs text-white/40">暂无</div>
+                )}
+              </VIPGate>
             </div>
-            <VIPGate lockedMessage="VIP 可见">
-              {bullish.length > 0 ? (
-                bullish.map((item: string, i: number) => (
-                  <div
-                    key={i}
-                    className="text-xs text-white/70 mb-1 leading-relaxed"
-                  >
-                    • {item}
-                  </div>
-                ))
-              ) : (
-                <div className="text-xs text-white/40">暂无</div>
-              )}
-            </VIPGate>
-          </div>
-        </div>
-      )}
 
-      {/* 风险提示 */}
-      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 mt-6">
-        <div className="text-sm font-medium text-red-400 mb-2">📌 风险提示</div>
-        <div className="text-xs text-white/60 leading-relaxed">
-          本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。
+            <div className="p-5 rounded-xl bg-green-500/8 border border-green-500/15">
+              <div className="flex items-center gap-2 text-xs text-green-400/80 mb-3">
+                <span>多方信号</span>
+                <HelpButton indicatorKey="bullish_signals" />
+              </div>
+              <VIPGate lockedMessage="VIP 可见">
+                {bullish.length > 0 ? (
+                  <div className="space-y-2">
+                    {bullish.map((item: string, i: number) => (
+                      <div key={i} className="text-xs text-white/70 leading-relaxed">
+                        • {item}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-xs text-white/40">暂无</div>
+                )}
+              </VIPGate>
+            </div>
+          </div>
+        )}
+
+        <div className="p-5 rounded-xl bg-red-500/10 border border-red-500/20 mt-8">
+          <div className="text-sm font-medium text-red-400 mb-2">📌 风险提示</div>
+          <div className="text-xs text-white/60 leading-relaxed">
+            本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
