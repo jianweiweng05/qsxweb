@@ -106,15 +106,9 @@ export default function ToolboxPage() {
                       className="overflow-visible max-w-full"
                     >
                       <defs>
-                        <radialGradient id="sphereGradient" cx="35%" cy="35%">
-                          <stop offset="0%" stopColor="rgba(56, 189, 248, 0.9)" />
-                          <stop offset="50%" stopColor="rgba(14, 165, 233, 0.7)" />
-                          <stop offset="100%" stopColor="rgba(2, 132, 199, 0.4)" />
-                        </radialGradient>
-                        <radialGradient id="sphereHighlight" cx="30%" cy="30%">
-                          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.6)" />
-                          <stop offset="40%" stopColor="rgba(125, 211, 252, 0.3)" />
-                          <stop offset="100%" stopColor="transparent" />
+                        <radialGradient id="earthGradient" cx="35%" cy="35%">
+                          <stop offset="0%" stopColor="rgba(100, 150, 200, 0.4)" />
+                          <stop offset="100%" stopColor="rgba(50, 100, 150, 0.7)" />
                         </radialGradient>
                         <filter id="glow">
                           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -129,110 +123,117 @@ export default function ToolboxPage() {
                       <circle cx={cx} cy={cy} r={outerR + 8} fill="none" stroke="rgba(6, 182, 212, 0.15)" strokeWidth="2" opacity="0.5" />
                       <circle cx={cx} cy={cy} r={innerR - 8} fill="none" stroke="rgba(6, 182, 212, 0.1)" strokeWidth="1" opacity="0.3" />
 
-                      {/* 外圈扇区 */}
-                      {reordered.map((item: any, i: number) => {
-                        const weight = weights[item.action as keyof typeof weights] || 1;
-                        const segmentAngle = (weight / totalWeight) * 360;
+                      {/* 外圈扇区 - 按颜色分组 */}
+                      {(() => {
+                        const colorGap = 8;
+                        const segmentGap = 2;
 
-                        const startAngle = currentAngle;
-                        const endAngle = currentAngle + segmentAngle - gap;
-                        currentAngle += segmentAngle;
+                        const greenAssets = reordered.filter((item: any) => item.action === 'IN');
+                        const yellowAssets = reordered.filter((item: any) => item.action === 'NEUTRAL');
+                        const redAssets = reordered.filter((item: any) => item.action === 'OUT');
 
-                        const startRad = (startAngle * Math.PI) / 180;
-                        const endRad = (endAngle * Math.PI) / 180;
+                        const totalAssets = greenAssets.length + yellowAssets.length + redAssets.length;
+                        const availableAngle = 360 - (colorGap * 3);
+                        const anglePerAsset = availableAngle / totalAssets;
 
-                        const x1o = cx + outerR * Math.cos(startRad);
-                        const y1o = cy + outerR * Math.sin(startRad);
-                        const x2o = cx + outerR * Math.cos(endRad);
-                        const y2o = cy + outerR * Math.sin(endRad);
-                        const x1i = cx + innerR * Math.cos(startRad);
-                        const y1i = cy + innerR * Math.sin(startRad);
-                        const x2i = cx + innerR * Math.cos(endRad);
-                        const y2i = cy + innerR * Math.sin(endRad);
+                        let currentAngle = -90;
+                        const allGroups = [
+                          { assets: greenAssets, color: '#22c55e', className: 'gauge-segment-in' },
+                          { assets: yellowAssets, color: '#eab308', className: 'gauge-segment-neutral' },
+                          { assets: redAssets, color: '#ef4444', className: 'gauge-segment-out' }
+                        ];
 
-                        const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-                        const color =
-                          item.action === "IN"
-                            ? "#22c55e"
-                            : item.action === "NEUTRAL"
-                              ? "#eab308"
-                              : "#ef4444";
+                        return allGroups.flatMap(({ assets, color, className }) => {
+                          if (assets.length === 0) return [];
 
-                        const midAngle = (startAngle + endAngle) / 2;
-                        const midRad = (midAngle * Math.PI) / 180;
-                        const labelX = cx + (outerR + 22) * Math.cos(midRad);
-                        const labelY = cy + (outerR + 22) * Math.sin(midRad);
+                          return assets.map((item: any, i: number) => {
+                            const startAngle = currentAngle;
+                            const endAngle = currentAngle + anglePerAsset - segmentGap;
+                            currentAngle += anglePerAsset;
 
-                        const segmentClass = item.action === "IN" ? "gauge-segment-in" : item.action === "NEUTRAL" ? "gauge-segment-neutral" : "gauge-segment-out";
+                            if (i === assets.length - 1) {
+                              currentAngle += colorGap;
+                            }
 
-                        return (
-                          <g key={i} onClick={() => setSelectedAsset(item)} style={{cursor: 'pointer'}}>
-                            {/* 外层发光边框 */}
-                            <path
-                              d={`M ${x1o} ${y1o}
-                                  A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
-                                  L ${x2i} ${y2i}
-                                  A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
-                                  Z`}
-                              fill={color}
-                              opacity="0.3"
-                              style={{filter: 'drop-shadow(0 0 12px ' + (item.action === "IN" ? 'rgba(34, 197, 94, 0.8)' : item.action === "NEUTRAL" ? 'rgba(234, 179, 8, 0.8)' : 'rgba(239, 68, 68, 0.8)') + ')'}}
-                            />
-                            {/* 主体段 */}
-                            <path
-                              d={`M ${x1o} ${y1o}
-                                  A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
-                                  L ${x2i} ${y2i}
-                                  A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
-                                  Z`}
-                              fill={color}
-                              opacity="0.9"
-                              className={segmentClass}
-                            />
-                            {/* 边框 */}
-                            <path
-                              d={`M ${x1o} ${y1o}
-                                  A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
-                                  L ${x2i} ${y2i}
-                                  A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
-                                  Z`}
-                              fill="none"
-                              stroke={color}
-                              strokeWidth="1.5"
-                              opacity="0.6"
-                            />
-                            <text
-                              x={labelX}
-                              y={labelY}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              className="fill-white text-[10px] font-bold pointer-events-none"
-                              style={{textShadow: '0 0 8px rgba(0,0,0,0.8)', filter: 'drop-shadow(0 0 2px ' + color + ')'}}
-                            >
-                              {String(item.label)}
-                            </text>
-                          </g>
-                        );
-                      })}
+                            const startRad = (startAngle * Math.PI) / 180;
+                            const endRad = (endAngle * Math.PI) / 180;
 
-                      {/* 3D 球体中心 */}
+                            const x1o = cx + outerR * Math.cos(startRad);
+                            const y1o = cy + outerR * Math.sin(startRad);
+                            const x2o = cx + outerR * Math.cos(endRad);
+                            const y2o = cy + outerR * Math.sin(endRad);
+                            const x1i = cx + innerR * Math.cos(startRad);
+                            const y1i = cy + innerR * Math.sin(startRad);
+                            const x2i = cx + innerR * Math.cos(endRad);
+                            const y2i = cy + innerR * Math.sin(endRad);
+
+                            const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+
+                            const midAngle = (startAngle + endAngle) / 2;
+                            const midRad = (midAngle * Math.PI) / 180;
+                            const labelX = cx + (outerR + 22) * Math.cos(midRad);
+                            const labelY = cy + (outerR + 22) * Math.sin(midRad);
+
+                            return (
+                              <g key={`${item.action}-${i}`} onClick={() => setSelectedAsset(item)} style={{cursor: 'pointer'}}>
+                                <path
+                                  d={`M ${x1o} ${y1o}
+                                      A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
+                                      L ${x2i} ${y2i}
+                                      A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
+                                      Z`}
+                                  fill={color}
+                                  opacity="0.3"
+                                  style={{filter: 'drop-shadow(0 0 12px ' + (item.action === "IN" ? 'rgba(34, 197, 94, 0.8)' : item.action === "NEUTRAL" ? 'rgba(234, 179, 8, 0.8)' : 'rgba(239, 68, 68, 0.8)') + ')'}}
+                                />
+                                <path
+                                  d={`M ${x1o} ${y1o}
+                                      A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
+                                      L ${x2i} ${y2i}
+                                      A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
+                                      Z`}
+                                  fill={color}
+                                  opacity="0.9"
+                                  className={className}
+                                />
+                                <path
+                                  d={`M ${x1o} ${y1o}
+                                      A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2o} ${y2o}
+                                      L ${x2i} ${y2i}
+                                      A ${innerR} ${innerR} 0 ${largeArc} 0 ${x1i} ${y1i}
+                                      Z`}
+                                  fill="none"
+                                  stroke={color}
+                                  strokeWidth="1.5"
+                                  opacity="0.6"
+                                />
+                                <text
+                                  x={labelX}
+                                  y={labelY}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
+                                  className="fill-white text-[10px] font-bold pointer-events-none"
+                                  style={{textShadow: '0 0 8px rgba(0,0,0,0.8)', filter: 'drop-shadow(0 0 2px ' + color + ')'}}
+                                >
+                                  {String(item.label)}
+                                </text>
+                              </g>
+                            );
+                          });
+                        });
+                      })()}
+
+                      {/* 地球中心 */}
                       <g className="sphere-3d" style={{transformOrigin: `${cx}px ${cy}px`}}>
-                        {/* 球体主体 */}
-                        <circle cx={cx} cy={cy} r="38" fill="url(#sphereGradient)" filter="url(#glow)" />
+                        <circle cx={cx} cy={cy} r="38" fill="url(#earthGradient)" filter="url(#glow)" />
 
-                        {/* 高光 */}
-                        <circle cx={cx - 8} cy={cy - 8} r="15" fill="url(#sphereHighlight)" opacity="0.8" />
+                        {/* 简化的陆地 */}
+                        <path d="M 130 115 Q 135 113 138 116 Q 140 120 137 123 Q 133 125 130 123 Z" fill="rgba(100,180,100,0.6)" />
+                        <path d="M 122 118 Q 125 116 128 118 Q 129 122 126 124 Q 123 125 122 122 Z" fill="rgba(100,180,100,0.6)" />
+                        <path d="M 130 128 Q 134 130 136 134 Q 135 138 131 139 Q 127 137 128 133 Z" fill="rgba(100,180,100,0.6)" />
+                        <path d="M 120 130 Q 122 128 125 130 Q 126 133 123 135 Q 120 134 120 131 Z" fill="rgba(100,180,100,0.6)" />
 
-                        {/* 经线 */}
-                        <ellipse cx={cx} cy={cy} rx="38" ry="38" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                        <ellipse cx={cx} cy={cy} rx="30" ry="38" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
-                        <ellipse cx={cx} cy={cy} rx="20" ry="38" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-                        <ellipse cx={cx} cy={cy} rx="10" ry="38" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" />
-
-                        {/* 纬线 */}
-                        <ellipse cx={cx} cy={cy - 20} rx="30" ry="8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-                        <ellipse cx={cx} cy={cy} rx="38" ry="10" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
-                        <ellipse cx={cx} cy={cy + 20} rx="30" ry="8" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                        <animateTransform attributeName="transform" type="rotate" from="0 130 130" to="360 130 130" dur="8s" repeatCount="indefinite" />
                       </g>
                     </svg>
                   </div>
