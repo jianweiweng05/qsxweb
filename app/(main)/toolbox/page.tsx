@@ -10,7 +10,7 @@ export default function ToolboxPage() {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
 
-  const proStrategyText = payload?.pro_strategy_text;
+  const strategyMatrix = payload?.strategy_matrix;
   const similarityTop3 = payload?.similarity?.top3;
   const similarityProSummary = payload?.similarity_pro_summary;
   const similarityHistoryRestore = payload?.similarity_history_restore;
@@ -408,17 +408,133 @@ export default function ToolboxPage() {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <span>今日策略指引</span>
-              <HelpButton indicatorKey="pro_strategy" />
+              <span>策略适配矩阵</span>
+              <HelpButton indicatorKey="strategy_matrix" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
-              <ProGate lockedMessage="升级 Pro 查看今日策略">
-                {proStrategyText ? (
-                  <pre className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed font-mono">
-                    {proStrategyText}
-                  </pre>
+              <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
+                {strategyMatrix?.version === "matrix_v2_decision" ? (
+                  <div className="space-y-3">
+                    {/* 版本信息 */}
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
+                      <div className="text-xs text-white/50">
+                        版本: {strategyMatrix.version}
+                      </div>
+                      {strategyMatrix.timestamp && (
+                        <div className="text-xs text-white/40">
+                          {new Date(strategyMatrix.timestamp).toLocaleString('zh-CN')}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 矩阵表格 */}
+                    {(() => {
+                      // 尝试从不同可能的数据结构中提取矩阵数据
+                      const matrixData = strategyMatrix.matrix || strategyMatrix.data || strategyMatrix.decisions || [];
+                      const dataArray = Array.isArray(matrixData) ? matrixData : Object.entries(matrixData).map(([key, value]) => ({ key, ...value }));
+
+                      if (dataArray.length === 0) {
+                        return <div className="text-xs text-white/50">暂无矩阵数据</div>;
+                      }
+
+                      // 获取信号状态的颜色和文本
+                      const getSignalStyle = (signal: string) => {
+                        const s = String(signal).toUpperCase();
+                        if (s === 'BUY' || s === 'LONG' || s === 'IN' || s === 'BULLISH' || s === 'GREEN') {
+                          return { color: 'bg-green-400', text: 'text-green-400', label: '看多' };
+                        } else if (s === 'SELL' || s === 'SHORT' || s === 'OUT' || s === 'BEARISH' || s === 'RED') {
+                          return { color: 'bg-red-400', text: 'text-red-400', label: '看空' };
+                        } else if (s === 'HOLD' || s === 'NEUTRAL' || s === 'YELLOW') {
+                          return { color: 'bg-yellow-400', text: 'text-yellow-400', label: '中性' };
+                        }
+                        return { color: 'bg-gray-400', text: 'text-gray-400', label: s };
+                      };
+
+                      return (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b border-white/10">
+                                <th className="text-left py-2 px-2 text-white/50 font-normal w-8"></th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">策略/资产</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">信号</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">置信度</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">说明</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {dataArray.map((item: any, i: number) => {
+                                const signal = item.signal || item.action || item.decision || item.status || 'NEUTRAL';
+                                const signalStyle = getSignalStyle(signal);
+                                const name = item.name || item.label || item.key || item.asset || `策略 ${i + 1}`;
+                                const confidence = item.confidence || item.score || item.strength;
+                                const description = item.description || item.reason || item.note || item.summary || '-';
+
+                                return (
+                                  <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <td className="py-2.5 px-2">
+                                      <div className="flex items-center gap-1.5">
+                                        {/* 红绿灯指示器 */}
+                                        <div className={`w-2 h-2 rounded-full ${signalStyle.color} shadow-lg`}
+                                             style={{
+                                               boxShadow: `0 0 8px ${signalStyle.color === 'bg-green-400' ? 'rgba(34, 197, 94, 0.6)' :
+                                                                      signalStyle.color === 'bg-red-400' ? 'rgba(239, 68, 68, 0.6)' :
+                                                                      'rgba(234, 179, 8, 0.6)'}`
+                                             }}
+                                        />
+                                      </div>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <div className="text-white/90 font-medium">{name}</div>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <span className={`${signalStyle.text} text-[10px] font-semibold uppercase`}>
+                                        {signalStyle.label}
+                                      </span>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      {confidence !== undefined && confidence !== null ? (
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[60px]">
+                                            <div
+                                              className={`h-full ${signalStyle.color} transition-all`}
+                                              style={{ width: `${Math.min(100, Math.max(0, Number(confidence) * 100))}%` }}
+                                            />
+                                          </div>
+                                          <span className="text-white/60 text-[10px] font-mono">
+                                            {(Number(confidence) * 100).toFixed(0)}%
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <span className="text-white/40">-</span>
+                                      )}
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <div className="text-white/60 text-[10px] leading-relaxed max-w-xs">
+                                        {description}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    })()}
+
+                    {/* 底部汇总信息 */}
+                    {strategyMatrix.summary && (
+                      <div className="mt-4 pt-3 border-t border-white/10">
+                        <div className="text-xs text-white/50 mb-2">整体评估</div>
+                        <div className="text-xs text-white/70 leading-relaxed">
+                          {strategyMatrix.summary}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="text-xs text-white/50">暂无在线策略输出</div>
+                  <div className="text-xs text-white/50">暂无策略适配矩阵数据</div>
                 )}
               </ProGate>
             </div>
