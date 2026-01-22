@@ -400,6 +400,12 @@ export default function ToolboxPage() {
                           </div>
                           <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{item.sim}</div>
                           <div className="text-white/70 text-[10px] leading-relaxed">{item.what_it_is}</div>
+                          {item.similarity_history_restore?.text && (
+                            <div className="mt-2 pt-2 border-t border-white/10">
+                              <div className="text-yellow-400/70 text-[10px] font-medium mb-1">历史重现：</div>
+                              <div className="text-white/60 text-[10px] leading-relaxed">{item.similarity_history_restore.text}</div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

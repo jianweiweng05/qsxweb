@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, Radar, Bell, Wrench, User } from "lucide-react";
+import { Activity, Radar, Bell, Box, User } from "lucide-react";
 import { FloatingAIBubble } from "./floating-ai-bubble";
 import { getLanguage, translations, type Language } from "@/app/lib/i18n";
 import { ReportProvider } from "./report-provider";
@@ -10,7 +10,7 @@ import { ReportProvider } from "./report-provider";
 const getTabs = (lang: Language) => [
   { key: "/today", title: translations[lang].today, Icon: Activity },
   { key: "/radar", title: translations[lang].dataCenter, Icon: Radar },
-  { key: "/toolbox", title: translations[lang].pro, Icon: Wrench },
+  { key: "/toolbox", title: translations[lang].pro, Icon: Box },
 ];
 
 function mapActiveKey(pathname: string, tabs: any[]): string {
