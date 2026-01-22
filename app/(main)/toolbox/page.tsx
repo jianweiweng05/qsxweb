@@ -254,30 +254,83 @@ export default function ToolboxPage() {
                               <table className="w-full text-xs">
                                 <thead>
                                   <tr className="border-b border-white/10">
-                                    <th className="text-left py-2 text-white/50 font-normal"></th>
+                                    <th className="text-left py-2 text-white/50 font-normal w-8"></th>
                                     <th className="text-left py-2 text-white/50 font-normal">资产</th>
                                     <th className="text-left py-2 text-white/50 font-normal">状态</th>
                                     <th className="text-left py-2 text-white/50 font-normal">说明</th>
+                                    <th className="text-left py-2 text-white/50 font-normal">
+                                      <span className="flex items-center gap-1">
+                                        Pro仓位建议
+                                        <span className="px-1 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
+                                      </span>
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {crossAsset.public.assets_8.map((item: any, i: number) => (
-                                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedAsset(item)}>
-                                      <td className="py-2">
-                                        <div
-                                          className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
-                                              ? "bg-green-400"
-                                              : item.action === "NEUTRAL" || item.action === "HOLD"
-                                                ? "bg-yellow-400"
-                                                : "bg-red-400"
-                                            }`}
-                                        />
-                                      </td>
-                                      <td className="py-2 text-white/80">{String(item.label).replace(/\(BTC\+ETH\)/g, '')}</td>
-                                      <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
-                                      <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
-                                    </tr>
-                                  ))}
+                                  {crossAsset.public.assets_8.map((item: any, i: number) => {
+                                    const posKey = item.key === 'SPX' ? 'US_EQUITY' :
+                                                   item.key === 'GOLD' ? 'GOLD' :
+                                                   item.key === 'BTC' ? 'BTC' :
+                                                   item.key === 'ETH' ? 'ETH' :
+                                                   item.key === 'CASH' ? 'CASH' : item.key;
+                                    const positionCap = crossAsset?.pro?.position_caps?.[posKey];
+                                    const hasPro = !!positionCap;
+                                    const isExpanded = selectedAsset?.key === item.key;
+
+                                    return (
+                                      <>
+                                        <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                                          <td className="py-2">
+                                            <div className="flex items-center gap-1">
+                                              <div
+                                                className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
+                                                    ? "bg-green-400"
+                                                    : item.action === "NEUTRAL" || item.action === "HOLD"
+                                                      ? "bg-yellow-400"
+                                                      : "bg-red-400"
+                                                  }`}
+                                              />
+                                              {hasPro && (
+                                                <button
+                                                  onClick={() => setSelectedAsset(isExpanded ? null : item)}
+                                                  className="text-white/40 hover:text-white/80 transition-colors"
+                                                >
+                                                  <svg className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                  </svg>
+                                                </button>
+                                              )}
+                                            </div>
+                                          </td>
+                                          <td className="py-2 text-white/80">{String(item.label).replace(/\(BTC\+ETH\)/g, '')}</td>
+                                          <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
+                                          <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
+                                          <td className="py-2">
+                                            <ProGate lockedMessage="Pro">
+                                              <span className="text-white/80 font-mono">{positionCap || '-'}</span>
+                                            </ProGate>
+                                          </td>
+                                        </tr>
+                                        {isExpanded && hasPro && (
+                                          <tr key={`${i}-detail`}>
+                                            <td colSpan={5} className="py-3 px-4 bg-white/5">
+                                              <ProGate lockedMessage="升级 Pro 查看详细分析">
+                                                <div className="text-xs space-y-2">
+                                                  <div className="flex items-center gap-2">
+                                                    <span className="text-cyan-400/70">仓位上限:</span>
+                                                    <span className="text-white/90 font-mono">{positionCap}</span>
+                                                  </div>
+                                                  <div className="text-white/60 leading-relaxed">
+                                                    {item.one_liner || '暂无详细说明'}
+                                                  </div>
+                                                </div>
+                                              </ProGate>
+                                            </td>
+                                          </tr>
+                                        )}
+                                      </>
+                                    );
+                                  })}
                                 </tbody>
                               </table>
                             </div>
@@ -288,39 +341,6 @@ export default function ToolboxPage() {
                   </div>
                 </div>
 
-                {/* 资产详情抽屉 */}
-                {selectedAsset && (() => {
-                  const posKey = selectedAsset.key === 'SPX' ? 'US_EQUITY' :
-                                 selectedAsset.key === 'GOLD' ? 'GOLD' :
-                                 selectedAsset.key === 'BTC' ? 'BTC' :
-                                 selectedAsset.key === 'ETH' ? 'ETH' :
-                                 selectedAsset.key === 'CASH' ? 'CASH' : selectedAsset.key;
-                  const positionCap = crossAsset?.pro?.position_caps?.[posKey];
-                  const now = new Date();
-                  const updateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-                  return (
-                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end">
-                      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedAsset(null)} />
-                      <div className="relative bg-black/80 border border-white/10 backdrop-blur-md rounded-lg p-4 w-full sm:w-80 sm:mr-4 mb-4 sm:mb-0 max-h-96 overflow-y-auto">
-                        <button onClick={() => setSelectedAsset(null)} className="absolute top-3 right-3 text-white/50 hover:text-white/80">✕</button>
-                        <div className="pr-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className={`w-2 h-2 rounded-full ${selectedAsset.action === "IN" ? "bg-green-400" : selectedAsset.action === "NEUTRAL" || selectedAsset.action === "HOLD" ? "bg-yellow-400" : "bg-red-400"}`} />
-                            <h3 className="text-sm font-semibold text-white">{String(selectedAsset.label).replace(/\(BTC\+ETH\)/g, '')}</h3>
-                          </div>
-                          <div className="text-xs text-white/50 mb-3">{selectedAsset.action}</div>
-                          <div className="text-xs text-white/70 leading-relaxed mb-3">{selectedAsset.one_liner || '暂无说明'}</div>
-                          <ProGate lockedMessage="升级 Pro 查看仓位建议">
-                            <div className="text-xs text-cyan-400/70 mb-2">仓位上限</div>
-                            <div className="text-sm font-mono text-white/80">{positionCap || '-'}</div>
-                          </ProGate>
-                          <div className="text-[10px] text-white/40 mt-3">更新于 {updateTime}</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             </div>
           );
