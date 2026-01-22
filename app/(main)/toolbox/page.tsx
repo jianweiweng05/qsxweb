@@ -431,7 +431,7 @@ export default function ToolboxPage() {
                     {(() => {
                       // 尝试从不同可能的数据结构中提取矩阵数据
                       const matrixData = strategyMatrix.matrix || strategyMatrix.data || strategyMatrix.decisions || [];
-                      const dataArray = Array.isArray(matrixData) ? matrixData : Object.entries(matrixData).map(([key, value]) => ({ key, ...value }));
+                      const dataArray = Array.isArray(matrixData) ? matrixData : Object.entries(matrixData).map(([key, value]) => ({ key, ...(value as any) }));
 
                       if (dataArray.length === 0) {
                         return <div className="text-xs text-white/50">暂无矩阵数据</div>;
