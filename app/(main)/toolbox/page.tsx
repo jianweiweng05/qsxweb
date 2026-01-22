@@ -420,34 +420,41 @@ export default function ToolboxPage() {
                       <div className="text-xs text-white/50">
                         版本: {strategyMatrix.version}
                       </div>
-                      {strategyMatrix.timestamp && (
+                      {strategyMatrix.asof && (
                         <div className="text-xs text-white/40">
-                          {new Date(strategyMatrix.timestamp).toLocaleString('zh-CN')}
+                          更新时间: {new Date(strategyMatrix.asof).toLocaleString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </div>
                       )}
                     </div>
 
                     {/* 矩阵表格 */}
                     {(() => {
-                      // 尝试从不同可能的数据结构中提取矩阵数据
-                      const matrixData = strategyMatrix.matrix || strategyMatrix.data || strategyMatrix.decisions || [];
-                      const dataArray = Array.isArray(matrixData) ? matrixData : Object.entries(matrixData).map(([key, value]) => ({ key, ...(value as any) }));
+                      // 从 rows 字段获取矩阵数据
+                      const rows = strategyMatrix.rows || [];
 
-                      if (dataArray.length === 0) {
+                      if (!Array.isArray(rows) || rows.length === 0) {
                         return <div className="text-xs text-white/50">暂无矩阵数据</div>;
                       }
 
-                      // 获取信号状态的颜色和文本
-                      const getSignalStyle = (signal: string) => {
-                        const s = String(signal).toUpperCase();
-                        if (s === 'BUY' || s === 'LONG' || s === 'IN' || s === 'BULLISH' || s === 'GREEN') {
-                          return { color: 'bg-green-400', text: 'text-green-400', label: '看多' };
-                        } else if (s === 'SELL' || s === 'SHORT' || s === 'OUT' || s === 'BEARISH' || s === 'RED') {
-                          return { color: 'bg-red-400', text: 'text-red-400', label: '看空' };
-                        } else if (s === 'HOLD' || s === 'NEUTRAL' || s === 'YELLOW') {
-                          return { color: 'bg-yellow-400', text: 'text-yellow-400', label: '中性' };
+                      // 获取红绿灯状态的颜色和文本
+                      const getLightStyle = (light: string, decision: string) => {
+                        const l = String(light).toUpperCase();
+                        const d = String(decision).toUpperCase();
+
+                        if (l === 'GREEN' || d === 'RECOMMENDED') {
+                          return { color: 'bg-green-400', text: 'text-green-400', label: '推荐' };
+                        } else if (l === 'RED' || d === 'AVOID') {
+                          return { color: 'bg-red-400', text: 'text-red-400', label: '规避' };
+                        } else if (l === 'YELLOW' || d === 'OPTIONAL') {
+                          return { color: 'bg-yellow-400', text: 'text-yellow-400', label: '可选' };
                         }
-                        return { color: 'bg-gray-400', text: 'text-gray-400', label: s };
+                        return { color: 'bg-gray-400', text: 'text-gray-400', label: d || l };
                       };
 
                       return (
@@ -456,62 +463,67 @@ export default function ToolboxPage() {
                             <thead>
                               <tr className="border-b border-white/10">
                                 <th className="text-left py-2 px-2 text-white/50 font-normal w-8"></th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">策略/资产</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">信号</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">置信度</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">说明</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">策略名称</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">市场接受度</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">Calmar范围</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">原因</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {dataArray.map((item: any, i: number) => {
-                                const signal = item.signal || item.action || item.decision || item.status || 'NEUTRAL';
-                                const signalStyle = getSignalStyle(signal);
-                                const name = item.name || item.label || item.key || item.asset || `策略 ${i + 1}`;
-                                const confidence = item.confidence || item.score || item.strength;
-                                const description = item.description || item.reason || item.note || item.summary || '-';
+                              {rows.map((row: any, i: number) => {
+                                const lightStyle = getLightStyle(row.light, row.decision);
+                                const marketAccept = row.market_accept || 0;
+                                const acceptPercent = (marketAccept / 5) * 100; // 转换为百分比
 
                                 return (
-                                  <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                  <tr key={row.key || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                     <td className="py-2.5 px-2">
                                       <div className="flex items-center gap-1.5">
                                         {/* 红绿灯指示器 */}
-                                        <div className={`w-2 h-2 rounded-full ${signalStyle.color} shadow-lg`}
-                                             style={{
-                                               boxShadow: `0 0 8px ${signalStyle.color === 'bg-green-400' ? 'rgba(34, 197, 94, 0.6)' :
-                                                                      signalStyle.color === 'bg-red-400' ? 'rgba(239, 68, 68, 0.6)' :
-                                                                      'rgba(234, 179, 8, 0.6)'}`
-                                             }}
+                                        <div
+                                          className={`w-2 h-2 rounded-full ${lightStyle.color} shadow-lg`}
+                                          style={{
+                                            boxShadow: `0 0 8px ${
+                                              lightStyle.color === 'bg-green-400' ? 'rgba(34, 197, 94, 0.6)' :
+                                              lightStyle.color === 'bg-red-400' ? 'rgba(239, 68, 68, 0.6)' :
+                                              'rgba(234, 179, 8, 0.6)'
+                                            }`
+                                          }}
                                         />
                                       </div>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      <div className="text-white/90 font-medium">{name}</div>
+                                      <div className="text-white/90 font-medium">{row.name}</div>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      <span className={`${signalStyle.text} text-[10px] font-semibold uppercase`}>
-                                        {signalStyle.label}
+                                      <span className="text-white/60 text-[10px]">{row.type}</span>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <span className={`${lightStyle.text} text-[10px] font-semibold`}>
+                                        {lightStyle.label}
                                       </span>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      {confidence !== undefined && confidence !== null ? (
-                                        <div className="flex items-center gap-2">
-                                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[60px]">
-                                            <div
-                                              className={`h-full ${signalStyle.color} transition-all`}
-                                              style={{ width: `${Math.min(100, Math.max(0, Number(confidence) * 100))}%` }}
-                                            />
-                                          </div>
-                                          <span className="text-white/60 text-[10px] font-mono">
-                                            {(Number(confidence) * 100).toFixed(0)}%
-                                          </span>
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[60px]">
+                                          <div
+                                            className={`h-full ${lightStyle.color} transition-all`}
+                                            style={{ width: `${acceptPercent}%` }}
+                                          />
                                         </div>
-                                      ) : (
-                                        <span className="text-white/40">-</span>
-                                      )}
+                                        <span className="text-white/60 text-[10px] font-mono">
+                                          {marketAccept}/5
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <span className="text-white/60 text-[10px] font-mono">{row.calmar_range}</span>
                                     </td>
                                     <td className="py-2.5 px-2">
                                       <div className="text-white/60 text-[10px] leading-relaxed max-w-xs">
-                                        {description}
+                                        {row.reason}
                                       </div>
                                     </td>
                                   </tr>
@@ -524,14 +536,67 @@ export default function ToolboxPage() {
                     })()}
 
                     {/* 底部汇总信息 */}
-                    {strategyMatrix.summary && (
-                      <div className="mt-4 pt-3 border-t border-white/10">
-                        <div className="text-xs text-white/50 mb-2">整体评估</div>
-                        <div className="text-xs text-white/70 leading-relaxed">
-                          {strategyMatrix.summary}
+                    {(() => {
+                      const evidencePanels = payload?.pro_evidence_panels;
+                      const hasSummary = strategyMatrix.summary;
+                      const hasEvidence = evidencePanels && Object.keys(evidencePanels).length > 0;
+
+                      if (!hasSummary && !hasEvidence) return null;
+
+                      return (
+                        <div className="mt-4 pt-3 border-t border-white/10 space-y-3">
+                          {hasSummary && (
+                            <div>
+                              <div className="text-xs text-white/50 mb-2">整体评估</div>
+                              <div className="text-xs text-white/70 leading-relaxed">
+                                {strategyMatrix.summary}
+                              </div>
+                            </div>
+                          )}
+
+                          {hasEvidence && (
+                            <div>
+                              <div className="text-xs text-white/50 mb-2">Pro 证据面板</div>
+                              <div className="grid gap-2">
+                                {Object.entries(evidencePanels).map(([key, panel]: [string, any]) => {
+                                  const statusColors: Record<string, string> = {
+                                    'RISK_ON': 'text-green-400',
+                                    'RISK_OFF': 'text-red-400',
+                                    'CONFLICT': 'text-yellow-400',
+                                    'HIGH_RISK': 'text-red-400',
+                                    'NEUTRAL': 'text-gray-400'
+                                  };
+                                  const statusColor = statusColors[panel.status] || 'text-white/60';
+
+                                  return (
+                                    <div key={key} className="p-2 rounded bg-white/5 border border-white/10">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-white/70 text-[10px] font-medium">
+                                          {key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                        </span>
+                                        <span className={`${statusColor} text-[10px] font-semibold`}>
+                                          {panel.status}
+                                        </span>
+                                      </div>
+                                      <div className="text-white/60 text-[10px] leading-relaxed mb-1">
+                                        {panel.conclusion}
+                                      </div>
+                                      {panel.evidences && Array.isArray(panel.evidences) && panel.evidences.length > 0 && (
+                                        <ul className="text-white/50 text-[10px] space-y-0.5 ml-3">
+                                          {panel.evidences.map((evidence: string, i: number) => (
+                                            <li key={i} className="list-disc">{evidence}</li>
+                                          ))}
+                                        </ul>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 ) : (
                   <div className="text-xs text-white/50">暂无策略适配矩阵数据</div>
