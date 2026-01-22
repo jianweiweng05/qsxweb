@@ -423,7 +423,7 @@ export default function ToolboxPage() {
                         <div className="space-y-1.5">
                           {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
                             line.trim() && (
-                              <div key={i} className="text-[10px] text-white/70 leading-relaxed">
+                              <div key={i} className="text-xs text-white/90 leading-relaxed">
                                 {line}
                               </div>
                             )
