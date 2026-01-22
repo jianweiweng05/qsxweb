@@ -219,7 +219,7 @@ export default function ToolboxPage() {
                                   className="fill-white text-[10px] font-bold pointer-events-none"
                                   style={{textShadow: '0 0 8px rgba(0,0,0,0.8)', filter: 'drop-shadow(0 0 2px ' + color + ')'}}
                                 >
-                                  {String(item.label)}
+                                  {String(item.label).replace(/\(BTC\+ETH\)/g, '')}
                                 </text>
                               </g>
                             );
@@ -273,7 +273,7 @@ export default function ToolboxPage() {
                                             }`}
                                         />
                                       </td>
-                                      <td className="py-2 text-white/80">{String(item.label)}</td>
+                                      <td className="py-2 text-white/80">{String(item.label).replace(/\(BTC\+ETH\)/g, '')}</td>
                                       <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
                                       <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
                                     </tr>
@@ -307,7 +307,7 @@ export default function ToolboxPage() {
                         <div className="pr-6">
                           <div className="flex items-center gap-2 mb-3">
                             <div className={`w-2 h-2 rounded-full ${selectedAsset.action === "IN" ? "bg-green-400" : selectedAsset.action === "NEUTRAL" || selectedAsset.action === "HOLD" ? "bg-yellow-400" : "bg-red-400"}`} />
-                            <h3 className="text-sm font-semibold text-white">{selectedAsset.label}</h3>
+                            <h3 className="text-sm font-semibold text-white">{String(selectedAsset.label).replace(/\(BTC\+ETH\)/g, '')}</h3>
                           </div>
                           <div className="text-xs text-white/50 mb-3">{selectedAsset.action}</div>
                           <div className="text-xs text-white/70 leading-relaxed mb-3">{selectedAsset.one_liner || '暂无说明'}</div>
