@@ -413,12 +413,30 @@ export default function ToolboxPage() {
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
               <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
-                {strategyMatrix?.version === "matrix_v2_decision" ? (
+                {strategyMatrix?.version === "matrix_v3_scored" ? (
                   <div className="space-y-3">
-                    {/* 版本信息 */}
+                    {/* 版本信息和汇总统计 */}
                     <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                      <div className="text-xs text-white/50">
-                        版本: {strategyMatrix.version}
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs text-white/50">
+                          版本: {strategyMatrix.version}
+                        </div>
+                        {strategyMatrix.summary && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                              <span className="text-white/60">{strategyMatrix.summary.green}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                              <span className="text-white/60">{strategyMatrix.summary.yellow}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                              <span className="text-white/60">{strategyMatrix.summary.red}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       {strategyMatrix.asof && (
                         <div className="text-xs text-white/40">
@@ -447,7 +465,7 @@ export default function ToolboxPage() {
                         const l = String(light).toUpperCase();
                         const d = String(decision).toUpperCase();
 
-                        if (l === 'GREEN' || d === 'RECOMMENDED') {
+                        if (l === 'GREEN' || d === 'RECOMMENDED' || d === 'ALLOW') {
                           return { color: 'bg-green-400', text: 'text-green-400', label: '推荐' };
                         } else if (l === 'RED' || d === 'AVOID') {
                           return { color: 'bg-red-400', text: 'text-red-400', label: '规避' };
@@ -466,6 +484,7 @@ export default function ToolboxPage() {
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">策略名称</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">市场接受度</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">Calmar范围</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">原因</th>
@@ -476,6 +495,8 @@ export default function ToolboxPage() {
                                 const lightStyle = getLightStyle(row.light, row.decision);
                                 const marketAccept = row.market_accept || 0;
                                 const acceptPercent = (marketAccept / 5) * 100; // 转换为百分比
+                                const score = row.score || 0;
+                                const scorePercent = score; // score is already 0-100
 
                                 return (
                                   <tr key={row.key || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
@@ -504,6 +525,19 @@ export default function ToolboxPage() {
                                       <span className={`${lightStyle.text} text-[10px] font-semibold`}>
                                         {lightStyle.label}
                                       </span>
+                                    </td>
+                                    <td className="py-2.5 px-2">
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[50px]">
+                                          <div
+                                            className={`h-full ${lightStyle.color} transition-all`}
+                                            style={{ width: `${scorePercent}%` }}
+                                          />
+                                        </div>
+                                        <span className="text-white/70 text-[10px] font-mono font-semibold">
+                                          {score}
+                                        </span>
+                                      </div>
                                     </td>
                                     <td className="py-2.5 px-2">
                                       <div className="flex items-center gap-2">
@@ -538,18 +572,39 @@ export default function ToolboxPage() {
                     {/* 底部汇总信息 */}
                     {(() => {
                       const evidencePanels = payload?.pro_evidence_panels;
-                      const hasSummary = strategyMatrix.summary;
+                      const summary = strategyMatrix.summary;
                       const hasEvidence = evidencePanels && Object.keys(evidencePanels).length > 0;
 
-                      if (!hasSummary && !hasEvidence) return null;
+                      if (!summary && !hasEvidence) return null;
 
                       return (
                         <div className="mt-4 pt-3 border-t border-white/10 space-y-3">
-                          {hasSummary && (
+                          {summary && typeof summary === 'object' && (
                             <div>
-                              <div className="text-xs text-white/50 mb-2">整体评估</div>
-                              <div className="text-xs text-white/70 leading-relaxed">
-                                {strategyMatrix.summary}
+                              <div className="text-xs text-white/50 mb-2">策略分布统计</div>
+                              <div className="flex items-center gap-4 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                  <span className="text-white/60">推荐: {summary.green} 个</span>
+                                  {summary.green_keys && summary.green_keys.length > 0 && (
+                                    <span className="text-white/40 text-[10px]">
+                                      ({summary.green_keys.join(', ')})
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                  <span className="text-white/60">可选: {summary.yellow} 个</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                                  <span className="text-white/60">规避: {summary.red} 个</span>
+                                  {summary.red_keys && summary.red_keys.length > 0 && (
+                                    <span className="text-white/40 text-[10px]">
+                                      ({summary.red_keys.join(', ')})
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           )}
