@@ -8,6 +8,7 @@ import { useState } from "react";
 export default function ToolboxPage() {
   const { data: payload } = useReport();
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
+  const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
 
   const proStrategyText = payload?.pro_strategy_text;
   const similarityTop3 = payload?.similarity?.top3;
@@ -397,14 +398,21 @@ export default function ToolboxPage() {
                             <span className="text-white/90 font-medium">{'①②③'[i]}</span>
                             <span className="text-white/60 text-[10px]">{item.date}</span>
                             <span className="text-white/90 text-xs">｜{item.name}</span>
-                            <span className="text-white/40 text-[10px]">（{item.group}）</span>
                           </div>
-                          <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{item.sim}</div>
-                          <div className="text-white/70 text-[10px] leading-relaxed">{item.what_it_is}</div>
+                          <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{(item.sim * 100).toFixed(1)}%</div>
                           {similarityHistoryRestore?.[i]?.text && (
-                            <div className="mt-2 pt-2 border-t border-white/10">
-                              <div className="text-yellow-400/70 text-[10px] font-medium mb-1">历史重现：</div>
-                              <div className="text-white/60 text-[10px] leading-relaxed">{similarityHistoryRestore[i].text}</div>
+                            <div className="mt-2">
+                              <button
+                                onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
+                                className="text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
+                              >
+                                历史重现 {expandedHistory === i ? '▲' : '▼'}
+                              </button>
+                              {expandedHistory === i && (
+                                <div className="mt-1 pt-2 border-t border-white/10">
+                                  <div className="text-white/60 text-[10px] leading-relaxed">{similarityHistoryRestore[i].text}</div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
