@@ -161,11 +161,15 @@ function GlowingRadar({
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <linearGradient id="sweepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="rgba(0,255,100,0)" />
-          <stop offset="50%" stopColor="rgba(0,255,100,0.3)" />
+        <radialGradient id="radarSweep">
+          <stop offset="0%" stopColor="rgba(0,255,100,0.6)" />
           <stop offset="100%" stopColor="rgba(0,255,100,0)" />
-        </linearGradient>
+        </radialGradient>
+        <mask id="sweepMask">
+          <path d="M 150 150 L 150 30 A 120 120 0 0 1 220 80 Z" fill="url(#radarSweep)">
+            <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="3s" repeatCount="indefinite" />
+          </path>
+        </mask>
         <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="rgba(0,255,100,0.15)" />
           <stop offset="100%" stopColor="rgba(0,255,100,0.05)" />
@@ -209,10 +213,8 @@ function GlowingRadar({
         return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(120,120,140,0.4)" strokeWidth="2" />;
       })}
 
-      {/* 扫描线 */}
-      <line x1={cx} y1={cy} x2={cx + maxR} y2={cy} stroke="url(#sweepGradient)" strokeWidth="2" opacity="0.6">
-        <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="4s" repeatCount="indefinite" />
-      </line>
+      {/* 扫描效果 */}
+      <circle cx={cx} cy={cy} r={maxR} fill="rgba(0,255,100,0.15)" mask="url(#sweepMask)" />
 
       {/* 数据多边形 */}
       <polygon points={hexPoints(cx, cy, maxR, values)} fill="url(#dataFill)"
@@ -305,11 +307,6 @@ function GlowingRadar({
       {/* 中心地球 */}
       <g>
         <circle cx={cx} cy={cy} r="18" fill="url(#earthGradient)" stroke="rgba(100,150,200,0.4)" strokeWidth="1" />
-        {/* 简化的陆地 */}
-        <path d="M 150 135 Q 155 133 158 136 Q 160 140 157 143 Q 153 145 150 143 Z" fill="rgba(100,180,100,0.5)" />
-        <path d="M 142 138 Q 145 136 148 138 Q 149 142 146 144 Q 143 145 142 142 Z" fill="rgba(100,180,100,0.5)" />
-        <path d="M 150 148 Q 154 150 156 154 Q 155 158 151 159 Q 147 157 148 153 Z" fill="rgba(100,180,100,0.5)" />
-        <path d="M 140 150 Q 142 148 145 150 Q 146 153 143 155 Q 140 154 140 151 Z" fill="rgba(100,180,100,0.5)" />
         <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="8s" repeatCount="indefinite" />
       </g>
 
