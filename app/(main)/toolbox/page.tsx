@@ -259,11 +259,7 @@ export default function ToolboxPage() {
                     {/* 宏观结论 */}
                     {crossAsset.public.macro_one_liner && (
                       <div className="mt-4 text-center">
-                        <div className="flex items-center justify-center gap-2 text-xs text-white/50 mb-2">
-                          <span>宏观结论</span>
-                          <HelpButton indicatorKey="macro_summary" />
-                        </div>
-                        <div className="text-xs text-white/80 leading-relaxed">
+                        <div className="text-xs text-white/80 leading-relaxed" style={{transform: 'scale(1.1)', transformOrigin: 'center'}}>
                           {String(crossAsset.public.macro_one_liner)}
                         </div>
                       </div>
@@ -271,11 +267,10 @@ export default function ToolboxPage() {
                     </div>
                   </div>
 
-                  {/* 右侧：Pro全球资产仓位建议 */}
+                  {/* 右侧：仓位建议 */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
-                      <span>Pro全球资产仓位建议</span>
-                      <span className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
+                      <span>仓位建议</span>
                       <HelpButton indicatorKey="pro_position_recommendations" />
                     </div>
                     <ProGate lockedMessage="升级 Pro 查看仓位建议">
@@ -286,13 +281,7 @@ export default function ToolboxPage() {
                                     <th className="text-left py-2 text-white/50 font-normal w-8"></th>
                                     <th className="text-left py-2 text-white/50 font-normal">资产</th>
                                     <th className="text-left py-2 text-white/50 font-normal">状态</th>
-                                    <th className="text-left py-2 text-white/50 font-normal">说明</th>
-                                    <th className="text-left py-2 text-white/50 font-normal">
-                                      <span className="flex items-center gap-1">
-                                        Pro仓位建议
-                                        <span className="px-1 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
-                                      </span>
-                                    </th>
+                                    <th className="text-left py-2 text-white/50 font-normal">仓位建议</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -310,43 +299,39 @@ export default function ToolboxPage() {
                                       <>
                                         <tr key={i} className="border-b border-white/5 hover:bg-white/5">
                                           <td className="py-2">
-                                            <div className="flex items-center gap-1">
-                                              <div
-                                                className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
-                                                    ? "bg-green-400"
-                                                    : item.action === "NEUTRAL" || item.action === "HOLD"
-                                                      ? "bg-yellow-400"
-                                                      : "bg-red-400"
-                                                  }`}
-                                              />
-                                              {hasPro && (
-                                                <button
-                                                  onClick={() => setSelectedAsset(isExpanded ? null : item)}
-                                                  className="text-white/40 hover:text-white/80 transition-colors"
-                                                >
-                                                  <svg className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                  </svg>
-                                                </button>
-                                              )}
-                                            </div>
+                                            <div
+                                              className={`w-1.5 h-1.5 rounded-full ${item.action === "IN"
+                                                  ? "bg-green-400"
+                                                  : item.action === "NEUTRAL" || item.action === "HOLD"
+                                                    ? "bg-yellow-400"
+                                                    : "bg-red-400"
+                                                }`}
+                                            />
                                           </td>
                                           <td className="py-2 text-white/80">{String(item.label).replace(/\(BTC\+ETH\)/g, '')}</td>
                                           <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
-                                          <td className="py-2 text-white/40 text-[10px]">{item.one_liner || '-'}</td>
                                           <td className="py-2">
-                                            <ProGate lockedMessage="Pro">
-                                              <span className="text-white/80 font-mono">{positionCap || '-'}</span>
-                                            </ProGate>
+                                            {hasPro ? (
+                                              <button
+                                                onClick={() => setSelectedAsset(isExpanded ? null : item)}
+                                                className="flex items-center gap-1 text-white/40 hover:text-white/80 transition-colors"
+                                              >
+                                                <svg className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                                                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                              </button>
+                                            ) : (
+                                              <span className="text-white/40">-</span>
+                                            )}
                                           </td>
                                         </tr>
                                         {isExpanded && hasPro && (
                                           <tr key={`${i}-detail`}>
-                                            <td colSpan={5} className="py-3 px-4 bg-white/5">
+                                            <td colSpan={4} className="py-3 px-4 bg-white/5">
                                               <ProGate lockedMessage="升级 Pro 查看详细分析">
                                                 <div className="text-xs space-y-2">
                                                   <div className="flex items-center gap-2">
-                                                    <span className="text-cyan-400/70">仓位上限:</span>
+                                                    <span className="text-cyan-400/70">仓位建议:</span>
                                                     <span className="text-white/90 font-mono">{positionCap}</span>
                                                   </div>
                                                   <div className="text-white/60 leading-relaxed">
