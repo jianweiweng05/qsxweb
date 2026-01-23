@@ -1,5 +1,19 @@
 # QuantscopeX Development Log
 
+## 2026-01-23: 修复历史重现K线图路径映射
+
+### Bug Fix
+- 修复K线图无法正确加载的问题
+- 原实现使用数组索引生成文件名（如 `C1_2024_01_12.png`），但实际文件名与索引不对应
+- 新实现：导入 `/public/sim_charts/index.json` 作为日期到图片URL的映射表
+- 通过 `item.date` 查找对应的 `chart_url`，确保图片路径正确
+
+### Technical Details
+- 修改文件：`app/(main)/toolbox/page.tsx`
+- 新增导入：`import chartIndex from "@/public/sim_charts/index.json"`
+- 创建 Map 对象用于快速查找：`chartUrlMap.get(item.date)`
+- 当日期在映射表中不存在时，返回 null（不显示图片）
+
 ## 2026-01-23: 历史重现卡片增加静态K线图展示
 
 ### Feature Enhancement

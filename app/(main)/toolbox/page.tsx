@@ -3,7 +3,8 @@
 import { ProGate, isPro } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
 import { useReport } from "../report-provider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import chartIndex from "@/public/sim_charts/index.json";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
@@ -16,6 +17,11 @@ export default function ToolboxPage() {
   const similarityProSummary = payload?.similarity_pro_summary;
   const similarityHistoryRestore = payload?.similarity_history_restore;
   const crossAsset = payload?.cross_asset;
+
+  // Create a lookup map for chart URLs by date
+  const chartUrlMap = new Map(
+    chartIndex.map((item: any) => [item.date, item.chart_url])
+  );
 
   // Debug: Log what we're receiving
   if (typeof window !== 'undefined') {
@@ -392,8 +398,8 @@ export default function ToolboxPage() {
                             <div className="mt-2 pt-2 border-t border-white/10">
                               <div className="text-white/60 text-[10px] leading-relaxed mb-3">{similarityHistoryRestore[i].text}</div>
                               {(() => {
-                                const caseId = `C${i + 1}_${item.date.replace(/-/g, '_')}`;
-                                const chartPath = `/sim_charts/${caseId}.png`;
+                                const chartPath = chartUrlMap.get(item.date);
+                                if (!chartPath) return null;
                                 return (
                                   <div className="mt-3">
                                     <img
