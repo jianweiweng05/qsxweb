@@ -791,3 +791,59 @@ normalize → tier check → quota check → KB match → (if VIP/PRO + intent +
 - All 7 KB files (constitution, rules, terms, status, templates, page_guides, subscription) loaded successfully
 - No knowledge_faq.json references remain in source code
 
+## 2026-01-23: 离线批量生成历史相似度K线图工具
+
+### 目标
+新增离线批量工具，读取 data/similarity_cases.json，自动拉取 BTCUSDT 日K数据并生成静态PNG图表，输出到 qsx-web/public/sim_charts/，前端可直接引用。
+
+### 新增文件
+1. scripts/generate_sim_charts.py（237 行）- Python 脚本，调用 Binance 公共 API 生成 K 线图
+2. scripts/README.md（68 行）- 工具使用文档
+
+### 技术实现
+- 数据源：Binance 公共 API（https://api.binance.com/api/v3/klines）
+- 交易对：BTCUSDT，时间间隔：1d（日K）
+- 时间窗口：T0 前 30 天 + T0 后 180 天（固定 210 天窗口）
+- 图表尺寸：1200x650 像素（12x6.5 英寸 @ 100 DPI）
+- 图表样式：深色主题，绿涨红跌蜡烛图，橙色虚线标记 T0
+- 依赖库：requests（HTTP 请求）+ matplotlib（图表生成）
+- 错误处理：数据不足或 API 失败时跳过该 case，打印原因，继续处理其他 case
+
+### 输出产物
+- PNG 图表：qsx-web/public/sim_charts/<case_id>.png（32 个文件，约 1.7MB）
+- 索引清单：qsx-web/public/sim_charts/index.json（包含 id/date/symbol/chart_url）
+
+### 使用方法
+```bash
+# 从项目根目录运行
+python3 scripts/generate_sim_charts.py
+
+# 或直接执行
+./scripts/generate_sim_charts.py
+```
+
+### 验收结果
+- ✅ 单条命令生成全部 PNG 与 index.json
+- ✅ 成功生成 32 个 case 的 PNG 图表（100% 成功率）
+- ✅ 每张图包含：日K蜡烛、T0 竖线（橙色虚线）、标题含 case name + date
+- ✅ index.json 中 chart_url 为 `/sim_charts/<id>.png`
+- ✅ 数据不足时跳过并打印 id + 原因（本次运行无失败 case）
+
+### 文件统计
+- 功能文件：1 个（scripts/generate_sim_charts.py）
+- 文档文件：1 个（scripts/README.md）
+- 新增行数：305 行（237 + 68）
+- 输出文件：33 个（32 PNG + 1 index.json）
+
+### 为什么不能更少
+1. **必要的数据处理逻辑**：需要解析 JSON、计算日期范围、调用 API、解析响应（约 80 行）
+2. **图表绘制逻辑**：matplotlib 蜡烛图需要逐根绘制高低线和矩形、设置样式、格式化坐标轴（约 60 行）
+3. **错误处理与日志**：需要捕获 API 异常、数据不足、日期解析错误，并打印详细日志（约 40 行）
+4. **批量处理与索引生成**：需要遍历所有 case、收集结果、生成 index.json、打印统计摘要（约 30 行）
+5. **文档说明**：README 需要覆盖功能、依赖、使用方法、输出格式、前端集成示例（68 行）
+
+### 前端集成路径
+- 图表路径：`/sim_charts/<case_id>.png`（Next.js public 目录自动映射）
+- 索引文件：`/sim_charts/index.json`（可通过 fetch 或 import 读取）
+- 示例：`<img src="/sim_charts/A1_2020_03_12.png" alt="312 流动性枯竭" />`
+
