@@ -131,17 +131,52 @@ function isGreeting(s: string): boolean {
 }
 
 const MSG_GREETING = "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'RR25 是什么？'或'仓位规则'";
+const MSG_GREETING_EN = "Hello! I'm QuantscopeX AI assistant. I can answer: market status/position rules/indicator definitions/page features. Try asking: 'What is RR25?' or 'Position rules'";
+
+function detectLanguage(text: string): "zh" | "en" {
+  const chineseChars = text.match(/[\u4e00-\u9fa5]/g);
+  return chineseChars && chineseChars.length > text.length * 0.3 ? "zh" : "en";
+}
+
+async function translateText(text: string, targetLang: "zh" | "en"): Promise<string> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const baseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
+  if (!apiKey || text.length > 600) return text;
+
+  try {
+    const prompt = targetLang === "zh"
+      ? `Translate the following text to Chinese. Only output the translation, no explanations:\n\n${text}`
+      : `Translate the following text to English. Only output the translation, no explanations:\n\n${text}`;
+
+    const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3,
+      }),
+    });
+
+    if (!res.ok) return text;
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || text;
+  } catch {
+    return text;
+  }
+}
 const MSG_INVALID = "请输入有效的市场问题（2-200字）。";
+const MSG_INVALID_EN = "Please enter a valid market question (2-200 characters).";
 
 type ClassifyResult =
   | { type: "blocked"; reason: string; text: string; upgrade_hint?: boolean }
   | { type: "kb"; text: string; source_id: string }
   | { type: "llm"; is_high_value: boolean };
 
-function classifyQuery(q: string, tier: UserTier): ClassifyResult {
+function classifyQuery(q: string, tier: UserTier, lang: "zh" | "en"): ClassifyResult {
   const s = normalize(q);
-  if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: MSG_INVALID };
-  if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: MSG_GREETING };
+  if (isInvalid(s)) return { type: "blocked", reason: "invalid", text: lang === "en" ? MSG_INVALID_EN : MSG_INVALID };
+  if (isGreeting(s)) return { type: "blocked", reason: "greeting", text: lang === "en" ? MSG_GREETING_EN : MSG_GREETING };
 
   // 1. 裁决短路：裁决意图优先匹配 status KB
   if (isDecisionIntent(s)) {
@@ -212,12 +247,48 @@ const SYSTEM_PROMPT = `你是 QSX（L1–L6 Macro Weather System）的 AI 解读
 
 记住：少说一句，比多说一句更专业。`;
 
+const SYSTEM_PROMPT_EN = `You are the AI interpretation engine for QSX (L1–L6 Macro Weather System). Goal: Use the fewest words to explain the most critical risk information.
+
+【Core Principles】
+1) Be concise, no lengthy explanations
+2) If one sentence is enough, never use two
+3) Prioritize structured output, no free-form elaboration
+4) No teaching, no background, no storytelling
+5) No price predictions, no specific levels, no trading orders
+
+【Priority】
+- Response length priority > eloquence > completeness
+- Default response ≤120 words
+- No more than 4 lines unless necessary
+- Avoid filler phrases like "firstly/secondly/therefore/in conclusion"
+
+【Response Strategy】
+- Give conclusion + 1 sentence reason
+- Don't explain internal models or formulas
+Example structure:
+"Conclusion: {one-sentence conclusion}
+Reason: {one-sentence logic}"
+
+【Must Refuse】
+- Requests for price levels / buy/sell / stop-loss
+- Requests for price predictions
+- Requests for internal weights / formulas / code
+Standard reply: "The system does not provide specific trading instructions, only for risk management and position limit judgment."
+
+【Style】
+- Calm, restrained, professional
+- Like institutional risk reports, not advisors or influencers
+- No emotional comfort, no empathy for losses
+- No emojis
+
+Remember: Saying less is more professional than saying more.`;
+
 export async function POST(req: NextRequest) {
   const { message, language } = await req.json();
   const tier = getUserTier();
   const lang = language || "zh";
 
-  const result = classifyQuery(message || "", tier);
+  const result = classifyQuery(message || "", tier, lang);
 
   if (result.type === "blocked") {
     console.log(`[chat] path=blocked tier=${tier} reason=${result.reason}`);
@@ -226,7 +297,17 @@ export async function POST(req: NextRequest) {
 
   if (result.type === "kb") {
     console.log(`[chat] path=kb tier=${tier} source_id=${result.source_id}`);
-    return NextResponse.json({ type: "kb", text: result.text, source_id: result.source_id });
+
+    // Detect language mismatch and translate if needed (short responses only)
+    let responseText = result.text;
+    const detectedLang = detectLanguage(responseText);
+    if (detectedLang !== lang && responseText.length <= 600) {
+      const translated = await translateText(responseText, lang);
+      responseText = translated;
+      console.log(`[chat] translated kb response from ${detectedLang} to ${lang}`);
+    }
+
+    return NextResponse.json({ type: "kb", text: responseText, source_id: result.source_id });
   }
 
   // LLM
@@ -238,11 +319,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const systemPrompt = lang === "en"
-      ? SYSTEM_PROMPT.replace("你是 QSX 全市场风险引擎的 AI 助手", "You are the AI assistant for QSX Market Risk Engine")
-        .replace("不构成投资建议", "does not constitute investment advice")
-        .replace("AI 分析仅基于当前数据，不构成投资建议。", "AI analysis is based on current data only and does not constitute investment advice.")
-      : SYSTEM_PROMPT;
+    const systemPrompt = lang === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT;
+    const prefix = lang === "en" ? "🧠 [AI Deep Analysis]\n" : "🧠 [AI 深度推演]\n";
 
     const res = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
@@ -276,7 +354,7 @@ export async function POST(req: NextRequest) {
 
             let chunk = decoder.decode(value, { stream: true });
             if (isFirst) {
-              chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: "🧠 [AI 深度推演]\n" } }] })}\n\n${chunk}`;
+              chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: prefix } }] })}\n\n${chunk}`;
               isFirst = false;
             }
             controller.enqueue(encoder.encode(chunk));
