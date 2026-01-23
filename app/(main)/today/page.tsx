@@ -9,14 +9,15 @@ export default function TodayPage() {
   const { data: payload, isLoading } = useReport();
   const [expandComment, setExpandComment] = useState(false);
   const [expandAllocation, setExpandAllocation] = useState(false);
+  const [expandGamma, setExpandGamma] = useState(false);
 
   if (isLoading) {
     return (
       <div className="py-8 text-white">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-white/5 rounded w-32" />
-          <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-white/5 rounded" />)}
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => <div key={i} className="h-24 bg-white/5 rounded" />)}
           </div>
         </div>
       </div>
@@ -49,15 +50,49 @@ export default function TodayPage() {
           <span className="text-xs text-white/40">{generatedAt}</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
           <div className="p-6 rounded-xl bg-white/5 border border-white/10">
             <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
               <span>市场状态</span>
               <HelpButton indicatorKey="market_weather" />
             </div>
-            <div className="text-[22px] font-semibold text-white/90 leading-snug">
+            <div className="text-[22px] font-semibold text-white/90 leading-snug mb-3">
               {weatherTitle}
             </div>
+
+            {/* Collapsible Gamma section */}
+            <button
+              onClick={() => setExpandGamma(!expandGamma)}
+              className="flex items-center gap-1.5 text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors"
+            >
+              <span>{expandGamma ? "收起波动详情 ▲" : "查看波动详情 ▼"}</span>
+              <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                PRO
+              </span>
+            </button>
+
+            {/* Collapsible gamma details - PRO exclusive */}
+            {expandGamma && (
+              <ProGate
+                lockedMessage="升级 Pro 查看波动详情"
+                unlockConfig={{
+                  title: "波动状态监控",
+                  description: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
+                  features: ["Gamma 波动率实时监控", "市场情绪波动预警", "历史波动率对比分析"]
+                }}
+              >
+                <div className="pt-3 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[10px] text-white/50">
+                    <span>波动状态</span>
+                    <span className="text-[9px] text-white/30">(Gamma)</span>
+                    <HelpButton indicatorKey="gamma" />
+                  </div>
+                  <div className="text-base font-semibold text-white/90 leading-snug">
+                    {gammaTitle}
+                  </div>
+                </div>
+              </ProGate>
+            )}
           </div>
 
           <div className="p-6 rounded-xl bg-cyan-500/15 border border-cyan-500/30">
@@ -68,29 +103,6 @@ export default function TodayPage() {
             <div className="text-4xl font-bold text-cyan-400 tracking-tight">
               {riskCap != null ? `≤ ${riskCap}%` : "—"}
             </div>
-          </div>
-
-          <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-            <div className="flex items-center gap-1.5 text-xs text-white/40 mb-3">
-              <span>波动状态</span>
-              <span className="text-[9px] text-white/30">(Gamma)</span>
-              <HelpButton indicatorKey="gamma" />
-              <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                PRO
-              </span>
-            </div>
-            <ProGate
-              lockedMessage="升级 Pro 查看"
-              unlockConfig={{
-                title: "波动状态监控",
-                description: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
-                features: ["Gamma 波动率实时监控", "市场情绪波动预警", "历史波动率对比分析"]
-              }}
-            >
-              <div className="text-[22px] font-semibold text-white/90 leading-snug">
-                {gammaTitle}
-              </div>
-            </ProGate>
           </div>
 
           <div className="p-6 rounded-xl bg-white/5 border border-white/10">
