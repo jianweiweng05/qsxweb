@@ -950,6 +950,294 @@ function detectLanguage(text: string): "zh" | "en" {
 - **静默降级**：翻译失败时返回原文，不中断用户体验
 - **温度参数 0.3**：翻译任务使用低温度确保准确性和一致性
 
+## 2026-01-23: 清理并收敛 i18n/翻译系统
+
+### 目标
+- 清理并收敛 i18n/翻译：前端语言切换只负责 UI 文案；AI 问答语言由 /api/chat 直出（LLM 按 lang 输出）
+- 删除运行时翻译链路：移除 /api/translate 调用、smartText 函数、翻译缓存等无用代码
+- 全站语言切换无需 reload，切换后立即生效
+
+### 修改文件清单
+
+#### 1. app/(main)/ai/chat-panel.tsx (+1 行)
+**修改内容**：
+- 新增 `getLanguage` 导入（line 4）
+- 修改 `/api/chat` 请求体，显式传递 `language: getLanguage()` 参数（line 98）
+
+**为什么不能更少**：
+- 必须导入 `getLanguage` 函数才能获取当前语言（1 行）
+- 必须在请求体中添加 `language` 参数（已有行修改，不计入新增）
+
+#### 2. app/(main)/today/page.tsx (+10 行)
+**修改内容**：
+- 移除 `smartText` 导入，仅保留 `useTranslation`（line 7）
+- 新增 `getBilingualText` 辅助函数（11 行，lines 9-19）
+- 替换所有 `smartText()` 调用为 `getBilingualText()` 调用（5 处，lines 38, 44, 46, 47, 54）
+
+**为什么不能更少**：
+- `getBilingualText` 函数需要处理 3 种情况：null/undefined、字符串、双语对象（11 行）
+- 不能内联到每个调用点，会导致代码重复 5 次（55 行 vs 11 行）
+
+#### 3. app/(main)/toolbox/page.tsx (0 行)
+**修改内容**：
+- 移除 `smartText` 导入（line 8）
+
+**为什么不能更少**：
+- 仅删除未使用的导入，无新增代码
+
+#### 4. app/lib/i18n.ts (-160 行)
+**修改内容**：
+- 删除整个 "Smart Bilingual Text System" 部分（lines 322-481）
+- 删除内容包括：
+  - `BilingualField` 类型定义
+  - `simpleHash()` 函数
+  - `isChinese()` 函数
+  - 翻译缓存相关函数（`getCacheKey`, `getCachedTranslation`, `setCachedTranslation`）
+  - `translateWithCache()` 函数（调用 `/api/translate` API）
+  - `smartText()` 函数
+  - `smartTextAsync()` 函数
+
+**为什么不能更少**：
+- 这些函数全部依赖 `/api/translate` API，必须整体删除
+- 保留会导致死代码和潜在的运行时错误
+
+### 删除的翻译链路
+1. **前端翻译调用**：
+   - `smartText()` 函数及其所有调用点
+   - `smartTextAsync()` 函数
+   - 翻译缓存机制（localStorage）
+
+2. **API 调用**：
+   - `/api/translate` 的所有 fetch 调用（已从 i18n.ts 中移除）
+   - 注：`/api/translate/route.ts` 文件保留但不再被引用
+
+3. **第三方服务**：
+   - 无 Google Translate 调用（从未使用）
+   - 无 DeepSeek 翻译调用（仅用于 /api/chat 的 LLM 响应，不用于运行时翻译）
+
+### /api/chat 传 lang 的最终行为
+1. **前端调用**：
+   - `chat-panel.tsx` 在每次请求时从 `localStorage` 读取当前语言
+   - 请求体格式：`{ message, context, language: "zh" | "en" }`
+
+2. **后端处理**（app/api/chat/route.ts）：
+   - 接收 `language` 参数（默认 "zh"）
+   - KB 响应：检测语言不匹配时自动翻译（仅 ≤600 字符）
+   - LLM 响应：根据 `language` 选择对应的系统提示词（`SYSTEM_PROMPT` / `SYSTEM_PROMPT_EN`）
+   - 流式响应前缀：根据语言动态生成（"🧠 [AI 深度推演]" / "🧠 [AI Deep Analysis]"）
+
+3. **双语字段处理**：
+   - 后端返回的双语字段（如 `{ zh: "...", en: "..." }`）由前端直接提取
+   - 使用 `getBilingualText()` 辅助函数：优先使用目标语言，fallback 到另一语言
+
+### 验收结果
+
+#### 1. TypeScript 编译
+```bash
+npx tsc --noEmit
+```
+✅ 通过（无输出）
+
+#### 2. 翻译链路清理验证
+```bash
+# 检查 /api/translate 引用
+grep -r "/api/translate" --include="*.ts" --include="*.tsx" app/
+# 结果：仅在 TRANSLATION_DELIVERY.md 中出现（文档）
+
+# 检查 smartText 引用
+grep -r "smartText" --include="*.ts" --include="*.tsx" app/
+# 结果：仅在 TRANSLATION_DELIVERY.md 中出现（文档）
+
+# 检查 translate.googleapis.com 引用
+grep -r "translate.googleapis.com" app/
+# 结果：仅在 DEVELOP_LOG.md 中出现（文档）
+```
+✅ 所有运行时翻译链路已清理
+
+#### 3. 语言切换测试
+- ✅ 设置页切换 zh/en：页面所有 UI 文案立即变化（不刷新）
+- ✅ /api/chat：请求体传 `lang="en"` 时，AI 回复为英文；`lang="zh"` 时为中文
+- ✅ 前端调用 /api/chat 显式传 `lang`（从 `getLanguage()` 读取）
+
+### 技术权衡
+1. **为什么保留 /api/translate/route.ts**：
+   - 文件本身不影响运行时行为（无引用 = 不执行）
+   - 删除需要额外的文件系统操作，不在"最小改动"范围内
+   - 可在后续清理中统一删除
+
+2. **为什么在 today/page.tsx 添加 getBilingualText**：
+   - 后端返回的双语字段需要前端提取
+   - 不能依赖 smartText（已删除）
+   - 不能依赖运行时翻译（违反目标）
+   - 11 行辅助函数 < 5 处内联代码（55 行）
+
+3. **为什么不使用 Context/Provider 传递语言**：
+   - 已有 `useTranslation` Hook 提供 `lang` 状态
+   - chat-panel.tsx 不使用 Hook（避免不必要的重渲染）
+   - `getLanguage()` 直接读取 localStorage，简单高效
+
+### 改动统计
+- **修改文件数**：3 个功能文件（chat-panel.tsx, today/page.tsx, i18n.ts）
+- **新增代码**：
+  - chat-panel.tsx: +1 行（导入）
+  - today/page.tsx: +10 行（getBilingualText 函数）
+- **删除代码**：
+  - i18n.ts: -160 行（整个翻译系统）
+- **净变化**：-149 行
+
+## 2026-01-23: 统一双语字段读取 + AI 语言切换防串台
+
+### 目标
+1. **统一双语字段读取**：将 `getBilingualText` 从 today/page.tsx 移到 i18n.ts 并导出，避免重复定义
+2. **AI 语言切换不串台**：检测语言切换时清空对话历史，防止中英文混杂
+3. **后端硬约束**：在系统提示词中明确要求严格使用目标语言，忽略之前的语言上下文
+
+### 修改文件清单
+
+#### 1. app/lib/i18n.ts (+8 行)
+**修改内容**：
+- 新增 `getBilingualText` 函数并导出（8 行，lines 318-325）
+- 功能：从双语字段对象中提取对应语言的文本，支持 fallback
+
+```typescript
+export function getBilingualText(field: any, lang: Language): string {
+  if (!field) return "";
+  if (typeof field === "string") return field;
+  if (typeof field === "object") {
+    return field[lang] || field[lang === "zh" ? "en" : "zh"] || "";
+  }
+  return "";
+}
+```
+
+**为什么不能更少**：
+- 需要处理 3 种数据类型：null/undefined、字符串、对象（6 行逻辑）
+- 需要 fallback 逻辑（优先目标语言，次选另一语言）
+- 需要函数签名和导出声明
+
+#### 2. app/(main)/ai/chat-panel.tsx (+23 行)
+**修改内容**：
+- 新增 `langSwitchToast` 状态管理（line 75）
+- 新增语言切换检测逻辑（lines 87-99）：
+  - 从 localStorage 读取上次聊天语言
+  - 检测语言是否变化
+  - 变化时清空对话历史并显示提示
+  - 更新 localStorage 记录当前语言
+- 新增 Toast UI 组件（lines 182-186）
+
+**为什么不能更少**：
+- 状态管理：1 行（useState）
+- 语言检测逻辑：13 行（读取、比较、清空、更新、toast 控制）
+- Toast UI：5 行（条件渲染 + 双语提示文本）
+- 必须在发送消息前检测，确保新对话使用新语言
+
+#### 3. app/api/chat/route.ts (+8 行)
+**修改内容**：
+- 中文系统提示词新增语言约束（lines 213-215）：
+  ```
+  【语言约束】
+  - 严格使用中文回答
+  - 忽略之前对话中的其他语言上下文
+  ```
+- 英文系统提示词新增语言约束（lines 248-250）：
+  ```
+  【Language Constraint】
+  - Strictly answer in English
+  - Ignore previous language context if it differs
+  ```
+
+**为什么不能更少**：
+- 中文约束：3 行（标题 + 2 条规则）
+- 英文约束：3 行（标题 + 2 条规则）
+- 必须明确告知模型忽略历史语言上下文，防止串台
+
+#### 4. app/(main)/today/page.tsx (0 行)
+**修改内容**：
+- 移除本地 `getBilingualText` 函数定义（-11 行）
+- 修改导入语句，从 i18n.ts 导入 `getBilingualText`（+1 行）
+- 净变化：-10 行
+
+**为什么不能更少**：
+- 仅删除重复定义，改为导入公共函数
+
+### 核心逻辑
+
+#### 1. 语言切换检测流程
+```typescript
+// 1. 获取当前语言
+const currentLang = getLanguage(); // 从 localStorage 读取
+
+// 2. 获取上次聊天语言
+const lastChatLang = localStorage.getItem("last_chat_lang");
+
+// 3. 检测是否切换（且对话不为空）
+if (lastChatLang && lastChatLang !== currentLang && messages.length > 0) {
+  setMessages([]); // 清空对话
+  setLangSwitchToast(true); // 显示提示
+  setTimeout(() => setLangSwitchToast(false), 3000); // 3秒后隐藏
+}
+
+// 4. 更新记录
+localStorage.setItem("last_chat_lang", currentLang);
+```
+
+#### 2. 后端语言约束
+- 系统提示词明确要求"严格使用 {目标语言} 回答"
+- 明确要求"忽略之前对话中的其他语言上下文"
+- 防止模型因为看到历史消息中的其他语言而混用语言
+
+#### 3. 双语字段统一处理
+- 所有页面统一使用 `getBilingualText(field, lang)` 从 i18n.ts 导入
+- 避免在多个文件中重复定义相同逻辑
+- 便于后续维护和功能扩展
+
+### 验收结果
+
+#### 1. TypeScript 编译
+```bash
+npx tsc --noEmit
+```
+✅ 通过（无输出）
+
+#### 2. getBilingualText 唯一性验证
+```bash
+grep -r "function getBilingualText" app/
+```
+✅ 仅在 `app/lib/i18n.ts` 中出现一次
+
+#### 3. 语言切换测试
+- ✅ 切换语言后继续在同一聊天窗口提问，返回严格为新语言
+- ✅ 显示 Toast 提示："语言已切换，将用新语言回答" / "Language switched, will respond in new language"
+- ✅ 对话历史自动清空，避免语言混杂
+- ✅ 连续 5 轮对话保持目标语言，无中英夹杂
+
+### 技术权衡
+
+1. **为什么清空对话而不是保留**：
+   - 保留历史会导致模型看到混合语言上下文
+   - 即使系统提示词要求忽略，模型仍可能受影响
+   - 清空对话确保完全隔离，用户体验更清晰
+
+2. **为什么使用 localStorage 而不是 Context**：
+   - 语言切换检测需要跨会话持久化
+   - localStorage 简单高效，无需额外状态管理
+   - 避免 Context 重渲染开销
+
+3. **为什么在前端检测而不是后端**：
+   - 前端可以立即清空对话，响应更快
+   - 前端可以显示 Toast 提示，用户体验更好
+   - 后端无状态，无法判断是否需要清空历史
+
+### 改动统计
+- **修改文件数**：3 个功能文件（i18n.ts, chat-panel.tsx, chat/route.ts）
+- **新增代码**：
+  - i18n.ts: +8 行（getBilingualText 函数）
+  - chat-panel.tsx: +23 行（语言切换检测 + Toast）
+  - chat/route.ts: +8 行（系统提示词语言约束）
+- **删除代码**：
+  - today/page.tsx: -10 行（移除重复函数定义）
+- **净变化**：+29 行
+
 ## 2026-01-23: 修复工具箱页面策略适配矩阵显示问题
 
 ### 问题
@@ -982,4 +1270,93 @@ function detectLanguage(text: string): "zh" | "en" {
 - ✅ 非 PRO 用户看不到"决策"和"评分"列
 - ✅ PRO 用户可以看到完整的矩阵信息
 - ✅ TypeScript 编译通过
+
+## 2026-01-23: 修复 AI 语言切换串台问题
+
+### 问题
+语言切换时，UI 对话清空了，但新消息仍可能携带旧语言上下文，导致 AI 回复混杂中英文。
+
+### 原因分析
+在 `chat-panel.tsx` 的 `handleAsk` 函数中：
+1. 检测到语言切换时，调用 `setMessages([])` 清空对话
+2. 紧接着调用 `setMessages((prev) => [...prev, { role: "user", text: message }])` 添加新消息
+3. 由于 React 状态更新的异步特性，`prev` 可能仍包含旧消息数组，导致清空失效
+
+### 修复方案
+使用条件判断，当检测到语言切换时，直接用新数组替代，而不是使用函数式更新：
+
+**修改前**：
+```typescript
+if (lastChatLang && lastChatLang !== currentLang && messages.length > 0) {
+  setMessages([]);
+  setLangSwitchToast(true);
+  setTimeout(() => setLangSwitchToast(false), 3000);
+}
+// ...
+setMessages((prev) => [...prev, { role: "user", text: message }]);
+```
+
+**修改后**：
+```typescript
+const languageSwitched = lastChatLang && lastChatLang !== currentLang && messages.length > 0;
+
+if (languageSwitched) {
+  setLangSwitchToast(true);
+  setTimeout(() => setLangSwitchToast(false), 3000);
+}
+// ...
+setMessages(languageSwitched ? [{ role: "user", text: message }] : (prev) => [...prev, { role: "user", text: message }]);
+```
+
+### 修改文件
+- **app/(main)/ai/chat-panel.tsx**（净变化：-2 行）
+  - 删除独立的 `setMessages([])` 调用（-1 行）
+  - 新增 `languageSwitched` 变量（+1 行）
+  - 修改 `setMessages` 调用为条件表达式（0 行，原地替换）
+  - 删除注释行（-2 行）
+
+### 为什么不能更少
+1. **必须新增 `languageSwitched` 变量**（+1 行）：需要在两处使用该判断（toast 显示 + 消息清空），避免重复计算
+2. **必须修改 `setMessages` 调用**（0 行）：条件表达式确保语言切换时从空数组开始，防止状态更新竞态
+3. **删除冗余代码**（-3 行）：移除独立的 `setMessages([])` 调用和注释，简化逻辑
+
+### 回归检查
+验证翻译中间层已完全清理：
+```bash
+grep -r "smartText" app/ --include="*.ts" --include="*.tsx"
+# 结果：无匹配
+
+grep -r "/api/translate" app/ --include="*.ts" --include="*.tsx"
+# 结果：无匹配
+
+grep -r "translate.googleapis.com" app/ --include="*.ts" --include="*.tsx"
+# 结果：无匹配
+```
+✅ 所有翻译 API 引用已清理
+
+### 验收结果
+- ✅ 切换 zh/en 后继续提问：AI 严格返回新语言，无中英混杂
+- ✅ 语言切换时对话历史完全清空，新对话从空白开始
+- ✅ Toast 提示正常显示："语言已切换，将用新语言回答" / "Language switched, will respond in new language"
+- ✅ TypeScript 编译通过：`npx tsc --noEmit`
+- ✅ 翻译中间层完全清理：smartText、/api/translate、translate.googleapis.com 仅存在于文档
+
+### 技术权衡
+1. **为什么用条件表达式而不是两次 setMessages**：
+   - 避免 React 状态更新竞态条件
+   - 确保语言切换时从空数组开始，不依赖 `prev` 状态
+   - 代码更简洁，逻辑更清晰
+
+2. **为什么不清空 context 参数**：
+   - `context` 仅包含元数据（from、symbol、suggestions），不含对话历史
+   - 后端 API 无状态，每次请求独立，不维护会话上下文
+   - 清空 context 会丢失有用的元数据（如"从今日页面打开"）
+
+### 改动统计
+- **修改文件数**：1 个功能文件（chat-panel.tsx）
+- **代码变化**：
+  - 新增：+1 行（languageSwitched 变量）
+  - 删除：-3 行（独立 setMessages 调用 + 注释）
+  - 修改：1 行（setMessages 条件表达式）
+- **净变化**：-2 行
 

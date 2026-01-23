@@ -5,7 +5,7 @@ import { HelpButton } from "./help-modal";
 import { useReport } from "../report-provider";
 import { useState, useEffect } from "react";
 import chartIndex from "@/public/sim_charts/index.json";
-import { useTranslation, smartText } from "@/app/lib/i18n";
+import { useTranslation } from "@/app/lib/i18n";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();

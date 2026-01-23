@@ -4,7 +4,7 @@ import { useState } from "react";
 import { VIPGate, ProGate } from "@/app/lib/gate";
 import { HelpButton } from "../toolbox/help-modal";
 import { useReport } from "../report-provider";
-import { useTranslation, smartText } from "@/app/lib/i18n";
+import { useTranslation, getBilingualText } from "@/app/lib/i18n";
 
 export default function TodayPage() {
   const { data: payload, isLoading } = useReport();
@@ -26,23 +26,23 @@ export default function TodayPage() {
     );
   }
 
-  const weatherTitle = smartText(payload?.weather?.title, lang) || t.noData;
+  const weatherTitle = getBilingualText(payload?.weather?.title, lang) || t.noData;
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : t.noData;
   const riskCap =
     payload?.risk_cap != null ? Math.round(payload.risk_cap * 100 * 10) / 10 : null;
-  const gammaTitle = smartText(payload?.gamma?.title, lang) || t.noData;
+  const gammaTitle = getBilingualText(payload?.gamma?.title, lang) || t.noData;
 
-  const oneLiner = smartText(payload?.ai_json?.one_liner, lang) || t.noData;
-  const marketComment = smartText(payload?.ai_json?.market_comment, lang, { skipAutoTranslate: true }) || t.noData;
+  const oneLiner = getBilingualText(payload?.ai_json?.one_liner, lang) || t.noData;
+  const marketComment = getBilingualText(payload?.ai_json?.market_comment, lang) || t.noData;
   const bearish = payload?.ai_json?.collision?.bearish_2 || [];
   const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
   const cryptoAllocation = payload?.crypto_risk_allocation;
   const allocationWeights = cryptoAllocation?.weights;
   const allocationLocks = cryptoAllocation?.locks;
-  const allocationOneLiner = smartText(cryptoAllocation?.one_liner, lang);
+  const allocationOneLiner = getBilingualText(cryptoAllocation?.one_liner, lang);
 
   return (
     <div className="text-white pb-28">

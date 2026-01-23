@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { UnlockTrigger } from "@/app/lib/unlock-modal";
+import { getLanguage } from "@/app/lib/i18n";
 
 function DecisionCard({ text }: { text: string }) {
   const lines = text.split("\n").filter(Boolean);
@@ -72,6 +73,7 @@ export function ChatPanel({
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [upgradeHint, setUpgradeHint] = useState(false);
+  const [langSwitchToast, setLangSwitchToast] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,10 +86,24 @@ export function ChatPanel({
     const message = msg || input;
     if (!message.trim()) return;
 
+    const currentLang = getLanguage();
+    const lastChatLang = typeof window !== "undefined" ? localStorage.getItem("last_chat_lang") : null;
+
+    const languageSwitched = lastChatLang && lastChatLang !== currentLang && messages.length > 0;
+
+    if (languageSwitched) {
+      setLangSwitchToast(true);
+      setTimeout(() => setLangSwitchToast(false), 3000);
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("last_chat_lang", currentLang);
+    }
+
     abortRef.current?.abort();
     abortRef.current = new AbortController();
 
-    setMessages((prev) => [...prev, { role: "user", text: message }]);
+    setMessages(languageSwitched ? [{ role: "user", text: message }] : (prev) => [...prev, { role: "user", text: message }]);
     setInput("");
     setUpgradeHint(false);
 
@@ -95,7 +111,7 @@ export function ChatPanel({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, context }),
+        body: JSON.stringify({ message, context, language: getLanguage() }),
         signal: abortRef.current.signal,
       });
 
@@ -160,6 +176,11 @@ export function ChatPanel({
 
   return (
     <div className="flex flex-col h-full">
+      {langSwitchToast && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs">
+          {getLanguage() === "zh" ? "语言已切换，将用新语言回答" : "Language switched, will respond in new language"}
+        </div>
+      )}
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
         <div className="w-7 h-7 rounded bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-400 text-sm font-bold">
           Q
