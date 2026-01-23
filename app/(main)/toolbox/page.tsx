@@ -571,11 +571,9 @@ export default function ToolboxPage() {
 
                     {/* 底部汇总信息 */}
                     {(() => {
-                      const evidencePanels = payload?.pro_evidence_panels;
                       const summary = strategyMatrix.summary;
-                      const hasEvidence = evidencePanels && Object.keys(evidencePanels).length > 0;
 
-                      if (!summary && !hasEvidence) return null;
+                      if (!summary) return null;
 
                       return (
                         <div className="mt-4 pt-3 border-t border-white/10 space-y-3">
@@ -605,47 +603,6 @@ export default function ToolboxPage() {
                                     </span>
                                   )}
                                 </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {hasEvidence && (
-                            <div>
-                              <div className="text-xs text-white/50 mb-2">Pro 证据面板</div>
-                              <div className="grid gap-2">
-                                {Object.entries(evidencePanels).map(([key, panel]: [string, any]) => {
-                                  const statusColors: Record<string, string> = {
-                                    'RISK_ON': 'text-green-400',
-                                    'RISK_OFF': 'text-red-400',
-                                    'CONFLICT': 'text-yellow-400',
-                                    'HIGH_RISK': 'text-red-400',
-                                    'NEUTRAL': 'text-gray-400'
-                                  };
-                                  const statusColor = statusColors[panel.status] || 'text-white/60';
-
-                                  return (
-                                    <div key={key} className="p-2 rounded bg-white/5 border border-white/10">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-white/70 text-[10px] font-medium">
-                                          {key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                                        </span>
-                                        <span className={`${statusColor} text-[10px] font-semibold`}>
-                                          {panel.status}
-                                        </span>
-                                      </div>
-                                      <div className="text-white/60 text-[10px] leading-relaxed mb-1">
-                                        {panel.conclusion}
-                                      </div>
-                                      {panel.evidences && Array.isArray(panel.evidences) && panel.evidences.length > 0 && (
-                                        <ul className="text-white/50 text-[10px] space-y-0.5 ml-3">
-                                          {panel.evidences.map((evidence: string, i: number) => (
-                                            <li key={i} className="list-disc">{evidence}</li>
-                                          ))}
-                                        </ul>
-                                      )}
-                                    </div>
-                                  );
-                                })}
                               </div>
                             </div>
                           )}
