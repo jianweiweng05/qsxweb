@@ -479,7 +479,6 @@ export default function ToolboxPage() {
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">Calmar范围</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -524,13 +523,7 @@ export default function ToolboxPage() {
                                             style={{ width: `${scorePercent}%` }}
                                           />
                                         </div>
-                                        <span className="text-white/70 text-[10px] font-mono font-semibold">
-                                          {score}
-                                        </span>
                                       </div>
-                                    </td>
-                                    <td className="py-2.5 px-2">
-                                      <span className="text-white/60 text-[10px] font-mono">{row.calmar_range}</span>
                                     </td>
                                   </tr>
                                 );
