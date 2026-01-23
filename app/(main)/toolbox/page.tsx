@@ -415,7 +415,7 @@ export default function ToolboxPage() {
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
               <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
-                {strategyMatrix?.version === "matrix_v3_scored" ? (
+                {strategyMatrix && (strategyMatrix.version === "matrix_v3_scored" || strategyMatrix.rows) ? (
                   <div className="space-y-3">
                     {/* 策略分布统计 */}
                     {strategyMatrix.summary && typeof strategyMatrix.summary === 'object' && (

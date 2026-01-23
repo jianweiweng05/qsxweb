@@ -847,3 +847,36 @@ python3 scripts/generate_sim_charts.py
 - 索引文件：`/sim_charts/index.json`（可通过 fetch 或 import 读取）
 - 示例：`<img src="/sim_charts/A1_2020_03_12.png" alt="312 流动性枯竭" />`
 
+## 2026-01-23: 修复工具箱页面策略适配矩阵显示问题
+
+### 问题
+策略适配矩阵面板显示"暂无策略适配矩阵数据"，但后端 API 实际返回了数据。
+
+### 原因分析
+代码中使用了严格的版本检查 `strategyMatrix?.version === "matrix_v3_scored"`，导致当后端返回的数据版本字段不匹配或缺失时，即使有有效的 `rows` 数据也无法显示。
+
+### 修复方案
+1. **放宽版本检查条件**：从严格匹配改为灵活检查
+   - 原条件：`strategyMatrix?.version === "matrix_v3_scored"`
+   - 新条件：`strategyMatrix && (strategyMatrix.version === "matrix_v3_scored" || strategyMatrix.rows)`
+   - 逻辑：只要有 `rows` 数组就显示，不强制要求特定版本号
+
+2. **保持 PRO 权限控制**：
+   - "决策"（Decision）列：仅 PRO 用户可见（line 484）
+   - "评分"（Score）列：仅 PRO 用户可见（line 485）
+   - 非 PRO 用户只能看到：指示灯、策略名称、类型
+
+### 修改文件
+- app/(main)/toolbox/page.tsx（1 处修改，line 418）
+
+### 技术细节
+- 使用 `isProUser` 变量控制列的条件渲染
+- 表头和表体都使用相同的条件判断确保一致性
+- 保留了完整的数据结构支持（summary、rows、light、decision、score）
+
+### 验收标准
+- ✅ 策略适配矩阵正常显示数据
+- ✅ 非 PRO 用户看不到"决策"和"评分"列
+- ✅ PRO 用户可以看到完整的矩阵信息
+- ✅ TypeScript 编译通过
+
