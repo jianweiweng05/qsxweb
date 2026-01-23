@@ -47,6 +47,11 @@ export const translations = {
     cancel: "取消",
     confirm: "确认",
     unknown: "未知",
+    noData: "暂无数据",
+    expand: "展开",
+    collapse: "收起",
+    viewDetails: "查看详情",
+    hideDetails: "收起详情",
 
     // Features
     aiMarketAnalysis: "AI 市场解读",
@@ -64,6 +69,79 @@ export const translations = {
     alertFeature1: "多层级风险监控",
     alertFeature2: "历史报警回溯分析",
     alertFeature3: "关键指标异常提醒",
+
+    // Today page
+    todayOverview: "今日概览",
+    marketStatus: "市场状态",
+    recommendedPosition: "建议仓位",
+    riskAllocation: "风险配置建议",
+    aiAnalysis: "机构分析师观点",
+    bearishSignals: "空方信号",
+    bullishSignals: "多方信号",
+    volatilityStatus: "波动状态",
+    viewVolatilityDetails: "查看波动详情",
+    hideVolatilityDetails: "收起波动详情",
+    viewAllocationDetails: "查看配置详情",
+    hideAllocationDetails: "收起配置详情",
+    upgradeProForVolatility: "升级 Pro 查看波动详情",
+    upgradeProForAllocation: "升级 Pro 查看",
+    upgradeProForDetails: "升级 Pro 查看配置详情",
+    volatilityMonitoringTitle: "波动状态监控",
+    volatilityMonitoringDesc: "实时追踪市场波动率变化，帮助您把握市场节奏，优化进出场时机。",
+    volatilityFeature1: "Gamma 波动率实时监控",
+    volatilityFeature2: "市场情绪波动预警",
+    volatilityFeature3: "历史波动率对比分析",
+    riskAllocationTitle: "风险配置建议",
+    riskAllocationDesc: "基于市场结构风险分析，为您提供 BTC、ETH 和山寨币的动态配置建议。",
+    riskAllocationFeature1: "实时资产配置权重",
+    riskAllocationFeature2: "风险传导分析",
+    riskAllocationFeature3: "流动性闸门监控",
+    allocationDetailsTitle: "配置详情",
+    allocationDetailsDesc: "查看 BTC、ETH 和山寨币的具体配置权重。",
+    aiMarketAnalysisTitle: "AI 市场解读",
+    aiMarketAnalysisDesc: "基于多维度数据分析，为您提供专业的市场解读和投资建议。",
+    aiMarketFeature1: "每日市场核心观点总结",
+    aiMarketFeature2: "多空信号智能识别",
+    aiMarketFeature3: "关键风险点提示",
+    vipRequired: "AI 解读需要 VIP 订阅",
+    vipVisible: "VIP 可见",
+    riskWarning: "风险提示",
+
+    // Toolbox page
+    toolbox: "工具箱",
+    globalRiskMonitor: "全球资产风险监控仪",
+    globalRiskAllocation: "全球资产风险配置建议",
+    status: "状态",
+    asset: "资产",
+    action: "状态",
+    positionAdvice: "仓位建议",
+    historicalSimilarity: "历史相似度",
+    strategyMatrix: "策略适配矩阵",
+    similarScenes: "相似场景",
+    proAnalysis: "Pro 结构解读",
+    similarity: "相似度",
+    historyReplay: "历史重现",
+    noChartData: "暂无K线图",
+    noSimilarityData: "暂无历史相似性数据",
+    noMatrixData: "暂无矩阵数据",
+    noStrategyData: "暂无策略适配矩阵数据",
+    upgradeProForSimilarity: "升级 Pro 查看完整分析",
+    upgradeProForMatrix: "升级 Pro 查看策略适配矩阵",
+    upgradeProForPosition: "升级 Pro 查看仓位建议",
+    upgradeProForDetails: "升级 Pro 查看详细分析",
+    strategyName: "策略名称",
+    strategyType: "类型",
+    decision: "决策",
+    score: "评分",
+    recommended: "推荐",
+    optional: "可选",
+    avoid: "规避",
+    recommendedCount: "推荐",
+    optionalCount: "可选",
+    avoidCount: "规避",
+    items: "个",
+    macroConclusion: "宏观结论",
+    noDetailedDescription: "暂无详细说明",
 
     // Risk disclaimer
     riskDisclaimer: "本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。",
@@ -112,6 +190,11 @@ export const translations = {
     cancel: "Cancel",
     confirm: "Confirm",
     unknown: "Unknown",
+    noData: "No data",
+    expand: "Expand",
+    collapse: "Collapse",
+    viewDetails: "View details",
+    hideDetails: "Hide details",
 
     // Features
     aiMarketAnalysis: "AI Market Analysis",
@@ -129,6 +212,79 @@ export const translations = {
     alertFeature1: "Multi-level risk monitoring",
     alertFeature2: "Historical alert analysis",
     alertFeature3: "Key indicator alerts",
+
+    // Today page
+    todayOverview: "Today's Overview",
+    marketStatus: "Market Status",
+    recommendedPosition: "Recommended Position",
+    riskAllocation: "Risk Allocation",
+    aiAnalysis: "Analyst Insights",
+    bearishSignals: "Bearish Signals",
+    bullishSignals: "Bullish Signals",
+    volatilityStatus: "Volatility Status",
+    viewVolatilityDetails: "View volatility details",
+    hideVolatilityDetails: "Hide volatility details",
+    viewAllocationDetails: "View allocation details",
+    hideAllocationDetails: "Hide allocation details",
+    upgradeProForVolatility: "Upgrade to Pro for volatility details",
+    upgradeProForAllocation: "Upgrade to Pro",
+    upgradeProForDetails: "Upgrade to Pro for allocation details",
+    volatilityMonitoringTitle: "Volatility Monitoring",
+    volatilityMonitoringDesc: "Real-time tracking of market volatility changes to help you optimize entry and exit timing.",
+    volatilityFeature1: "Real-time Gamma volatility monitoring",
+    volatilityFeature2: "Market sentiment volatility alerts",
+    volatilityFeature3: "Historical volatility comparison",
+    riskAllocationTitle: "Risk Allocation Advice",
+    riskAllocationDesc: "Dynamic allocation recommendations for BTC, ETH, and altcoins based on market structure risk analysis.",
+    riskAllocationFeature1: "Real-time asset allocation weights",
+    riskAllocationFeature2: "Risk contagion analysis",
+    riskAllocationFeature3: "Liquidity gate monitoring",
+    allocationDetailsTitle: "Allocation Details",
+    allocationDetailsDesc: "View specific allocation weights for BTC, ETH, and altcoins.",
+    aiMarketAnalysisTitle: "AI Market Analysis",
+    aiMarketAnalysisDesc: "Professional market insights and investment advice based on multi-dimensional data analysis.",
+    aiMarketFeature1: "Daily market core insights",
+    aiMarketFeature2: "Intelligent long/short signal identification",
+    aiMarketFeature3: "Key risk point alerts",
+    vipRequired: "VIP subscription required for AI analysis",
+    vipVisible: "VIP only",
+    riskWarning: "Risk Warning",
+
+    // Toolbox page
+    toolbox: "Toolbox",
+    globalRiskMonitor: "Global Asset Risk Monitor",
+    globalRiskAllocation: "Global Asset Risk Allocation",
+    status: "Status",
+    asset: "Asset",
+    action: "Action",
+    positionAdvice: "Position Advice",
+    historicalSimilarity: "Historical Similarity",
+    strategyMatrix: "Strategy Matrix",
+    similarScenes: "Similar Scenarios",
+    proAnalysis: "Pro Analysis",
+    similarity: "Similarity",
+    historyReplay: "History Replay",
+    noChartData: "No chart data",
+    noSimilarityData: "No historical similarity data",
+    noMatrixData: "No matrix data",
+    noStrategyData: "No strategy matrix data",
+    upgradeProForSimilarity: "Upgrade to Pro for full analysis",
+    upgradeProForMatrix: "Upgrade to Pro for strategy matrix",
+    upgradeProForPosition: "Upgrade to Pro for position advice",
+    upgradeProForDetails: "Upgrade to Pro for detailed analysis",
+    strategyName: "Strategy",
+    strategyType: "Type",
+    decision: "Decision",
+    score: "Score",
+    recommended: "Recommended",
+    optional: "Optional",
+    avoid: "Avoid",
+    recommendedCount: "Recommended",
+    optionalCount: "Optional",
+    avoidCount: "Avoid",
+    items: "",
+    macroConclusion: "Macro Conclusion",
+    noDetailedDescription: "No detailed description",
 
     // Risk disclaimer
     riskDisclaimer: "This system is a research-oriented market risk analysis tool that provides risk environment references based on multi-dimensional historical data and structured models. It does not constitute investment advice or profit guarantees. All decisions and risks are borne by users.",
@@ -161,4 +317,164 @@ export function useTranslation() {
     setLang: setLanguage,
     mounted,
   };
+}
+
+// ============ Smart Bilingual Text System ============
+
+export type BilingualField = {
+  zh?: string;
+  en?: string;
+} | string | null | undefined;
+
+// Simple hash function for cache keys
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36);
+}
+
+// Detect if text is primarily Chinese
+function isChinese(text: string): boolean {
+  const chineseRegex = /[\u4e00-\u9fa5]/;
+  const chineseChars = text.match(/[\u4e00-\u9fa5]/g);
+  return chineseChars ? chineseChars.length > text.length * 0.3 : false;
+}
+
+// Translation cache in localStorage
+const CACHE_PREFIX = "translate_cache_";
+const CACHE_VERSION = "v1";
+
+function getCacheKey(text: string, targetLang: Language): string {
+  return `${CACHE_PREFIX}${CACHE_VERSION}_${simpleHash(text)}_${targetLang}`;
+}
+
+function getCachedTranslation(text: string, targetLang: Language): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const cached = localStorage.getItem(getCacheKey(text, targetLang));
+    return cached;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedTranslation(text: string, targetLang: Language, translation: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(getCacheKey(text, targetLang), translation);
+  } catch (e) {
+    console.warn("Failed to cache translation:", e);
+  }
+}
+
+// Translate with cache
+async function translateWithCache(text: string, targetLang: Language): Promise<string> {
+  // Check cache first
+  const cached = getCachedTranslation(text, targetLang);
+  if (cached) return cached;
+
+  // Call translation API
+  try {
+    const response = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, target: targetLang }),
+    });
+
+    if (!response.ok) {
+      console.error("Translation API error:", response.status);
+      return text; // Fallback to original
+    }
+
+    const data = await response.json();
+    const translated = data.translated || text;
+
+    // Cache the result
+    setCachedTranslation(text, targetLang, translated);
+
+    return translated;
+  } catch (error) {
+    console.error("Translation error:", error);
+    return text; // Fallback to original
+  }
+}
+
+// Smart text handler - main function
+export function smartText(
+  field: BilingualField,
+  lang: Language,
+  options?: { skipAutoTranslate?: boolean }
+): string {
+  // Handle null/undefined
+  if (!field) return "";
+
+  // Handle bilingual object
+  if (typeof field === "object" && field !== null) {
+    // Try to get the requested language
+    const text = field[lang] || field[lang === "zh" ? "en" : "zh"] || "";
+    return text;
+  }
+
+  // Handle plain string
+  if (typeof field === "string") {
+    // If Chinese mode or skip auto-translate, return as-is
+    if (lang === "zh" || options?.skipAutoTranslate) {
+      return field;
+    }
+
+    // If English mode and text is Chinese, translate it
+    if (lang === "en" && isChinese(field)) {
+      // Return original immediately, but trigger async translation
+      // This prevents blocking the UI
+      const cached = getCachedTranslation(field, "en");
+      if (cached) return cached;
+
+      // Trigger async translation (non-blocking)
+      translateWithCache(field, "en").catch(console.error);
+
+      // Return original for now
+      return field;
+    }
+
+    return field;
+  }
+
+  return "";
+}
+
+// Async version for use with React state
+export async function smartTextAsync(
+  field: BilingualField,
+  lang: Language,
+  options?: { skipAutoTranslate?: boolean }
+): Promise<string> {
+  // Handle null/undefined
+  if (!field) return "";
+
+  // Handle bilingual object
+  if (typeof field === "object" && field !== null) {
+    const text = field[lang] || field[lang === "zh" ? "en" : "zh"] || "";
+    return text;
+  }
+
+  // Handle plain string
+  if (typeof field === "string") {
+    // If Chinese mode or skip auto-translate, return as-is
+    if (lang === "zh" || options?.skipAutoTranslate) {
+      return field;
+    }
+
+    // If English mode and text is Chinese, translate it
+    if (lang === "en" && isChinese(field)) {
+      return await translateWithCache(field, "en");
+    }
+
+    return field;
+  }
+
+  return "";
 }

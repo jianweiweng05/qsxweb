@@ -5,9 +5,11 @@ import { HelpButton } from "./help-modal";
 import { useReport } from "../report-provider";
 import { useState, useEffect } from "react";
 import chartIndex from "@/public/sim_charts/index.json";
+import { useTranslation, smartText } from "@/app/lib/i18n";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
+  const { lang, t } = useTranslation();
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
   const isProUser = isPro();
@@ -39,7 +41,7 @@ export default function ToolboxPage() {
     <div className="min-h-full bg-black/90 text-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-6">
 
-        <h1 className="text-xl font-bold mb-6">工具箱</h1>
+        <h1 className="text-xl font-bold mb-6">{t.toolbox}</h1>
 
         {/* 全球资产风险监控仪 */}
         {crossAsset?.public?.assets_8 && Array.isArray(crossAsset.public.assets_8) && (() => {
@@ -80,12 +82,12 @@ export default function ToolboxPage() {
                 {/* 顶部状态条 */}
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-white/80">全球资产风险监控仪</span>
+                    <span className="text-sm font-medium text-white/80">{t.globalRiskMonitor}</span>
                     <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Live</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className="text-xs text-white/50">状态</div>
+                      <div className="text-xs text-white/50">{t.status}</div>
                       <div className="text-sm font-semibold text-green-400">RISK_ON</div>
                     </div>
                     <HelpButton indicatorKey="cross_asset_rotation" />
@@ -270,19 +272,19 @@ export default function ToolboxPage() {
                   {/* 右侧：全球资产风险配置建议 */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
-                      <span>全球资产风险配置建议</span>
+                      <span>{t.globalRiskAllocation}</span>
                       <span className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
                       <HelpButton indicatorKey="pro_position_recommendations" />
                     </div>
-                    <ProGate lockedMessage="升级 Pro 查看仓位建议">
+                    <ProGate lockedMessage={t.upgradeProForPosition}>
                       <div className="overflow-x-auto">
                               <table className="w-full text-xs">
                                 <thead>
                                   <tr className="border-b border-white/10">
                                     <th className="text-left py-2 text-white/50 font-normal w-8"></th>
-                                    <th className="text-left py-2 text-white/50 font-normal">资产</th>
-                                    <th className="text-left py-2 text-white/50 font-normal">状态</th>
-                                    <th className="text-left py-2 text-white/50 font-normal">仓位建议</th>
+                                    <th className="text-left py-2 text-white/50 font-normal">{t.asset}</th>
+                                    <th className="text-left py-2 text-white/50 font-normal">{t.status}</th>
+                                    <th className="text-left py-2 text-white/50 font-normal">{t.positionAdvice}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -357,15 +359,15 @@ export default function ToolboxPage() {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <span>历史相似度</span>
+              <span>{t.historicalSimilarity}</span>
               <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
-              <ProGate lockedMessage="升级 Pro 查看完整分析">
+              <ProGate lockedMessage={t.upgradeProForSimilarity}>
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
                   <>
-                    <div className="text-xs text-white/50 mb-3">相似场景 Top 3</div>
+                    <div className="text-xs text-white/50 mb-3">{t.similarScenes} Top 3</div>
                     <div className="space-y-3 mb-4">
                       {similarityTop3.map((item: any, i: number) => (
                         <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
@@ -378,11 +380,11 @@ export default function ToolboxPage() {
                                 onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
                                 className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
                               >
-                                历史重现 {expandedHistory === i ? '▲' : '▼'}
+                                {t.historyReplay} {expandedHistory === i ? '▲' : '▼'}
                               </button>
                             )}
                           </div>
-                          <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{(item.sim * 100).toFixed(1)}%</div>
+                          <div className="text-cyan-400/80 text-[10px] mb-1">{t.similarity}：{(item.sim * 100).toFixed(1)}%</div>
                           {expandedHistory === i && (() => {
                             const chartPath = chartUrlMap.get(item.date);
                             if (!chartPath) return null;
@@ -425,7 +427,7 @@ export default function ToolboxPage() {
                     )}
                   </>
                 ) : (
-                  <div className="text-xs text-white/50">暂无历史相似性数据</div>
+                  <div className="text-xs text-white/50">{t.noSimilarityData}</div>
                 )}
               </ProGate>
             </div>
@@ -433,12 +435,12 @@ export default function ToolboxPage() {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <span>策略适配矩阵</span>
+              <span>{t.strategyMatrix}</span>
               <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="strategy_matrix" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
-              <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
+              <ProGate lockedMessage={t.upgradeProForMatrix}>
                 {strategyMatrix && (strategyMatrix.version === "matrix_v3_scored" || strategyMatrix.rows) ? (
                   <div className="space-y-3">
                     {/* 策略分布统计 */}
@@ -447,15 +449,15 @@ export default function ToolboxPage() {
                         <div className="flex items-center gap-4 text-xs">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                            <span className="text-white/60">推荐: {strategyMatrix.summary.green} 个</span>
+                            <span className="text-white/60">{t.recommendedCount}: {strategyMatrix.summary.green} {t.items}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-                            <span className="text-white/60">可选: {strategyMatrix.summary.yellow} 个</span>
+                            <span className="text-white/60">{t.optionalCount}: {strategyMatrix.summary.yellow} {t.items}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                            <span className="text-white/60">规避: {strategyMatrix.summary.red} 个</span>
+                            <span className="text-white/60">{t.avoidCount}: {strategyMatrix.summary.red} {t.items}</span>
                           </div>
                         </div>
                       </div>
@@ -467,7 +469,7 @@ export default function ToolboxPage() {
                       const rows = strategyMatrix.rows || [];
 
                       if (!Array.isArray(rows) || rows.length === 0) {
-                        return <div className="text-xs text-white/50">暂无矩阵数据</div>;
+                        return <div className="text-xs text-white/50">{t.noMatrixData}</div>;
                       }
 
                       // 获取红绿灯状态的颜色和文本
@@ -476,11 +478,11 @@ export default function ToolboxPage() {
                         const d = String(decision).toUpperCase();
 
                         if (l === 'GREEN' || d === 'RECOMMENDED' || d === 'ALLOW') {
-                          return { color: 'bg-green-400', text: 'text-green-400', label: '推荐' };
+                          return { color: 'bg-green-400', text: 'text-green-400', label: t.recommended };
                         } else if (l === 'RED' || d === 'AVOID') {
-                          return { color: 'bg-red-400', text: 'text-red-400', label: '规避' };
+                          return { color: 'bg-red-400', text: 'text-red-400', label: t.avoid };
                         } else if (l === 'YELLOW' || d === 'OPTIONAL') {
-                          return { color: 'bg-yellow-400', text: 'text-yellow-400', label: '可选' };
+                          return { color: 'bg-yellow-400', text: 'text-yellow-400', label: t.optional };
                         }
                         return { color: 'bg-gray-400', text: 'text-gray-400', label: d || l };
                       };
@@ -491,12 +493,12 @@ export default function ToolboxPage() {
                             <thead>
                               <tr className="border-b border-white/10">
                                 <th className="text-left py-2 px-2 text-white/50 font-normal w-8"></th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">策略名称</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">{t.strategyName}</th>
+                                <th className="text-left py-2 px-2 text-white/50 font-normal">{t.strategyType}</th>
                                 {isProUser && (
                                   <>
-                                    <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
-                                    <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
+                                    <th className="text-left py-2 px-2 text-white/50 font-normal">{t.decision}</th>
+                                    <th className="text-left py-2 px-2 text-white/50 font-normal">{t.score}</th>
                                   </>
                                 )}
                               </tr>
@@ -559,7 +561,7 @@ export default function ToolboxPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="text-xs text-white/50">暂无策略适配矩阵数据</div>
+                  <div className="text-xs text-white/50">{t.noStrategyData}</div>
                 )}
               </ProGate>
             </div>
