@@ -353,7 +353,7 @@ export default function ToolboxPage() {
               <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px] max-h-[600px] overflow-y-auto">
               <ProGate lockedMessage="升级 Pro 查看完整分析">
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
                   <>
@@ -411,45 +411,39 @@ export default function ToolboxPage() {
               <span>策略适配矩阵</span>
               <HelpButton indicatorKey="strategy_matrix" />
             </div>
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px]">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px] max-h-[600px] overflow-y-auto">
               <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
                 {strategyMatrix?.version === "matrix_v3_scored" ? (
                   <div className="space-y-3">
-                    {/* 版本信息和汇总统计 */}
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                      <div className="flex items-center gap-3">
-                        <div className="text-xs text-white/50">
-                          版本: {strategyMatrix.version}
-                        </div>
-                        {strategyMatrix.summary && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                              <span className="text-white/60">{strategyMatrix.summary.green}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-                              <span className="text-white/60">{strategyMatrix.summary.yellow}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                              <span className="text-white/60">{strategyMatrix.summary.red}</span>
-                            </div>
+                    {/* 策略分布统计 */}
+                    {strategyMatrix.summary && typeof strategyMatrix.summary === 'object' && (
+                      <div className="mb-3 pb-3 border-b border-white/10">
+                        <div className="flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                            <span className="text-white/60">推荐: {strategyMatrix.summary.green} 个</span>
+                            {strategyMatrix.summary.green_keys && strategyMatrix.summary.green_keys.length > 0 && (
+                              <span className="text-white/40 text-[10px]">
+                                ({strategyMatrix.summary.green_keys.join(', ')})
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      {strategyMatrix.asof && (
-                        <div className="text-xs text-white/40">
-                          更新时间: {new Date(strategyMatrix.asof).toLocaleString('zh-CN', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                            <span className="text-white/60">可选: {strategyMatrix.summary.yellow} 个</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                            <span className="text-white/60">规避: {strategyMatrix.summary.red} 个</span>
+                            {strategyMatrix.summary.red_keys && strategyMatrix.summary.red_keys.length > 0 && (
+                              <span className="text-white/40 text-[10px]">
+                                ({strategyMatrix.summary.red_keys.join(', ')})
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
                     {/* 矩阵表格 */}
                     {(() => {
@@ -485,16 +479,12 @@ export default function ToolboxPage() {
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">市场接受度</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">Calmar范围</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">原因</th>
                               </tr>
                             </thead>
                             <tbody>
                               {rows.map((row: any, i: number) => {
                                 const lightStyle = getLightStyle(row.light, row.decision);
-                                const marketAccept = row.market_accept || 0;
-                                const acceptPercent = (marketAccept / 5) * 100; // 转换为百分比
                                 const score = row.score || 0;
                                 const scorePercent = score; // score is already 0-100
 
@@ -540,72 +530,13 @@ export default function ToolboxPage() {
                                       </div>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[60px]">
-                                          <div
-                                            className={`h-full ${lightStyle.color} transition-all`}
-                                            style={{ width: `${acceptPercent}%` }}
-                                          />
-                                        </div>
-                                        <span className="text-white/60 text-[10px] font-mono">
-                                          {marketAccept}/5
-                                        </span>
-                                      </div>
-                                    </td>
-                                    <td className="py-2.5 px-2">
                                       <span className="text-white/60 text-[10px] font-mono">{row.calmar_range}</span>
-                                    </td>
-                                    <td className="py-2.5 px-2">
-                                      <div className="text-white/60 text-[10px] leading-relaxed max-w-xs">
-                                        {row.reason}
-                                      </div>
                                     </td>
                                   </tr>
                                 );
                               })}
                             </tbody>
                           </table>
-                        </div>
-                      );
-                    })()}
-
-                    {/* 底部汇总信息 */}
-                    {(() => {
-                      const summary = strategyMatrix.summary;
-
-                      if (!summary) return null;
-
-                      return (
-                        <div className="mt-4 pt-3 border-t border-white/10 space-y-3">
-                          {summary && typeof summary === 'object' && (
-                            <div>
-                              <div className="text-xs text-white/50 mb-2">策略分布统计</div>
-                              <div className="flex items-center gap-4 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                                  <span className="text-white/60">推荐: {summary.green} 个</span>
-                                  {summary.green_keys && summary.green_keys.length > 0 && (
-                                    <span className="text-white/40 text-[10px]">
-                                      ({summary.green_keys.join(', ')})
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-                                  <span className="text-white/60">可选: {summary.yellow} 个</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                                  <span className="text-white/60">规避: {summary.red} 个</span>
-                                  {summary.red_keys && summary.red_keys.length > 0 && (
-                                    <span className="text-white/40 text-[10px]">
-                                      ({summary.red_keys.join(', ')})
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       );
                     })()}
