@@ -75,7 +75,7 @@ export default function TodayPage() {
               <span>波动状态</span>
               <span className="text-[9px] text-white/30">(Gamma)</span>
               <HelpButton indicatorKey="gamma" />
-              <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
+              <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
                 PRO
               </span>
             </div>
@@ -97,9 +97,6 @@ export default function TodayPage() {
             <div className="flex items-center gap-1.5 text-xs text-white/40 mb-3">
               <span>风险配置建议</span>
               <HelpButton indicatorKey="crypto_allocation" />
-              <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                PRO
-              </span>
             </div>
             <ProGate
               lockedMessage="升级 Pro 查看"
@@ -113,7 +110,7 @@ export default function TodayPage() {
                 <div className="space-y-3">
                   {/* One-liner summary - visible to PRO users */}
                   {allocationOneLiner && (
-                    <div className="text-[11px] text-white/70 leading-relaxed">
+                    <div className="text-[11px] text-white/90 leading-relaxed">
                       {allocationOneLiner}
                     </div>
                   )}
@@ -121,9 +118,12 @@ export default function TodayPage() {
                   {/* Expand/Collapse button */}
                   <button
                     onClick={() => setExpandAllocation(!expandAllocation)}
-                    className="text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors"
+                    className="flex items-center gap-1.5 text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors"
                   >
-                    {expandAllocation ? "收起配置详情 ▲" : "查看配置详情 ▼"}
+                    <span>{expandAllocation ? "收起配置详情 ▲" : "查看配置详情 ▼"}</span>
+                    <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                      PRO
+                    </span>
                   </button>
 
                   {/* Collapsible allocation details - PRO exclusive */}
