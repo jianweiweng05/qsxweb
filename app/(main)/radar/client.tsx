@@ -152,7 +152,7 @@ function GlowingRadar({
   const cx = 150, cy = 150, maxR = 120;
 
   return (
-    <svg viewBox="0 0 300 300" className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] mx-auto">
+    <svg viewBox="0 0 300 300" className="w-full max-w-[256px] sm:max-w-[288px] lg:max-w-[320px] mx-auto">
       <defs>
         <filter id="metalGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2" result="coloredBlur" />
@@ -470,7 +470,8 @@ export default function RadarClient() {
           <GlowingRadar values={radarValues} layers={layers} />
         </div>
         {breakdown && (
-          <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="mt-6 flex justify-center">
+            <div className="grid grid-cols-3 gap-4" style={{transform: 'scale(0.775)', transformOrigin: 'center top'}}>
             {LAYER_KEYS.map((k) => {
               const raw = breakdown[k];
               const normalized = Math.min(1, Math.max(-1, raw / 15));
@@ -541,6 +542,7 @@ export default function RadarClient() {
                 </div>
               );
             })}
+            </div>
           </div>
         )}
       </div>
