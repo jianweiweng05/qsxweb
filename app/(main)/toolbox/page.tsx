@@ -1,6 +1,6 @@
 "use client";
 
-import { ProGate } from "@/app/lib/gate";
+import { ProGate, isPro } from "@/app/lib/gate";
 import { HelpButton } from "./help-modal";
 import { useReport } from "../report-provider";
 import { useState } from "react";
@@ -9,6 +9,7 @@ export default function ToolboxPage() {
   const { data: payload } = useReport();
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
+  const isProUser = isPro();
 
   const strategyMatrix = payload?.strategy_matrix;
   const similarityTop3 = payload?.similarity?.top3;
@@ -353,7 +354,7 @@ export default function ToolboxPage() {
               <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px] max-h-[600px] overflow-y-auto">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
               <ProGate lockedMessage="升级 Pro 查看完整分析">
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
                   <>
@@ -409,9 +410,10 @@ export default function ToolboxPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
               <span>策略适配矩阵</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="strategy_matrix" />
             </div>
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[320px] max-h-[600px] overflow-y-auto">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
               <ProGate lockedMessage="升级 Pro 查看策略适配矩阵">
                 {strategyMatrix?.version === "matrix_v3_scored" ? (
                   <div className="space-y-3">
@@ -477,8 +479,12 @@ export default function ToolboxPage() {
                                 <th className="text-left py-2 px-2 text-white/50 font-normal w-8"></th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">策略名称</th>
                                 <th className="text-left py-2 px-2 text-white/50 font-normal">类型</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
+                                {isProUser && (
+                                  <>
+                                    <th className="text-left py-2 px-2 text-white/50 font-normal">决策</th>
+                                    <th className="text-left py-2 px-2 text-white/50 font-normal">评分</th>
+                                  </>
+                                )}
                               </tr>
                             </thead>
                             <tbody>
@@ -510,21 +516,25 @@ export default function ToolboxPage() {
                                     <td className="py-2.5 px-2">
                                       <span className="text-white/60 text-[10px]">{row.type}</span>
                                     </td>
-                                    <td className="py-2.5 px-2">
-                                      <span className={`${lightStyle.text} text-[10px] font-semibold`}>
-                                        {lightStyle.label}
-                                      </span>
-                                    </td>
-                                    <td className="py-2.5 px-2">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[50px]">
-                                          <div
-                                            className={`h-full ${lightStyle.color} transition-all`}
-                                            style={{ width: `${scorePercent}%` }}
-                                          />
-                                        </div>
-                                      </div>
-                                    </td>
+                                    {isProUser && (
+                                      <>
+                                        <td className="py-2.5 px-2">
+                                          <span className={`${lightStyle.text} text-[10px] font-semibold`}>
+                                            {lightStyle.label}
+                                          </span>
+                                        </td>
+                                        <td className="py-2.5 px-2">
+                                          <div className="flex items-center gap-2">
+                                            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[50px]">
+                                              <div
+                                                className={`h-full ${lightStyle.color} transition-all`}
+                                                style={{ width: `${scorePercent}%` }}
+                                              />
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </>
+                                    )}
                                   </tr>
                                 );
                               })}
