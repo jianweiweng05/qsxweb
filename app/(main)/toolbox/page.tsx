@@ -92,8 +92,8 @@ export default function ToolboxPage() {
                   </div>
                 </div>
 
-                <div className="grid lg:grid-cols-[420px_1fr] gap-6">
-                  {/* 左侧：双圈仪表 */}
+                <div className="grid lg:grid-cols-2 gap-6">
+                  {/* 左侧：资产风险健康 */}
                   <div className="flex flex-col items-center relative">
                     <style>{`
                       @keyframes glow-pulse {
@@ -117,12 +117,13 @@ export default function ToolboxPage() {
                       .gauge-segment-neutral { animation: glow-pulse-yellow 2s ease-in-out infinite; }
                       .sphere-3d { animation: sphere-rotate 8s linear infinite; }
                     `}</style>
-                    <svg
-                      width="360"
-                      height="360"
-                      viewBox="-20 -20 300 300"
-                      className="overflow-visible max-w-full"
-                    >
+                    <div style={{transform: 'scale(0.8)', transformOrigin: 'center top'}}>
+                      <svg
+                        width="360"
+                        height="360"
+                        viewBox="-20 -20 300 300"
+                        className="overflow-visible max-w-full"
+                      >
                       <defs>
                         <radialGradient id="earthGradient" cx="30%" cy="30%">
                           <stop offset="0%" stopColor="rgba(120, 180, 240, 0.9)" />
@@ -254,22 +255,31 @@ export default function ToolboxPage() {
                         <animateTransform attributeName="transform" type="rotate" from="0 130 130" to="360 130 130" dur="8s" repeatCount="indefinite" />
                       </g>
                     </svg>
+
+                    {/* 宏观结论 */}
+                    {crossAsset.public.macro_one_liner && (
+                      <div className="mt-4 text-center">
+                        <div className="flex items-center justify-center gap-2 text-xs text-white/50 mb-2">
+                          <span>宏观结论</span>
+                          <HelpButton indicatorKey="macro_summary" />
+                        </div>
+                        <div className="text-xs text-white/80 leading-relaxed">
+                          {String(crossAsset.public.macro_one_liner)}
+                        </div>
+                      </div>
+                    )}
+                    </div>
                   </div>
 
-                  {/* 中间：Pro 分析 */}
-                  <div className="min-w-0 min-h-[360px]">
-                    <ProGate lockedMessage="升级 Pro 查看深度分析">
-                      <div className="space-y-4">
-                        {crossAsset.public.macro_one_liner && (
-                          <div>
-                            <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
-                              <span>宏观结论</span>
-                              <HelpButton indicatorKey="macro_summary" />
-                            </div>
-                            <div className="text-xs text-white/80 leading-relaxed mb-3">
-                              {String(crossAsset.public.macro_one_liner)}
-                            </div>
-                            <div className="overflow-x-auto">
+                  {/* 右侧：Pro全球资产仓位建议 */}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
+                      <span>Pro全球资产仓位建议</span>
+                      <span className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
+                      <HelpButton indicatorKey="pro_position_recommendations" />
+                    </div>
+                    <ProGate lockedMessage="升级 Pro 查看仓位建议">
+                      <div className="overflow-x-auto">
                               <table className="w-full text-xs">
                                 <thead>
                                   <tr className="border-b border-white/10">
@@ -353,9 +363,6 @@ export default function ToolboxPage() {
                                 </tbody>
                               </table>
                             </div>
-                          </div>
-                        )}
-                      </div>
                     </ProGate>
                   </div>
                 </div>
