@@ -459,11 +459,6 @@ export default function ToolboxPage() {
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-green-400"></div>
                             <span className="text-white/60">推荐: {strategyMatrix.summary.green} 个</span>
-                            {strategyMatrix.summary.green_keys && strategyMatrix.summary.green_keys.length > 0 && (
-                              <span className="text-white/40 text-[10px]">
-                                ({strategyMatrix.summary.green_keys.join(', ')})
-                              </span>
-                            )}
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
@@ -472,11 +467,6 @@ export default function ToolboxPage() {
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-red-400"></div>
                             <span className="text-white/60">规避: {strategyMatrix.summary.red} 个</span>
-                            {strategyMatrix.summary.red_keys && strategyMatrix.summary.red_keys.length > 0 && (
-                              <span className="text-white/40 text-[10px]">
-                                ({strategyMatrix.summary.red_keys.join(', ')})
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
