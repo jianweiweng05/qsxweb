@@ -17,6 +17,18 @@ export default function ToolboxPage() {
   const similarityHistoryRestore = payload?.similarity_history_restore;
   const crossAsset = payload?.cross_asset;
 
+  // Debug: Log what we're receiving
+  if (typeof window !== 'undefined') {
+    console.log('=== Toolbox Debug ===');
+    console.log('Full payload:', payload);
+    console.log('Payload keys:', payload ? Object.keys(payload) : 'no payload');
+    console.log('strategyMatrix:', strategyMatrix);
+    console.log('strategyMatrix type:', typeof strategyMatrix);
+    console.log('strategyMatrix keys:', strategyMatrix ? Object.keys(strategyMatrix) : 'no strategyMatrix');
+    console.log('Has rows?', strategyMatrix?.rows);
+    console.log('Version:', strategyMatrix?.version);
+  }
+
   return (
     <div className="min-h-full bg-black/90 text-white">
       <div className="mx-auto w-full max-w-6xl px-4 py-6">
