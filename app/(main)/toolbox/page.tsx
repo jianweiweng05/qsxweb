@@ -267,10 +267,11 @@ export default function ToolboxPage() {
                     </div>
                   </div>
 
-                  {/* 右侧：仓位建议 */}
+                  {/* 右侧：全球资产风险配置建议 */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
-                      <span>仓位建议</span>
+                      <span>全球资产风险配置建议</span>
+                      <span className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
                       <HelpButton indicatorKey="pro_position_recommendations" />
                     </div>
                     <ProGate lockedMessage="升级 Pro 查看仓位建议">
@@ -286,11 +287,7 @@ export default function ToolboxPage() {
                                 </thead>
                                 <tbody>
                                   {crossAsset.public.assets_8.map((item: any, i: number) => {
-                                    const posKey = item.key === 'SPX' ? 'US_EQUITY' :
-                                                   item.key === 'GOLD' ? 'GOLD' :
-                                                   item.key === 'BTC' ? 'BTC' :
-                                                   item.key === 'ETH' ? 'ETH' :
-                                                   item.key === 'CASH' ? 'CASH' : item.key;
+                                    const posKey = item.key;
                                     const positionCap = crossAsset?.pro?.position_caps?.[posKey];
                                     const hasPro = !!positionCap;
                                     const isExpanded = selectedAsset?.key === item.key;
