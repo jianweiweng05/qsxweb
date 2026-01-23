@@ -1,54 +1,50 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+
+const ALLOWED = new Set(["en", "zh"]);
+const MAX_LEN = 300;
 
 export async function POST(request: Request) {
+  let payload: any = null;
+
   try {
-    const { text, target } = await request.json();
+    payload = await request.json();
+    const text = typeof payload?.text === "string" ? payload.text.trim() : "";
+    const target = typeof payload?.target === "string" ? payload.target : "";
 
-    if (!text || !target) {
-      return NextResponse.json(
-        { error: 'Missing text or target language' },
-        { status: 400 }
-      );
+    if (!text || !ALLOWED.has(target)) {
+      return NextResponse.json({ error: "bad_request" }, { status: 400 });
     }
 
-    // Use Google Translate API or similar service
-    // For now, using a simple proxy to a translation service
-    // You can replace this with your preferred translation API
-
-    const response = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`,
-      {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Translation API error:', response.status);
-      return NextResponse.json(
-        { translated: text }, // Fallback to original
-        { status: 200 }
-      );
+    if (text.length > MAX_LEN) {
+      return NextResponse.json({ translated: text }, { status: 200 });
     }
 
-    const data = await response.json();
+    const url =
+      "https://translate.googleapis.com/translate_a/single" +
+      `?client=gtx&sl=auto&tl=${encodeURIComponent(target)}` +
+      `&dt=t&q=${encodeURIComponent(text)}`;
 
-    // Parse Google Translate response format
-    // Response is: [[[translated_text, original_text, ...]]]
+    const resp = await fetch(url, {
+      method: "GET",
+      headers: { "User-Agent": "Mozilla/5.0" },
+      cache: "no-store",
+    });
+
+    if (!resp.ok) {
+      return NextResponse.json({ translated: text }, { status: 200 });
+    }
+
+    const data = await resp.json();
     let translated = text;
-    if (Array.isArray(data) && data[0] && Array.isArray(data[0])) {
-      translated = data[0].map((item: any) => item[0]).join('');
+
+    if (Array.isArray(data) && Array.isArray(data[0])) {
+      translated = data[0].map((it: any) => (Array.isArray(it) ? it[0] : "")).join("");
+      if (!translated) translated = text;
     }
 
-    return NextResponse.json({ translated });
-  } catch (error) {
-    console.error('Translation error:', error);
-    // Return original text as fallback
-    return NextResponse.json(
-      { translated: (await request.json()).text },
-      { status: 200 }
-    );
+    return NextResponse.json({ translated }, { status: 200 });
+  } catch {
+    const text = typeof payload?.text === "string" ? payload.text : "";
+    return NextResponse.json({ translated: text }, { status: 200 });
   }
 }
