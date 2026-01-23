@@ -390,7 +390,29 @@ export default function ToolboxPage() {
                           <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{(item.sim * 100).toFixed(1)}%</div>
                           {similarityHistoryRestore?.[i]?.text && expandedHistory === i && (
                             <div className="mt-2 pt-2 border-t border-white/10">
-                              <div className="text-white/60 text-[10px] leading-relaxed">{similarityHistoryRestore[i].text}</div>
+                              <div className="text-white/60 text-[10px] leading-relaxed mb-3">{similarityHistoryRestore[i].text}</div>
+                              {(() => {
+                                const caseId = `C${i + 1}_${item.date.replace(/-/g, '_')}`;
+                                const chartPath = `/sim_charts/${caseId}.png`;
+                                return (
+                                  <div className="mt-3">
+                                    <img
+                                      src={chartPath}
+                                      alt={`${item.name} K线图`}
+                                      className="w-full rounded-lg border border-white/10"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        const fallback = target.nextElementSibling as HTMLElement;
+                                        if (fallback) fallback.style.display = 'block';
+                                      }}
+                                    />
+                                    <div className="text-white/40 text-[10px] text-center py-2" style={{display: 'none'}}>
+                                      暂无K线图
+                                    </div>
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>

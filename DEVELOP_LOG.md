@@ -1,5 +1,21 @@
 # QuantscopeX Development Log
 
+## 2026-01-23: 历史重现卡片增加静态K线图展示
+
+### Feature Enhancement
+- 在工具箱页面的"历史相似度"模块中，为每个相似场景卡片的"历史重现"展开内容添加静态K线图展示
+- 图片来源：`/public/sim_charts/<case_id>.png`（例如：`/sim_charts/C1_2024_01_12.png`）
+- case_id 格式：`C<序号>_<日期>`，其中日期格式为 `YYYY_MM_DD`
+- 实现图片加载失败时的优雅降级：显示"暂无K线图"文字提示
+- 图片样式：自适应宽度，圆角边框，与暗色主题一致
+- 依赖：假设 `public/sim_charts` 目录已存在相应的K线图产物
+
+### Technical Details
+- 修改文件：`app/(main)/toolbox/page.tsx`
+- 新增代码：约 20 行（包含图片展示和错误处理逻辑）
+- 无需新增依赖，无需后端改动
+- 使用原生 `<img>` 标签和 `onError` 事件处理图片加载失败
+
 ## 2026-01-08: Initial Site Build
 
 ### Project Setup
