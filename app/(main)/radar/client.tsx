@@ -487,7 +487,7 @@ export default function RadarClient() {
               const layerNote = data?.ai_json?.layer_notes?.[k as keyof LayerNotes] || '';
 
               return (
-                <div key={k} className="bg-white/5 rounded-lg p-2 flex flex-col items-center">
+                <div key={k} className="flex flex-col items-center">
                   <div className="text-white/60 text-xs font-mono mb-1">{k}</div>
                   <svg viewBox="0 0 300 180" className="w-full" style={{aspectRatio: '300/180'}}>
                     <defs>
