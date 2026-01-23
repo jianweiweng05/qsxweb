@@ -8,6 +8,7 @@ import { useReport } from "../report-provider";
 export default function TodayPage() {
   const { data: payload, isLoading } = useReport();
   const [expandComment, setExpandComment] = useState(false);
+  const [expandAllocation, setExpandAllocation] = useState(false);
 
   if (isLoading) {
     return (
@@ -109,58 +110,82 @@ export default function TodayPage() {
               }}
             >
               {allocationWeights ? (
-                <div className="space-y-2.5">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-white/60">BTC</span>
-                      <span className="text-xs font-bold text-cyan-400">
-                        {(allocationWeights.BTC * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
-                        style={{ width: `${allocationWeights.BTC * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-white/60">ETH</span>
-                      <span className="text-xs font-bold text-cyan-400">
-                        {(allocationWeights.ETH * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
-                        style={{ width: `${allocationWeights.ETH * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] text-white/60">ALTS</span>
-                        {allocationLocks?.ALTS && (
-                          <span className="text-[8px]">🔒</span>
-                        )}
-                      </div>
-                      <span className="text-xs font-bold text-white/40">
-                        {(allocationWeights.ALTS * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-white/20"
-                        style={{ width: `${allocationWeights.ALTS * 100}%` }}
-                      />
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  {/* One-liner summary - visible to PRO users */}
                   {allocationOneLiner && (
-                    <div className="pt-1 text-[9px] text-white/50 leading-relaxed">
+                    <div className="text-[11px] text-white/70 leading-relaxed">
                       {allocationOneLiner}
                     </div>
+                  )}
+
+                  {/* Expand/Collapse button */}
+                  <button
+                    onClick={() => setExpandAllocation(!expandAllocation)}
+                    className="text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors"
+                  >
+                    {expandAllocation ? "收起配置详情 ▲" : "查看配置详情 ▼"}
+                  </button>
+
+                  {/* Collapsible allocation details - PRO exclusive */}
+                  {expandAllocation && (
+                    <ProGate
+                      lockedMessage="升级 Pro 查看配置详情"
+                      unlockConfig={{
+                        title: "配置详情",
+                        description: "查看 BTC、ETH 和山寨币的具体配置权重。",
+                        features: ["实时资产配置权重", "风险传导分析", "流动性闸门监控"]
+                      }}
+                    >
+                      <div className="space-y-2.5 pt-2">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] text-white/60">BTC</span>
+                            <span className="text-xs font-bold text-cyan-400">
+                              {(allocationWeights.BTC * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
+                              style={{ width: `${allocationWeights.BTC * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] text-white/60">ETH</span>
+                            <span className="text-xs font-bold text-cyan-400">
+                              {(allocationWeights.ETH * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
+                              style={{ width: `${allocationWeights.ETH * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-white/60">ALTS</span>
+                              {allocationLocks?.ALTS && (
+                                <span className="text-[8px]">🔒</span>
+                              )}
+                            </div>
+                            <span className="text-xs font-bold text-white/40">
+                              {(allocationWeights.ALTS * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-white/20"
+                              style={{ width: `${allocationWeights.ALTS * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </ProGate>
                   )}
                 </div>
               ) : (
