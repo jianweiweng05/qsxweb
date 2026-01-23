@@ -35,6 +35,11 @@ export default function TodayPage() {
   const bearish = payload?.ai_json?.collision?.bearish_2 || [];
   const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
+  const cryptoAllocation = payload?.crypto_risk_allocation;
+  const allocationWeights = cryptoAllocation?.weights;
+  const allocationLocks = cryptoAllocation?.locks;
+  const allocationOneLiner = cryptoAllocation?.one_liner;
+
   return (
     <div className="text-white pb-28">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 py-8">
@@ -87,6 +92,92 @@ export default function TodayPage() {
             </ProGate>
           </div>
         </div>
+
+        {allocationWeights && (
+          <div className="rounded-xl bg-white/5 border border-white/10 p-6 mb-8">
+            <div className="flex items-center gap-2 text-sm font-medium text-white/60 mb-5">
+              <span>加密资产配置</span>
+              <HelpButton indicatorKey="crypto_allocation" />
+              <span className="px-1.5 py-0.5 text-[9px] rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-medium">
+                PRO
+              </span>
+            </div>
+
+            <ProGate
+              lockedMessage="升级 Pro 查看资产配置建议"
+              unlockConfig={{
+                title: "加密资产配置",
+                description: "基于市场结构风险分析，为您提供 BTC、ETH 和山寨币的动态配置建议。",
+                features: ["实时资产配置权重", "风险传导分析", "流动性闸门监控"]
+              }}
+            >
+              <div className="space-y-4">
+                {/* BTC */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-white/80 font-medium">BTC</span>
+                    <span className="text-lg font-bold text-cyan-400">
+                      {(allocationWeights.BTC * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full"
+                      style={{ width: `${allocationWeights.BTC * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* ETH */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-white/80 font-medium">ETH</span>
+                    <span className="text-lg font-bold text-cyan-400">
+                      {(allocationWeights.ETH * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full"
+                      style={{ width: `${allocationWeights.ETH * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* ALTS */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-white/80 font-medium">ALTS</span>
+                      {allocationLocks?.ALTS && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">
+                          🔒 已锁定
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-lg font-bold text-white/40">
+                      {(allocationWeights.ALTS * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-white/20 rounded-full"
+                      style={{ width: `${allocationWeights.ALTS * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {allocationOneLiner && (
+                  <div className="pt-3 mt-3 border-t border-white/10">
+                    <div className="text-xs text-white/60 leading-relaxed">
+                      {allocationOneLiner}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ProGate>
+          </div>
+        )}
 
         <div className="rounded-xl bg-white/6 border border-white/10 p-6">
           <div className="flex items-center justify-between gap-3 mb-4">
