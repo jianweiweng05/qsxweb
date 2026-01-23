@@ -384,7 +384,7 @@ export default function ToolboxPage() {
                             <span className="text-white/90 font-medium">{'①②③'[i]}</span>
                             <span className="text-white/60 text-[10px]">{item.date}</span>
                             <span className="text-white/90 text-xs">｜{item.name}</span>
-                            {similarityHistoryRestore?.[i]?.text && (
+                            {chartUrlMap.get(item.date) && (
                               <button
                                 onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
                                 className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
@@ -394,33 +394,28 @@ export default function ToolboxPage() {
                             )}
                           </div>
                           <div className="text-cyan-400/80 text-[10px] mb-1">相似度：{(item.sim * 100).toFixed(1)}%</div>
-                          {similarityHistoryRestore?.[i]?.text && expandedHistory === i && (
-                            <div className="mt-2 pt-2 border-t border-white/10">
-                              <div className="text-white/60 text-[10px] leading-relaxed mb-3">{similarityHistoryRestore[i].text}</div>
-                              {(() => {
-                                const chartPath = chartUrlMap.get(item.date);
-                                if (!chartPath) return null;
-                                return (
-                                  <div className="mt-3">
-                                    <img
-                                      src={chartPath}
-                                      alt={`${item.name} K线图`}
-                                      className="w-full rounded-lg border border-white/10"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.style.display = 'none';
-                                        const fallback = target.nextElementSibling as HTMLElement;
-                                        if (fallback) fallback.style.display = 'block';
-                                      }}
-                                    />
-                                    <div className="text-white/40 text-[10px] text-center py-2" style={{display: 'none'}}>
-                                      暂无K线图
-                                    </div>
-                                  </div>
-                                );
-                              })()}
-                            </div>
-                          )}
+                          {expandedHistory === i && (() => {
+                            const chartPath = chartUrlMap.get(item.date);
+                            if (!chartPath) return null;
+                            return (
+                              <div className="mt-2 pt-2 border-t border-white/10">
+                                <img
+                                  src={chartPath}
+                                  alt={`${item.name} K线图`}
+                                  className="w-full rounded-lg border border-white/10"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    const fallback = target.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'block';
+                                  }}
+                                />
+                                <div className="text-white/40 text-[10px] text-center py-2" style={{display: 'none'}}>
+                                  暂无K线图
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       ))}
                     </div>
