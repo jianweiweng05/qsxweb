@@ -96,7 +96,7 @@ export default function TodayPage() {
             <div className="flex items-center gap-1.5 text-xs text-white/40 mb-3">
               <span>风险配置建议</span>
               <HelpButton indicatorKey="crypto_allocation" />
-              <span className="px-1 py-0.5 text-[8px] rounded bg-white/5 text-white/40 border border-white/10">
+              <span className="px-1 py-0.5 text-[8px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
                 PRO
               </span>
             </div>
@@ -109,30 +109,59 @@ export default function TodayPage() {
               }}
             >
               {allocationWeights ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/70">BTC</span>
-                    <span className="text-base font-bold text-cyan-400">
-                      {(allocationWeights.BTC * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/70">ETH</span>
-                    <span className="text-base font-bold text-cyan-400">
-                      {(allocationWeights.ETH * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-white/70">ALTS</span>
-                      {allocationLocks?.ALTS && (
-                        <span className="text-[8px]">🔒</span>
-                      )}
+                <div className="space-y-2.5">
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-white/60">BTC</span>
+                      <span className="text-xs font-bold text-cyan-400">
+                        {(allocationWeights.BTC * 100).toFixed(0)}%
+                      </span>
                     </div>
-                    <span className="text-base font-bold text-white/40">
-                      {(allocationWeights.ALTS * 100).toFixed(0)}%
-                    </span>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
+                        style={{ width: `${allocationWeights.BTC * 100}%` }}
+                      />
+                    </div>
                   </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-white/60">ETH</span>
+                      <span className="text-xs font-bold text-cyan-400">
+                        {(allocationWeights.ETH * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400"
+                        style={{ width: `${allocationWeights.ETH * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-white/60">ALTS</span>
+                        {allocationLocks?.ALTS && (
+                          <span className="text-[8px]">🔒</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-white/40">
+                        {(allocationWeights.ALTS * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-white/20"
+                        style={{ width: `${allocationWeights.ALTS * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  {allocationOneLiner && (
+                    <div className="pt-1 text-[9px] text-white/50 leading-relaxed">
+                      {allocationOneLiner}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-sm text-white/40">暂无数据</div>
