@@ -7,7 +7,7 @@ import { useReport } from "../report-provider";
 import { useTranslation, getBilingualText } from "@/app/lib/i18n";
 
 export default function TodayPage() {
-  const { data: payload, isLoading } = useReport();
+  const { data: payload, isLoading, mutate } = useReport();
   const { lang, t } = useTranslation();
   const [expandComment, setExpandComment] = useState(false);
   const [expandAllocation, setExpandAllocation] = useState(false);
@@ -44,12 +44,27 @@ export default function TodayPage() {
   const allocationLocks = cryptoAllocation?.locks;
   const allocationOneLiner = getBilingualText(cryptoAllocation?.one_liner, lang);
 
+  // Debug: log the allocation data
+  if (typeof window !== 'undefined') {
+    console.log('[TodayPage] crypto_risk_allocation:', cryptoAllocation);
+    console.log('[TodayPage] allocationWeights:', allocationWeights);
+  }
+
   return (
     <div className="text-white pb-28">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 py-8">
         <div className="flex items-baseline justify-between mb-10">
           <h1 className="text-xl font-semibold">{t.todayOverview}</h1>
-          <span className="text-xs text-white/40">{generatedAt}</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => mutate()}
+              className="text-xs text-cyan-400/70 hover:text-cyan-400 transition-colors"
+              title="刷新数据"
+            >
+              🔄
+            </button>
+            <span className="text-xs text-white/40">{generatedAt}</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">

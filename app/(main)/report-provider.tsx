@@ -8,7 +8,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 const ReportContext = createContext<any>(null);
 
 export function ReportProvider({ children }: { children: ReactNode }) {
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     "/api/report",
     fetcher,
     {
@@ -19,7 +19,7 @@ export function ReportProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <ReportContext.Provider value={{ data, error, isLoading }}>
+    <ReportContext.Provider value={{ data, error, isLoading, mutate }}>
       {children}
     </ReportContext.Provider>
   );
