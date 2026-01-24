@@ -1360,3 +1360,123 @@ grep -r "translate.googleapis.com" app/ --include="*.ts" --include="*.tsx"
   - 修改：1 行（setMessages 条件表达式）
 - **净变化**：-2 行
 
+## 2026-01-24: 前台报警系统改为事件型报警，Control Tower 完全对外隐藏
+
+### 目标
+- 对外网站 App 彻底移除 Control Tower 的入口与相关文案，仅保留"事件报警/Alerts"
+- 前台报警统一读取新接口：GET https://qsx-ai.onrender.com/macro/v1/alerts/latest
+- Control Tower 仅作为内部运维工具保留，不对客户暴露
+- 报警支持中英文双语，按语言设置显示对应文字
+
+### 修改文件
+- **app/(main)/alerts/client.tsx**（147 行，-155 行）
+  - 移除所有 Control Tower 相关接口调用和数据结构
+  - 移除历史报警 tab 和相关功能
+  - 新增 Alert 接口定义（badge, name, meaning, action_tag, action_note, status）
+  - 新增 getBilingualText 辅助函数，支持双语字段提取
+  - 改用新接口：https://qsx-ai.onrender.com/macro/v1/alerts/latest
+  - 接口失败时不报错，显示"当前无风险事件"
+  - 最多展示 3 条事件，按接口返回顺序
+  - 四段式展示：徽章（badge）、事件名称（name）、一句话含义（meaning）、动作建议（action_tag + action_note）
+  - 熔断级事件视觉强调（红色背景/边框/文字），警告级使用黄色
+  - 不展示 event_code、tier、priority 等内部字段
+
+### 核心改动
+
+#### 1. 数据结构变更
+**旧结构（Control Tower）**：
+```typescript
+interface AlertData {
+  ok: boolean;
+  generated_at: string;
+  summary: AlertSummary;
+  layers: AlertLayer[];
+}
+```
+
+**新结构（事件报警）**：
+```typescript
+interface Alert {
+  badge: string;
+  name: string | { zh: string; en: string };
+  meaning: string | { zh: string; en: string };
+  action_tag: string | { zh: string; en: string };
+  action_note: string | { zh: string; en: string };
+  status: string;
+}
+```
+
+#### 2. 双语支持
+```typescript
+function getBilingualText(field: string | { zh: string; en: string } | undefined, lang: Language): string {
+  if (!field) return '';
+  if (typeof field === 'string') return field;
+  return field[lang] || field[lang === 'zh' ? 'en' : 'zh'] || '';
+}
+```
+
+#### 3. 视觉分级
+- **熔断级**（badge 包含"熔断"或"Circuit"）：
+  - 背景：`bg-red-500/15`
+  - 边框：`border-red-500/40`
+  - 徽章：`bg-red-500/30 text-red-300 font-bold`
+  - 文字：`text-red-300` / `text-red-400`
+
+- **警告级**（其他）：
+  - 背景：`bg-yellow-500/10`
+  - 边框：`border-yellow-500/30`
+  - 徽章：`bg-yellow-500/30 text-yellow-300`
+  - 文字：`text-yellow-200` / `text-yellow-400`
+
+#### 4. 空状态处理
+```typescript
+{!hasAlerts ? (
+  <div className="p-6 rounded-lg bg-white/5 border border-white/10 text-center text-white/50">
+    {lang === 'zh' ? '当前无风险事件' : 'No risk events'}
+  </div>
+) : (
+  // 显示报警列表
+)}
+```
+
+### 移除的功能
+1. **历史报警 tab**：完全移除，不再显示历史数据
+2. **红色报警统计卡片**：移除统计数字展示
+3. **层级信息**：不再显示 L1-L6 层级标签
+4. **HelpButton**：移除指标帮助按钮
+5. **天数选择器**：移除 7/30 天选择功能
+6. **Control Tower API 调用**：完全移除 `/api/control_tower` 和 `/api/proxy?path=/macro/v1/control_tower_alert_history`
+
+### 验收结果
+- ✅ 页面加载时请求：GET https://qsx-ai.onrender.com/macro/v1/alerts/latest
+- ✅ 前台最多展示 3 条事件，按接口返回顺序
+- ✅ 每条事件展示四段式：徽章、事件名称、一句话含义、动作建议
+- ✅ 熔断级事件在视觉上明显高于警告级（红色 vs 黄色）
+- ✅ 前台不再出现任何 Control Tower 的入口、链接或说明
+- ✅ 接口无报警或请求失败时，页面显示"当前无风险事件"，且不报错
+- ✅ 报警文字按语言设置显示（中文配中文，英语配英语）
+- ✅ 不展示 event_code、tier、priority、TTL、age、KV 等内部字段
+
+### 改动统计
+- **修改文件数**：1 个功能文件（alerts/client.tsx）
+- **代码变化**：
+  - 原文件：302 行
+  - 新文件：147 行
+  - 净变化：-155 行
+- **影响范围**：仅报警页面（/alerts），不影响其他页面
+
+### 技术权衡
+1. **为什么接口失败时不报错**：
+   - 避免用户看到技术错误信息
+   - 统一显示"当前无风险事件"，用户体验更友好
+   - 符合"接口无报警或请求失败时"的需求
+
+2. **为什么移除历史报警功能**：
+   - Control Tower 仅作为内部运维工具
+   - 前台只需展示当前最新的事件报警
+   - 简化用户界面，聚焦核心功能
+
+3. **为什么使用 badge 判断熔断级**：
+   - badge 字段包含"熔断"或"Circuit"关键词
+   - 简单直观，无需额外的 tier/priority 字段
+   - 符合"不展示内部字段"的约束
