@@ -14,7 +14,7 @@ export default function ToolboxPage() {
   const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
   const isProUser = isPro();
 
-  const strategyMatrix = payload?.strategy_matrix;
+  const strategyMatrix = payload?.pro_strategy_matrix;
   const similarityTop3 = payload?.similarity?.top3;
   const similarityProSummary = payload?.similarity_pro_summary;
   const similarityHistoryRestore = payload?.similarity_history_restore;
