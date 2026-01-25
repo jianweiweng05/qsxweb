@@ -375,7 +375,7 @@ export default function ToolboxPage() {
                           <div className="flex items-baseline gap-2 mb-1.5">
                             <span className="text-white/90 font-medium">{'①②③'[i]}</span>
                             <span className="text-white/60 text-[10px]">{item.date}</span>
-                            <span className="text-white/90 text-xs">｜{item.name}</span>
+                            <span className="text-white/90 text-xs">｜{getBilingualMarketText(item.name, lang)}</span>
                             {chartUrlMap.get(item.date) && (
                               <button
                                 onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
