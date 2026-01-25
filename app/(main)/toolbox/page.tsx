@@ -6,6 +6,7 @@ import { useReport } from "../report-provider";
 import { useState, useEffect } from "react";
 import chartIndex from "@/public/sim_charts/index.json";
 import { useTranslation } from "@/app/lib/i18n";
+import { getBilingualMarketText } from "@/app/lib/market-regime-translator";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
@@ -241,7 +242,7 @@ export default function ToolboxPage() {
                                   className="fill-white text-[10px] font-bold pointer-events-none"
                                   style={{textShadow: '0 0 8px rgba(0,0,0,0.8)', filter: 'drop-shadow(0 0 2px ' + color + ')'}}
                                 >
-                                  {String(item.label).replace(/\(BTC\+ETH\)/g, '')}
+                                  {getBilingualMarketText(String(item.label).replace(/\(BTC\+ETH\)/g, ''), lang)}
                                 </text>
                               </g>
                             );
@@ -262,7 +263,7 @@ export default function ToolboxPage() {
                     {crossAsset.public.macro_one_liner && (
                       <div className="mt-4 text-center">
                         <div className="text-xs text-white/80 leading-relaxed" style={{transform: 'scale(1.1)', transformOrigin: 'center'}}>
-                          {String(crossAsset.public.macro_one_liner)}
+                          {getBilingualMarketText(String(crossAsset.public.macro_one_liner), lang)}
                         </div>
                       </div>
                     )}
@@ -307,7 +308,7 @@ export default function ToolboxPage() {
                                                 }`}
                                             />
                                           </td>
-                                          <td className="py-2 text-white/80">{String(item.label).replace(/\(BTC\+ETH\)/g, '')}</td>
+                                          <td className="py-2 text-white/80">{getBilingualMarketText(String(item.label).replace(/\(BTC\+ETH\)/g, ''), lang)}</td>
                                           <td className="py-2 text-white/40 text-[10px]">{String(item.action)}</td>
                                           <td className="py-2">
                                             {hasPro ? (

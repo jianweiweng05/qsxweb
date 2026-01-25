@@ -27,11 +27,30 @@ const marketRegimeTranslations: Record<string, string> = {
   '防插针': 'Liquidation Risk',
   '防逼空': 'Short Squeeze Risk',
   '双向': 'Two-Way Volatility',
+
+  // Global asset names
+  '美股-标普': 'US Stocks - S&P',
+  '美股-纳指': 'US Stocks - Nasdaq',
+  '新兴市场': 'Emerging Markets',
+  '大宗商品': 'Commodities',
+  '数字资产': 'Digital Assets',
+  '黄金': 'Gold',
+  '美元': 'US Dollar',
+  '现金': 'Cash',
+
+  // Macro descriptions
+  '流动性充裕': 'Ample Liquidity',
+  '风险偏好强': 'Strong Risk Appetite',
+  '配置风险资产': 'Allocate to Risk Assets',
+  '流动性收紧': 'Tightening Liquidity',
+  '风险偏好弱': 'Weak Risk Appetite',
+  '规避风险资产': 'Avoid Risk Assets',
 };
 
 /**
  * Translates market regime text from Chinese to bilingual format
  * Handles both single regime labels and compound labels (e.g., "熊市震荡｜下行承压")
+ * Also handles comma-separated phrases (e.g., "流动性充裕，风险偏好强")
  */
 export function translateMarketRegime(text: string, lang: Language): string {
   if (!text) return text;
@@ -39,15 +58,31 @@ export function translateMarketRegime(text: string, lang: Language): string {
   // If already in English or mixed, return as is
   if (lang === 'zh') return text;
 
-  // Split by separator if compound label
-  const parts = text.split('｜').map(part => part.trim());
+  // Handle mixed separators (｜ and ，) by processing pipe-separated parts first
+  if (text.includes('｜')) {
+    const pipeParts = text.split('｜').map(part => part.trim());
+    const translatedPipeParts = pipeParts.map(pipePart => {
+      // Each pipe part might have comma-separated phrases
+      if (pipePart.includes('，')) {
+        const commaParts = pipePart.split('，').map(p => p.trim());
+        const translatedCommaParts = commaParts.map(p => marketRegimeTranslations[p] || p);
+        return translatedCommaParts.join(', ');
+      } else {
+        return marketRegimeTranslations[pipePart] || pipePart;
+      }
+    });
+    return translatedPipeParts.join(' | ');
+  }
 
-  const translatedParts = parts.map(part => {
-    // Look up translation
-    return marketRegimeTranslations[part] || part;
-  });
+  // Handle comma-only separator
+  if (text.includes('，')) {
+    const parts = text.split('，').map(part => part.trim());
+    const translatedParts = parts.map(part => marketRegimeTranslations[part] || part);
+    return translatedParts.join(', ');
+  }
 
-  return translatedParts.join(' | ');
+  // Single phrase
+  return marketRegimeTranslations[text] || text;
 }
 
 /**

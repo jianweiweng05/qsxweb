@@ -1,8 +1,8 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "language": "bilingual",
   "updated_at": "2026-01-25",
-  "description": "Market regime, phase, and gamma/volatility translations for bilingual display",
+  "description": "Market regime, phase, gamma/volatility, and global asset translations for bilingual display",
   "market_regimes": {
     "BULL_FRENZY": {
       "zh": "牛市过热",
@@ -79,6 +79,66 @@
     "TWO_WAY_VOLATILITY": {
       "zh": "双向",
       "en": "Two-Way Volatility"
+    }
+  },
+  "global_assets": {
+    "US_STOCKS_SP": {
+      "zh": "美股-标普",
+      "en": "US Stocks - S&P"
+    },
+    "US_STOCKS_NASDAQ": {
+      "zh": "美股-纳指",
+      "en": "US Stocks - Nasdaq"
+    },
+    "EMERGING_MARKETS": {
+      "zh": "新兴市场",
+      "en": "Emerging Markets"
+    },
+    "COMMODITIES": {
+      "zh": "大宗商品",
+      "en": "Commodities"
+    },
+    "DIGITAL_ASSETS": {
+      "zh": "数字资产",
+      "en": "Digital Assets"
+    },
+    "GOLD": {
+      "zh": "黄金",
+      "en": "Gold"
+    },
+    "US_DOLLAR": {
+      "zh": "美元",
+      "en": "US Dollar"
+    },
+    "CASH": {
+      "zh": "现金",
+      "en": "Cash"
+    }
+  },
+  "macro_descriptions": {
+    "AMPLE_LIQUIDITY": {
+      "zh": "流动性充裕",
+      "en": "Ample Liquidity"
+    },
+    "STRONG_RISK_APPETITE": {
+      "zh": "风险偏好强",
+      "en": "Strong Risk Appetite"
+    },
+    "ALLOCATE_RISK_ASSETS": {
+      "zh": "配置风险资产",
+      "en": "Allocate to Risk Assets"
+    },
+    "TIGHTENING_LIQUIDITY": {
+      "zh": "流动性收紧",
+      "en": "Tightening Liquidity"
+    },
+    "WEAK_RISK_APPETITE": {
+      "zh": "风险偏好弱",
+      "en": "Weak Risk Appetite"
+    },
+    "AVOID_RISK_ASSETS": {
+      "zh": "规避风险资产",
+      "en": "Avoid Risk Assets"
     }
   }
 }
