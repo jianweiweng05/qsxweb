@@ -31,16 +31,37 @@ export default function MainLayout({
   const router = useRouter();
   const [lang, setLang] = useState<Language>("zh");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
 
   useEffect(() => {
     setLang(getLanguage());
   }, []);
 
+  useEffect(() => {
+    // Fetch alerts count
+    const fetchAlertsCount = async () => {
+      try {
+        const res = await fetch('https://qsx-ai.onrender.com/macro/v1/alerts/latest', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          const alertsCount = data?.alerts?.length || 0;
+          setUnreadAlerts(alertsCount);
+        }
+      } catch (e) {
+        // If fetch fails, set to 0 (no alerts)
+        setUnreadAlerts(0);
+      }
+    };
+
+    fetchAlertsCount();
+    // Refresh alerts count every 5 minutes
+    const interval = setInterval(fetchAlertsCount, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const t = translations[lang];
   const tabs = getTabs(lang);
   const activeKey = mapActiveKey(pathname, tabs);
-
-  const unreadAlerts = 3;
 
   return (
     <ReportProvider>
