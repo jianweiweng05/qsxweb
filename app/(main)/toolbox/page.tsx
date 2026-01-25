@@ -528,10 +528,10 @@ export default function ToolboxPage() {
                                       </div>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      <div className="text-white/90 font-medium">{row.name}</div>
+                                      <div className="text-white/90 font-medium">{getBilingualMarketText(row.name, lang)}</div>
                                     </td>
                                     <td className="py-2.5 px-2">
-                                      <span className="text-white/60 text-[10px]">{row.type}</span>
+                                      <span className="text-white/60 text-[10px]">{getBilingualMarketText(row.type, lang)}</span>
                                     </td>
                                     {isProUser && (
                                       <>

@@ -45,6 +45,25 @@ const marketRegimeTranslations: Record<string, string> = {
   '流动性收紧': 'Tightening Liquidity',
   '风险偏好弱': 'Weak Risk Appetite',
   '规避风险资产': 'Avoid Risk Assets',
+
+  // Strategy names
+  '趋势跟随': 'Trend Following',
+  '趋势回撤': 'Trend Retracement',
+  '动量策略': 'Momentum Strategy',
+  '区间震荡': 'Range Oscillation',
+  '均值回归': 'Mean Reversion',
+  '网格交易': 'Grid Trading',
+  '波动率管理': 'Volatility Management',
+  '波动率突破': 'Volatility Breakout',
+  '去杠杆 / 捆挤清洗': 'Deleveraging / Squeeze Washout',
+  '清算反转': 'Liquidation Reversal',
+
+  // Strategy types
+  '方向型': 'Directional',
+  '非方向': 'Non-directional',
+  '风控型': 'Risk Control',
+  '条件方向': 'Conditional Directional',
+  '结构型': 'Structural',
 };
 
 /**
