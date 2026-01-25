@@ -55,7 +55,6 @@ export default function MainLayout({
               }`}
             >
               <User size={20} strokeWidth={1.5} />
-              <span className="text-sm">{t.myAccount}</span>
             </button>
 
             <button
@@ -70,7 +69,6 @@ export default function MainLayout({
                   <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                 )}
               </span>
-              <span className="text-sm">{t.alerts}</span>
             </button>
           </div>
         </header>

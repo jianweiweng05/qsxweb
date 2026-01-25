@@ -6,6 +6,20 @@ import { HelpButton } from "../toolbox/help-modal";
 import { useReport } from "../report-provider";
 import { useTranslation, getBilingualText } from "@/app/lib/i18n";
 
+// Weather icon mapping based on market state
+function getWeatherIcon(weatherTitle: string): string {
+  const state = weatherTitle.split('｜')[0].trim();
+
+  if (state.includes('牛市过热')) return '🌞'; // Scorching sun
+  if (state.includes('健康牛市') || state.includes('牛市')) return '☀️'; // Sunny
+  if (state.includes('震荡市')) return '☁️'; // Cloudy
+  if (state.includes('熊市震荡')) return '🌧️'; // Light rain
+  if (state.includes('熊市恐慌')) return '⛈️'; // Thunderstorm
+  if (state.includes('熊市')) return '🌧️'; // Light rain (default bear)
+
+  return '☁️'; // Default cloudy
+}
+
 export default function TodayPage() {
   const { data: payload, isLoading, mutate } = useReport();
   const { lang, t } = useTranslation();
@@ -54,7 +68,12 @@ export default function TodayPage() {
     <div className="text-white pb-28">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 py-8">
         <div className="flex items-baseline justify-between mb-10">
-          <h1 className="text-xl font-semibold">{t.todayOverview}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold">{t.todayOverview}</h1>
+            <span className="text-2xl" title={weatherTitle}>
+              {getWeatherIcon(weatherTitle)}
+            </span>
+          </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => mutate()}
