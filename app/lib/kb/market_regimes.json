@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "language": "bilingual",
+  "updated_at": "2026-01-25",
+  "description": "Market regime and phase translations for bilingual display",
+  "market_regimes": {
+    "BULL_FRENZY": {
+      "zh": "牛市过热",
+      "en": "Overheated Bull Market"
+    },
+    "BULL_TREND": {
+      "zh": "健康牛市",
+      "en": "Healthy Bull Market"
+    },
+    "OSCILLATE": {
+      "zh": "震荡市",
+      "en": "Oscillating Market"
+    },
+    "BEAR_ACCUM": {
+      "zh": "熊市震荡",
+      "en": "Bear Market Oscillation"
+    },
+    "BEAR_PANIC": {
+      "zh": "熊市恐慌",
+      "en": "Bear Market Panic"
+    }
+  },
+  "market_phases": {
+    "ACCUMULATION_AT_LOWS": {
+      "zh": "底部吸筹",
+      "en": "Accumulation at Lows"
+    },
+    "OVERHEATED_RALLY": {
+      "zh": "过热拉升",
+      "en": "Overheated Rally"
+    },
+    "STRUCTURAL_RECOVERY": {
+      "zh": "结构修复",
+      "en": "Structural Recovery"
+    },
+    "BASE_FORMATION_RANGE": {
+      "zh": "筑底震荡",
+      "en": "Base Formation Range"
+    },
+    "DOWNSIDE_PRESSURE": {
+      "zh": "下行承压",
+      "en": "Downside Pressure"
+    }
+  }
+}
