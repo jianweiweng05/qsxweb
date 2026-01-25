@@ -5,6 +5,7 @@ import { VIPGate, ProGate } from "@/app/lib/gate";
 import { HelpButton } from "../toolbox/help-modal";
 import { useReport } from "../report-provider";
 import { useTranslation, getBilingualText } from "@/app/lib/i18n";
+import { getBilingualMarketText } from "@/app/lib/market-regime-translator";
 
 // Weather icon mapping based on market state
 function getWeatherIcon(weatherTitle: string): string {
@@ -40,13 +41,13 @@ export default function TodayPage() {
     );
   }
 
-  const weatherTitle = getBilingualText(payload?.weather?.title, lang) || t.noData;
+  const weatherTitle = getBilingualMarketText(payload?.weather?.title, lang) || t.noData;
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : t.noData;
   const riskCap =
     payload?.risk_cap != null ? Math.round(payload.risk_cap * 100 * 10) / 10 : null;
-  const gammaTitle = getBilingualText(payload?.gamma?.title, lang) || t.noData;
+  const gammaTitle = getBilingualMarketText(payload?.gamma?.title, lang) || t.noData;
 
   const oneLiner = getBilingualText(payload?.ai_json?.one_liner, lang) || t.noData;
   const marketComment = getBilingualText(payload?.ai_json?.market_comment, lang) || t.noData;
