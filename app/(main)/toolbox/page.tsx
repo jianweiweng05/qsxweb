@@ -6,7 +6,7 @@ import { useReport } from "../report-provider";
 import { useState, useEffect } from "react";
 import chartIndex from "@/public/sim_charts/index.json";
 import { useTranslation } from "@/app/lib/i18n";
-import { getBilingualMarketText } from "@/app/lib/market-regime-translator";
+import { getBilingualMarketText, translateProStructuralInsight } from "@/app/lib/market-regime-translator";
 
 export default function ToolboxPage() {
   const { data: payload } = useReport();
@@ -414,12 +414,12 @@ export default function ToolboxPage() {
                     {similarityProSummary && (
                       <>
                         <div className="border-t border-white/10 my-4" />
-                        <div className="text-xs text-white/50 mb-2">Pro 结构解读</div>
+                        <div className="text-xs text-white/50 mb-2">{t.proAnalysis}</div>
                         <div className="space-y-1.5">
                           {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
                             line.trim() && (
                               <div key={i} className="text-xs text-white/90 leading-relaxed">
-                                {line}
+                                {translateProStructuralInsight(line, lang)}
                               </div>
                             )
                           ))}

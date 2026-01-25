@@ -261,7 +261,7 @@ export const translations = {
     historicalSimilarity: "Historical Similarity",
     strategyMatrix: "Strategy Matrix",
     similarScenes: "Similar Scenarios",
-    proAnalysis: "Pro Analysis",
+    proAnalysis: "Pro Structural Insight",
     similarity: "Similarity",
     historyReplay: "History Replay",
     noChartData: "No chart data",

@@ -41,6 +41,10 @@ export default function TodayPage() {
     );
   }
 
+  // Get original Chinese title for icon determination
+  const weatherTitleOriginal = typeof payload?.weather?.title === 'string'
+    ? payload.weather.title
+    : (payload?.weather?.title?.zh || '');
   const weatherTitle = getBilingualMarketText(payload?.weather?.title, lang) || t.noData;
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
@@ -72,7 +76,7 @@ export default function TodayPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-semibold">{t.todayOverview}</h1>
             <span className="text-2xl" title={weatherTitle}>
-              {getWeatherIcon(weatherTitle)}
+              {getWeatherIcon(weatherTitleOriginal)}
             </span>
           </div>
           <div className="flex items-center gap-3">
