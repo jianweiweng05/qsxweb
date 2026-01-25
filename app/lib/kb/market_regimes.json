@@ -1,8 +1,8 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "language": "bilingual",
   "updated_at": "2026-01-25",
-  "description": "Market regime and phase translations for bilingual display",
+  "description": "Market regime, phase, and gamma/volatility translations for bilingual display",
   "market_regimes": {
     "BULL_FRENZY": {
       "zh": "牛市过热",
@@ -45,6 +45,40 @@
     "DOWNSIDE_PRESSURE": {
       "zh": "下行承压",
       "en": "Downside Pressure"
+    }
+  },
+  "gamma_volatility": {
+    "SUPPRESSED_VOLATILITY": {
+      "zh": "波动压制",
+      "en": "Suppressed Volatility"
+    },
+    "DOWNSIDE_DRIFT": {
+      "zh": "下探",
+      "en": "Downside Drift"
+    },
+    "SHORT_SQUEEZE_RISK": {
+      "zh": "逼空",
+      "en": "Short Squeeze Risk"
+    },
+    "RANGE_BOUND": {
+      "zh": "震荡",
+      "en": "Range-Bound"
+    },
+    "VOLATILITY_EXPANSION": {
+      "zh": "波动释放",
+      "en": "Volatility Expansion"
+    },
+    "LIQUIDATION_RISK": {
+      "zh": "防插针",
+      "en": "Liquidation Risk"
+    },
+    "SHORT_SQUEEZE_PREVENTION": {
+      "zh": "防逼空",
+      "en": "Short Squeeze Risk"
+    },
+    "TWO_WAY_VOLATILITY": {
+      "zh": "双向",
+      "en": "Two-Way Volatility"
     }
   }
 }
