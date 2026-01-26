@@ -1,6 +1,22 @@
 'use client';
 
-export default function SimilarityClient({ similarityText }: { similarityText?: string }) {
+interface StageShareTop20 {
+  high?: number;
+  mid?: number;
+  down?: number;
+}
+
+interface SimilarityClientProps {
+  similarityText?: string;
+  finalDecisionText?: string;
+  stageShareTop20?: StageShareTop20;
+}
+
+export default function SimilarityClient({
+  similarityText,
+  finalDecisionText,
+  stageShareTop20
+}: SimilarityClientProps) {
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-2">历史相似性分析</h1>
@@ -31,6 +47,45 @@ export default function SimilarityClient({ similarityText }: { similarityText?: 
           </div>
         </div>
       </div>
+
+      {/* 综合决策建议 */}
+      {finalDecisionText && (
+        <div className="mb-6">
+          <div className="text-sm text-white/50 mb-3">综合决策建议</div>
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="text-sm text-amber-300/90">{finalDecisionText}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Top20相似结构阶段分布 */}
+      {stageShareTop20 && (
+        <div className="mb-6">
+          <div className="text-sm text-white/50 mb-3">Top20相似结构阶段分布</div>
+          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+            <div className="space-y-3">
+              {stageShareTop20.high !== undefined && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70">高位阶段</span>
+                  <span className="text-sm font-medium text-cyan-400">{(stageShareTop20.high * 100).toFixed(0)}%</span>
+                </div>
+              )}
+              {stageShareTop20.mid !== undefined && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70">中位阶段</span>
+                  <span className="text-sm font-medium text-cyan-400">{(stageShareTop20.mid * 100).toFixed(0)}%</span>
+                </div>
+              )}
+              {stageShareTop20.down !== undefined && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70">下行阶段</span>
+                  <span className="text-sm font-medium text-cyan-400">{(stageShareTop20.down * 100).toFixed(0)}%</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 风险提示 */}
       <div className="p-3 rounded-lg bg-white/5 border border-white/10">

@@ -30,6 +30,14 @@ export default function SimilarityPage() {
   }
 
   const similarityText = payload?.similarity_text;
+  const finalDecisionText = payload?.final_decision_text;
+  const stageShareTop20 = payload?.stage_share_top20;
 
-  return <SimilarityClient similarityText={similarityText} />;
+  return (
+    <SimilarityClient
+      similarityText={similarityText}
+      finalDecisionText={finalDecisionText}
+      stageShareTop20={stageShareTop20}
+    />
+  );
 }
