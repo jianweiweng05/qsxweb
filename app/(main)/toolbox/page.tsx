@@ -538,7 +538,8 @@ export default function ToolboxPage() {
                           )}
 
                           {/* Playbook 参考 */}
-                          {proStrategy.playbook_refs && Array.isArray(proStrategy.playbook_refs) && proStrategy.playbook_refs.length > 0 && (\n                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                          {proStrategy.playbook_refs && Array.isArray(proStrategy.playbook_refs) && proStrategy.playbook_refs.length > 0 && (
+                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                               <div className="text-xs text-white/60 mb-2">📖 Playbook 参考</div>
                               <div className="space-y-1">
                                 {proStrategy.playbook_refs.map((item: any, i: number) => (
