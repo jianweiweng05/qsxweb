@@ -17,7 +17,9 @@ export default function ToolboxPage() {
 
   const strategyMatrix = payload?.pro_strategy_matrix;
   const similarityTop3 = payload?.similarity?.top3;
-  const similarityProSummary = payload?.similarity_pro_summary;
+  const similarityTop20 = payload?.similarity_top20;
+  const finalDecisionStats = payload?.final_decision_stats;
+  const proStrategy = payload?.pro_strategy;
   const similarityHistoryRestore = payload?.similarity_history_restore;
   const crossAsset = payload?.cross_asset;
 
@@ -360,73 +362,198 @@ export default function ToolboxPage() {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <span>{t.historicalSimilarity}</span>
+              <span>{t.historicalSimilarity} · PRO</span>
               <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
               <HelpButton indicatorKey="similarity_analysis" />
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-white/10 relative min-h-[600px] max-h-[800px] overflow-y-auto">
               <ProGate lockedMessage={t.upgradeProForSimilarity}>
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
-                  <>
-                    <div className="text-xs text-white/50 mb-3">{t.similarScenes} Top 3</div>
-                    <div className="space-y-3 mb-4">
-                      {similarityTop3.map((item: any, i: number) => (
-                        <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                          <div className="flex items-baseline gap-2 mb-1.5">
-                            <span className="text-white/90 font-medium">{'①②③'[i]}</span>
-                            <span className="text-white/60 text-[10px]">{item.date}</span>
-                            <span className="text-white/90 text-xs">｜{getBilingualMarketText(item.name, lang)}</span>
-                            {chartUrlMap.get(item.date) && (
-                              <button
-                                onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
-                                className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
-                              >
-                                {t.historyReplay} {expandedHistory === i ? '▲' : '▼'}
-                              </button>
-                            )}
-                          </div>
-                          <div className="text-cyan-400/80 text-[10px] mb-1">{t.similarity}：{(item.sim * 100).toFixed(1)}%</div>
-                          {expandedHistory === i && (() => {
-                            const chartPath = chartUrlMap.get(item.date);
-                            if (!chartPath) return null;
-                            return (
-                              <div className="mt-2 pt-2 border-t border-white/10">
-                                <img
-                                  src={chartPath}
-                                  alt={`${item.name} K线图`}
-                                  className="w-full rounded-lg border border-white/10"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const fallback = target.nextElementSibling as HTMLElement;
-                                    if (fallback) fallback.style.display = 'block';
-                                  }}
-                                />
-                                <div className="text-white/40 text-[10px] text-center py-2" style={{display: 'none'}}>
-                                  暂无K线图
+                  <div className="space-y-6">
+                    {/* A. 相似场景 Top3（仅展示） */}
+                    <div>
+                      <div className="text-xs text-white/50 mb-3">A. {t.similarScenes} Top 3</div>
+                      <div className="space-y-3">
+                        {similarityTop3.map((item: any, i: number) => (
+                          <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                            <div className="flex items-baseline gap-2 mb-1.5">
+                              <span className="text-white/90 font-medium">{'①②③'[i]}</span>
+                              <span className="text-white/60 text-[10px]">{item.date}</span>
+                              <span className="text-white/90 text-xs">｜{getBilingualMarketText(item.name, lang)}</span>
+                              {chartUrlMap.get(item.date) && (
+                                <button
+                                  onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
+                                  className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
+                                >
+                                  {t.historyReplay} {expandedHistory === i ? '▲' : '▼'}
+                                </button>
+                              )}
+                            </div>
+                            <div className="text-cyan-400/80 text-[10px] mb-1">{t.similarity}：{(item.sim * 100).toFixed(1)}%</div>
+                            {expandedHistory === i && (() => {
+                              const chartPath = chartUrlMap.get(item.date);
+                              if (!chartPath) return null;
+                              return (
+                                <div className="mt-2 pt-2 border-t border-white/10">
+                                  <img
+                                    src={chartPath}
+                                    alt={`${item.name} K线图`}
+                                    className="w-full rounded-lg border border-white/10"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const fallback = target.nextElementSibling as HTMLElement;
+                                      if (fallback) fallback.style.display = 'block';
+                                    }}
+                                  />
+                                  <div className="text-white/40 text-[10px] text-center py-2" style={{display: 'none'}}>
+                                    暂无K线图
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      ))}
+                              );
+                            })()}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    {similarityProSummary && (
-                      <>
-                        <div className="border-t border-white/10 my-4" />
-                        <div className="text-xs text-white/50 mb-2">{t.proAnalysis}</div>
-                        <div className="space-y-1.5">
-                          {typeof similarityProSummary === 'string' && similarityProSummary.split('\n').map((line: string, i: number) => (
-                            line.trim() && (
-                              <div key={i} className="text-xs text-white/90 leading-relaxed">
-                                {translateProStructuralInsight(line, lang)}
-                              </div>
-                            )
-                          ))}
+
+                    {/* B. Top20 结构分布（统计） */}
+                    {finalDecisionStats && (
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="text-xs text-white/50 mb-3">B. Top20 结构分布</div>
+                        <div className="p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-white/60">主导结构</span>
+                            <span className="text-cyan-400 font-medium">{finalDecisionStats.top_structure || '-'}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-white/60">结构占比</span>
+                            <span className="text-white/90">{finalDecisionStats.structure_share || '-'}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-white/60">高风险占比</span>
+                            <span className="text-red-400 font-medium">{finalDecisionStats.high_risk_share || '-'}</span>
+                          </div>
                         </div>
-                      </>
+                      </div>
                     )}
-                  </>
+
+                    {/* C. 风险画像（文字模板，来自结构） */}
+                    {finalDecisionStats?.top_structure && (
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="text-xs text-white/50 mb-3">C. 风险画像</div>
+                        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                          <div className="text-xs text-white/80 leading-relaxed">
+                            {(() => {
+                              const structure = finalDecisionStats.top_structure;
+                              const highRisk = finalDecisionStats.high_risk_share;
+
+                              // 根据结构生成风险画像文字模板
+                              if (structure.includes('顶部') || structure.includes('peak')) {
+                                return `当前市场结构与历史顶部特征相似度较高（${highRisk}），建议控制仓位，警惕回调风险。`;
+                              } else if (structure.includes('底部') || structure.includes('bottom')) {
+                                return `当前市场结构与历史底部特征相似，但需注意${highRisk}的案例出现进一步下跌，建议分批建仓。`;
+                              } else if (structure.includes('震荡') || structure.includes('consolidation')) {
+                                return `当前市场处于震荡整理阶段，${highRisk}的历史案例出现方向性突破失败，建议等待明确信号。`;
+                              } else if (structure.includes('上涨') || structure.includes('rally')) {
+                                return `当前市场处于上涨趋势中，但${highRisk}的案例随后出现反转，建议设置止盈止损。`;
+                              } else {
+                                return `当前市场结构为"${structure}"，历史相似案例中${highRisk}出现高风险情况，建议谨慎操作。`;
+                              }
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* D. 关键时间窗口 */}
+                    {finalDecisionStats?.common_window && (
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="text-xs text-white/50 mb-3">D. 关键时间窗口</div>
+                        <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                          <div className="text-xs text-white/80 leading-relaxed">
+                            {finalDecisionStats.common_window}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* E. PRO 行动指引 */}
+                    {proStrategy && (
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="text-xs text-white/50 mb-3">E. PRO 行动指引</div>
+                        <div className="space-y-3">
+                          {/* 模式和仓位上限 */}
+                          <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-cyan-400 font-medium">操作模式</span>
+                              <span className="text-sm text-white/90 font-semibold">{proStrategy.mode || '-'}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-cyan-400 font-medium">仓位上限</span>
+                              <span className="text-sm text-white/90 font-semibold">{proStrategy.position_cap || '-'}</span>
+                            </div>
+                          </div>
+
+                          {/* 操作节奏 */}
+                          {proStrategy.rhythm && Array.isArray(proStrategy.rhythm) && proStrategy.rhythm.length > 0 && (
+                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                              <div className="text-xs text-white/60 mb-2">操作节奏</div>
+                              <div className="space-y-1">
+                                {proStrategy.rhythm.map((item: string, i: number) => (
+                                  <div key={i} className="text-xs text-white/80 leading-relaxed">
+                                    • {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 禁止操作 */}
+                          {proStrategy.forbidden && Array.isArray(proStrategy.forbidden) && proStrategy.forbidden.length > 0 && (
+                            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                              <div className="text-xs text-red-400 font-medium mb-2">⚠️ 禁止操作</div>
+                              <div className="space-y-1">
+                                {proStrategy.forbidden.map((item: string, i: number) => (
+                                  <div key={i} className="text-xs text-white/70 leading-relaxed">
+                                    • {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 观察清单 */}
+                          {proStrategy.watchlist && Array.isArray(proStrategy.watchlist) && proStrategy.watchlist.length > 0 && (
+                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                              <div className="text-xs text-white/60 mb-2">观察清单</div>
+                              <div className="space-y-1">
+                                {proStrategy.watchlist.map((item: string, i: number) => (
+                                  <div key={i} className="text-xs text-white/80 leading-relaxed">
+                                    • {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Playbook 参考 */}
+                          {proStrategy.playbook_refs && Array.isArray(proStrategy.playbook_refs) && proStrategy.playbook_refs.length > 0 && (
+                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                              <div className="text-xs text-white/60 mb-2">📖 Playbook 参考</div>
+                              <div className="space-y-1">
+                                {proStrategy.playbook_refs.map((item: string, i: number) => (
+                                  <div key={i} className="text-xs text-cyan-400/80 leading-relaxed">
+                                    • {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="text-xs text-white/50">{t.noSimilarityData}</div>
                 )}
