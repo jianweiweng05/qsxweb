@@ -31,7 +31,7 @@ export default function SimilarityPage() {
 
   const similarityText = payload?.similarity_text;
   const finalDecisionText = payload?.final_decision_text;
-  const stageShareTop20 = payload?.stage_share_top20;
+  const stageShareTop20 = payload?.pro_strategy?.stage_share_top20;
 
   return (
     <SimilarityClient
