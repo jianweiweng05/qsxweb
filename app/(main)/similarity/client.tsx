@@ -33,9 +33,9 @@ export default function SimilarityClient({ similarityText }: { similarityText?: 
       </div>
 
       {/* 风险提示 */}
-      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-        <div className="text-sm font-medium text-red-400 mb-2">📌 风险提示</div>
-        <div className="text-xs text-white/60 leading-relaxed">
+      <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+        <div className="text-xs text-white/40 mb-1.5">风险提示</div>
+        <div className="text-[10px] text-white/30 leading-relaxed">
           本系统为研究型全市场风险分析工具，基于多维历史数据与结构化模型提供风险环境参考，不构成投资建议或收益承诺，所有决策与风险由用户自行承担。
         </div>
       </div>
