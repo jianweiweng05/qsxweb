@@ -13,7 +13,7 @@ function getWeatherIcon(weatherTitle: string): string {
 
   if (state.includes('牛市过热')) return '🌞'; // Scorching sun
   if (state.includes('健康牛市') || state.includes('牛市')) return '☀️'; // Sunny
-  if (state.includes('震荡市')) return '☁️'; // Cloudy
+  if (state.includes('震荡市')) return '🌤️'; // Partly cloudy with sun
   if (state.includes('熊市震荡')) return '🌧️'; // Light rain
   if (state.includes('熊市恐慌')) return '⛈️'; // Thunderstorm
   if (state.includes('熊市')) return '🌧️'; // Light rain (default bear)
