@@ -155,8 +155,83 @@ export const JUDGEMENT_WORDS = manifest.llm_config.judgement_words;
 export const CONFIDENCE_WORDS = manifest.llm_config.confidence_words;
 
 // ============================================================================
-// KB Loading
+// Validation & Error Handling
 // ============================================================================
+
+/**
+ * Validate KB item structure
+ *
+ * Ensures required fields are present and have correct types
+ *
+ * @param item Item to validate
+ * @param fileName Source file name for error context
+ * @throws Error if validation fails
+ */
+export function validateKBItem(item: any, fileName: string): asserts item is KBItem {
+  if (!item || typeof item !== 'object') {
+    throw new Error(`Invalid KB item in ${fileName}: not an object`);
+  }
+
+  if (typeof item.id !== 'string' || !item.id.trim()) {
+    throw new Error(`Invalid KB item in ${fileName}: missing or empty 'id' field`);
+  }
+
+  if (!Array.isArray(item.triggers)) {
+    throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): 'triggers' must be an array`);
+  }
+
+  if (item.triggers.length === 0) {
+    console.warn(`Warning: KB item in ${fileName} (id: ${item.id}) has empty triggers array`);
+  }
+
+  if (item.a === undefined || item.a === null) {
+    throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): missing 'a' field`);
+  }
+
+  if (typeof item.a !== 'string' && typeof item.a !== 'object') {
+    throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): 'a' must be string or object`);
+  }
+}
+
+/**
+ * Validate KB file structure
+ *
+ * @param data File data to validate
+ * @param fileName Source file name for error context
+ * @throws Error if validation fails
+ */
+export function validateKBFile(data: any, fileName: string): asserts data is KBFile {
+  if (!data || typeof data !== 'object') {
+    throw new Error(`Invalid KB file ${fileName}: not an object`);
+  }
+
+  const entries =
+    data.entries ||
+    data.constitution ||
+    data.rules ||
+    data.terms ||
+    data.status ||
+    data.templates ||
+    data.page_guides ||
+    data.subscription;
+
+  if (!entries) {
+    throw new Error(`Invalid KB file ${fileName}: no valid entries found`);
+  }
+
+  if (!Array.isArray(entries)) {
+    throw new Error(`Invalid KB file ${fileName}: entries must be an array, got ${typeof entries}`);
+  }
+
+  // Validate each entry
+  for (let i = 0; i < entries.length; i++) {
+    try {
+      validateKBItem(entries[i], fileName);
+    } catch (e) {
+      throw new Error(`${e instanceof Error ? e.message : String(e)} (entry index: ${i})`);
+    }
+  }
+}
 
 /**
  * Load all KB files specified in manifest.json
@@ -174,6 +249,10 @@ export function loadKB(): Record<string, KBItem[]> {
   for (const fname of manifest.kb_files) {
     try {
       const data: KBFile = require(`@/app/lib/kb/${fname}`);
+
+      // Validate file structure
+      validateKBFile(data, fname);
+
       const entries =
         data.entries ||
         data.constitution ||
@@ -184,12 +263,9 @@ export function loadKB(): Record<string, KBItem[]> {
         data.page_guides ||
         data.subscription;
 
+      // After validation, entries is guaranteed to exist
       if (!entries) {
         throw new Error(`No valid entries found in ${fname}`);
-      }
-
-      if (!Array.isArray(entries)) {
-        throw new Error(`Entries in ${fname} must be an array, got ${typeof entries}`);
       }
 
       const cat = fname.replace('.json', '');
