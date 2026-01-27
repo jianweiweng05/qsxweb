@@ -227,12 +227,32 @@ export function validateKBItem(item: any, fileName: string): asserts item is KBI
     console.warn(`Warning: KB item in ${fileName} (id: ${item.id}) has empty triggers array`);
   }
 
+  // Validate each trigger is a non-empty string
+  for (let i = 0; i < item.triggers.length; i++) {
+    if (typeof item.triggers[i] !== 'string') {
+      throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): trigger at index ${i} must be a string, got ${typeof item.triggers[i]}`);
+    }
+    if (!item.triggers[i].trim()) {
+      throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): trigger at index ${i} is empty`);
+    }
+  }
+
   if (item.a === undefined || item.a === null) {
     throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): missing 'a' field`);
   }
 
   if (typeof item.a !== 'string' && typeof item.a !== 'object') {
     throw new Error(`Invalid KB item in ${fileName} (id: ${item.id}): 'a' must be string or object`);
+  }
+
+  // Validate structured answer if it's an object
+  if (typeof item.a === 'object' && item.a !== null) {
+    const answer = item.a as any;
+    // Ensure at least one recognized field exists
+    const hasValidField = answer.one_liner || answer.what || answer.how || answer.pitfall;
+    if (!hasValidField) {
+      console.warn(`Warning: KB item in ${fileName} (id: ${item.id}) has structured answer with no recognized fields`);
+    }
   }
 }
 
@@ -362,7 +382,11 @@ export function loadKB(): Record<string, KBItem[]> {
  * normalize("你好，世界！") // "你好世界"
  */
 export function normalize(s: string): string {
-  return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
+  return s
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[，。？！、：；""''（）【】《》]/g, "")
+    .replace(/[,.\-?!;:'"()\[\]{}]/g, "");
 }
 
 /**
@@ -393,15 +417,17 @@ export function formatAnswer(a: string | KBAnswer): string {
  * @returns true if invalid, false if valid
  */
 export function isInvalid(s: string): boolean {
-  if (s.length < 2 || s.length > 200) return true;
+  const trimmed = s.trim();
+  if (trimmed.length < 2 || trimmed.length > 200) return true;
 
-  // Pure numbers/symbols
-  if (/^[0-9\s\p{P}\p{S}]+$/u.test(s)) return true;
+  // Pure numbers/symbols (no meaningful characters)
+  if (/^[0-9\s\p{P}\p{S}]+$/u.test(trimmed)) return true;
 
   // Repeated characters (e.g., aaa, 😀😀😀)
-  const chars = [...s];
+  // Allow up to 2 unique characters only if length >= 3
+  const chars = [...trimmed];
   const unique = new Set(chars).size;
-  if (unique <= 2 && s.length >= 3) return true;
+  if (unique <= 2 && chars.length >= 3) return true;
 
   return false;
 }
@@ -431,25 +457,30 @@ export function matchKB(
   s: string,
   kbFiles: Record<string, KBItem[]>
 ): { id: string; a: string | KBAnswer } | null {
-  // First: exact match (complete word)
-  for (const cat of manifest.match_policy.priority_order) {
-    const items = kbFiles[cat] || [];
+  const priorityOrder = manifest.match_policy.priority_order;
+
+  // First pass: exact match (complete word)
+  for (const cat of priorityOrder) {
+    const items = kbFiles[cat];
+    if (!items) continue;
+
     for (const item of items) {
-      for (const t of item.triggers) {
-        if (s === t.toLowerCase()) {
+      for (const trigger of item.triggers) {
+        if (s === trigger.toLowerCase()) {
           return { id: item.id, a: item.a };
         }
       }
     }
   }
 
-  // Then: contains match
-  for (const cat of manifest.match_policy.priority_order) {
-    const items = kbFiles[cat] || [];
+  // Second pass: contains match (substring)
+  for (const cat of priorityOrder) {
+    const items = kbFiles[cat];
+    if (!items) continue;
+
     for (const item of items) {
-      for (const t of item.triggers) {
-        const trigger = t.toLowerCase();
-        if (s.includes(trigger)) {
+      for (const trigger of item.triggers) {
+        if (s.includes(trigger.toLowerCase())) {
           return { id: item.id, a: item.a };
         }
       }
@@ -472,9 +503,12 @@ export function matchStatusKB(
   s: string,
   kbFiles: Record<string, KBItem[]>
 ): { id: string; a: string | KBAnswer } | null {
-  for (const item of kbFiles.status || []) {
-    for (const t of item.triggers) {
-      if (s.includes(t.toLowerCase())) {
+  const statusItems = kbFiles.status;
+  if (!statusItems) return null;
+
+  for (const item of statusItems) {
+    for (const trigger of item.triggers) {
+      if (s.includes(trigger.toLowerCase())) {
         return { id: item.id, a: item.a };
       }
     }
