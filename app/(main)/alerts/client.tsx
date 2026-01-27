@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getLanguage, translations, type Language } from '@/app/lib/i18n';
+import { getLanguage, translations, getBilingualText, type Language } from '@/app/lib/i18n';
 
 interface Alert {
   badge: string;
@@ -28,13 +28,6 @@ function LoadingSkeleton() {
       </div>
     </div>
   );
-}
-
-// Helper function to extract bilingual text
-function getBilingualText(field: string | { zh: string; en: string } | undefined, lang: Language): string {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[lang] || field[lang === 'zh' ? 'en' : 'zh'] || '';
 }
 
 export default function AlertsClient() {

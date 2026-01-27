@@ -1,5 +1,27 @@
 # QuantscopeX Development Log
 
+## 2026-01-27: Code Cleanup - Remove Dead Code and Deduplicate Helpers
+
+### Cleanup Summary
+- Removed 6 dead code files with no references in codebase
+- Deduplicated `getBilingualText` helper function in alerts component
+
+### Files Deleted
+- `app/components/TopNav.tsx` (21 lines) - Replaced by Navigation.tsx (already deleted)
+- `app/login/page.tsx` (49 lines) - Replaced by Clerk Auth /sign-in
+- `app/signin/page.tsx` (14 lines) - Placeholder page replaced by Clerk
+- `app/api/translate/route.ts` (128 lines) - Translation middleware removed (see 2026-01-23)
+- `app/lib/kb/market_regimes.json` - No references found
+- `app/lib/kb/terms_supplement.json` - No references found
+
+### Files Modified
+- `app/(main)/alerts/client.tsx` - Removed local `getBilingualText` function, now imports from `@/app/lib/i18n`
+
+### Verification
+- All deleted files verified with grep to have zero references
+- TypeScript compilation passed (`npx tsc --noEmit`)
+- Total lines removed: ~220 lines
+
 ## 2026-01-23: 修复历史重现K线图路径映射
 
 ### Bug Fix
