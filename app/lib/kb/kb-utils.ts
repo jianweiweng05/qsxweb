@@ -12,17 +12,48 @@
 import manifest from "./manifest.json";
 
 // ============================================================================
-// Types
+// Core KB Types
 // ============================================================================
 
+/**
+ * Core KB item structure
+ * All KB entries follow this base structure with optional additional fields
+ */
 export type KBItem = {
+  // Required fields
   id: string;
   triggers: string[];
-  a: string | object;
-  [key: string]: any; // Allow additional properties
+  a: string | KBAnswer;
+
+  // Optional fields (present in some KB files)
+  q?: string;
+  cat?: string;
+  tier?: string;
+  scope?: string[];
+  related?: string[];
+
+  // Additional fields for specific KB types
+  [key: string]: any;
 };
 
+/**
+ * KB answer can be either a simple string or a structured object
+ */
+export type KBAnswer = {
+  one_liner?: string;
+  what?: string;
+  how?: string[];
+  pitfall?: string[];
+  [key: string]: any;
+};
+
+/**
+ * KB file structure - supports multiple entry key names
+ */
 export type KBFile = {
+  version?: string;
+  language?: string;
+  system_name?: string;
   entries?: KBItem[];
   constitution?: KBItem[];
   rules?: KBItem[];
@@ -33,14 +64,34 @@ export type KBFile = {
   subscription?: KBItem[];
 };
 
-// UI Help File Types (for reference, not used in loadKB)
+// ============================================================================
+// UI Help File Types
+// ============================================================================
+
+/**
+ * Indicator help item (from indicator_help.json)
+ */
 export type IndicatorHelpItem = {
+  id: string;
   title: string;
   one_liner: string;
   how_to_read: string;
   notes: string[];
 };
 
+/**
+ * Indicator help file structure
+ */
+export type IndicatorHelpFile = {
+  version: string;
+  language: string;
+  type: string;
+  entries: IndicatorHelpItem[];
+};
+
+/**
+ * Alert indicator item (from alert_indicators.json)
+ */
 export type AlertIndicatorItem = {
   id?: string;
   code?: string;
@@ -53,6 +104,9 @@ export type AlertIndicatorItem = {
   tags: string[];
 };
 
+/**
+ * Alert indicators file structure
+ */
 export type AlertIndicatorsFile = {
   version: string;
   language: string;
@@ -63,6 +117,30 @@ export type AlertIndicatorsFile = {
   };
   threshold_indicators: AlertIndicatorItem[];
   composite_events: AlertIndicatorItem[];
+};
+
+// ============================================================================
+// Manifest Types
+// ============================================================================
+
+/**
+ * Manifest configuration structure
+ */
+export type ManifestConfig = {
+  kb_files: string[];
+  ui_help_files?: string[];
+  match_policy: {
+    priority_order: string[];
+  };
+  pro_config: {
+    pro_keywords: string[];
+  };
+  vip_config?: {
+    [key: string]: any;
+  };
+  llm_config?: {
+    [key: string]: any;
+  };
 };
 
 // ============================================================================
@@ -109,7 +187,13 @@ export const CONFIDENCE_WORDS = [
 
 /**
  * Load all KB files specified in manifest.json
- * Returns a map of category name to KB items
+ *
+ * @returns Map of category name to KB items
+ * @throws Error if any KB file fails to load or has invalid structure
+ *
+ * @example
+ * const kbFiles = loadKB();
+ * const constitutionItems = kbFiles.constitution;
  */
 export function loadKB(): Record<string, KBItem[]> {
   const result: Record<string, KBItem[]> = {};
@@ -128,7 +212,11 @@ export function loadKB(): Record<string, KBItem[]> {
         data.subscription;
 
       if (!entries) {
-        throw new Error(`No valid entries in ${fname}`);
+        throw new Error(`No valid entries found in ${fname}`);
+      }
+
+      if (!Array.isArray(entries)) {
+        throw new Error(`Entries in ${fname} must be an array, got ${typeof entries}`);
       }
 
       const cat = fname.replace('.json', '');
@@ -144,7 +232,8 @@ export function loadKB(): Record<string, KBItem[]> {
         result[cat] = entries;
       }
     } catch (e) {
-      throw new Error(`Failed to load ${fname}: ${e}`);
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      throw new Error(`Failed to load KB file ${fname}: ${errorMsg}`);
     }
   }
 
@@ -156,16 +245,30 @@ export function loadKB(): Record<string, KBItem[]> {
 // ============================================================================
 
 /**
- * Normalize text for matching: lowercase, remove spaces and punctuation
+ * Normalize text for matching
+ *
+ * Converts to lowercase, removes spaces and Chinese punctuation
+ * to enable consistent trigger matching
+ *
+ * @param s Input string
+ * @returns Normalized string
+ *
+ * @example
+ * normalize("你好，世界！") // "你好世界"
  */
 export function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
 }
 
 /**
- * Format KB answer (handle both string and object formats)
+ * Format KB answer for display
+ *
+ * Handles both string and structured object answer formats
+ *
+ * @param a Answer (string or object)
+ * @returns Formatted string
  */
-export function formatAnswer(a: string | object): string {
+export function formatAnswer(a: string | KBAnswer): string {
   if (typeof a === 'string') return a;
   const obj = a as any;
   if (obj.one_liner) return obj.one_liner;
@@ -174,7 +277,15 @@ export function formatAnswer(a: string | object): string {
 }
 
 /**
- * Check if input is invalid (too short, too long, or nonsense)
+ * Validate input query
+ *
+ * Rejects queries that are:
+ * - Too short (<2 chars) or too long (>200 chars)
+ * - Pure numbers/symbols
+ * - Repeated characters (e.g., "aaa", "😀😀😀")
+ *
+ * @param s Input string
+ * @returns true if invalid, false if valid
  */
 export function isInvalid(s: string): boolean {
   if (s.length < 2 || s.length > 200) return true;
@@ -196,12 +307,25 @@ export function isInvalid(s: string): boolean {
 
 /**
  * Match query against KB entries
- * Returns the first matching entry or null
+ *
+ * Uses two-pass matching strategy:
+ * 1. Exact match: query equals trigger (case-insensitive)
+ * 2. Contains match: trigger is substring of query
+ *
+ * Respects priority order from manifest.match_policy
+ *
+ * @param s Normalized query string
+ * @param kbFiles Loaded KB files map
+ * @returns Matching entry or null
+ *
+ * @example
+ * const match = matchKB("为什么l1下跌", kbFiles);
+ * if (match) console.log(match.id, match.a);
  */
 export function matchKB(
   s: string,
   kbFiles: Record<string, KBItem[]>
-): { id: string; a: string | object } | null {
+): { id: string; a: string | KBAnswer } | null {
   // First: exact match (complete word)
   for (const cat of manifest.match_policy.priority_order) {
     const items = kbFiles[cat] || [];
@@ -232,11 +356,17 @@ export function matchKB(
 
 /**
  * Match query against status KB specifically
+ *
+ * Used for status-related queries (market conditions, system status, etc.)
+ *
+ * @param s Normalized query string
+ * @param kbFiles Loaded KB files map
+ * @returns Matching status entry or null
  */
 export function matchStatusKB(
   s: string,
   kbFiles: Record<string, KBItem[]>
-): { id: string; a: string | object } | null {
+): { id: string; a: string | KBAnswer } | null {
   for (const item of kbFiles.status || []) {
     for (const t of item.triggers) {
       if (s.includes(t.toLowerCase())) {
@@ -253,6 +383,11 @@ export function matchStatusKB(
 
 /**
  * Check if query is a greeting
+ *
+ * Detects common greeting phrases in Chinese and English
+ *
+ * @param s Normalized query string
+ * @returns true if greeting detected
  */
 export function isGreeting(s: string): boolean {
   return GREETING_WORDS.some(w => s.includes(w));
@@ -260,6 +395,12 @@ export function isGreeting(s: string): boolean {
 
 /**
  * Check if query has decision/judgement intent
+ *
+ * Detects queries asking for decisions or judgements about market conditions
+ * Examples: "应该加仓吗", "现在是牛市吗", "怎么办"
+ *
+ * @param s Normalized query string
+ * @returns true if decision/judgement intent detected
  */
 export function isDecisionIntent(s: string): boolean {
   return DECISION_WORDS.some(w => s.includes(w)) ||
@@ -268,6 +409,11 @@ export function isDecisionIntent(s: string): boolean {
 
 /**
  * Check if query matches Pro-tier keywords
+ *
+ * Pro-tier keywords are restricted features only available to Pro subscribers
+ *
+ * @param s Normalized query string
+ * @returns true if Pro keyword detected
  */
 export function matchProKeyword(s: string): boolean {
   return manifest.pro_config.pro_keywords.some(k => s.includes(k.toLowerCase()));
@@ -275,6 +421,19 @@ export function matchProKeyword(s: string): boolean {
 
 /**
  * Check if query is eligible for LLM processing
+ *
+ * Uses two criteria:
+ * 1. Decision-intent queries: ≥6 chars with decision/judgement words
+ * 2. Technical queries: ≥12 chars with 2+ anchor words + 1+ logic word
+ *
+ * Rejects queries with 5+ anchors but no specific context (likely spam)
+ *
+ * @param s Normalized query string
+ * @returns true if query should be sent to LLM
+ *
+ * @example
+ * canUseLLM("为什么l1和l3背离") // true (logic + anchors + length)
+ * canUseLLM("l1 l2 l3 l4 l5 l6") // false (too many anchors, no context)
  */
 export function canUseLLM(s: string): boolean {
   // Decision-intent queries: relaxed threshold (≥6 chars)
