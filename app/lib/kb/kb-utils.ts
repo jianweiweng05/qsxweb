@@ -155,6 +155,49 @@ export const JUDGEMENT_WORDS = manifest.llm_config.judgement_words;
 export const CONFIDENCE_WORDS = manifest.llm_config.confidence_words;
 
 // ============================================================================
+// Caching & Performance
+// ============================================================================
+
+/**
+ * Cache for loaded KB data
+ * Stores the result of loadKB() to avoid repeated file reads and validation
+ */
+let kbCache: Record<string, KBItem[]> | null = null;
+let cacheVersion: string | null = null;
+
+/**
+ * Get cached KB data if available and valid
+ *
+ * Returns cached data if:
+ * 1. Cache exists
+ * 2. Manifest version hasn't changed
+ *
+ * @returns Cached KB data or null if cache is invalid
+ */
+export function getCachedKB(): Record<string, KBItem[]> | null {
+  // Check if cache exists and version matches
+  if (kbCache && cacheVersion === manifest.version) {
+    return kbCache;
+  }
+  return null;
+}
+
+/**
+ * Clear KB cache
+ *
+ * Use this when KB files have been updated and cache needs to be refreshed
+ * Useful for development or when KB files are modified at runtime
+ *
+ * @example
+ * clearKBCache();
+ * const freshKB = loadKB(); // Will reload from files
+ */
+export function clearKBCache(): void {
+  kbCache = null;
+  cacheVersion = null;
+}
+
+// ============================================================================
 // Validation & Error Handling
 // ============================================================================
 
@@ -236,6 +279,9 @@ export function validateKBFile(data: any, fileName: string): asserts data is KBF
 /**
  * Load all KB files specified in manifest.json
  *
+ * Uses caching to avoid repeated file reads and validation.
+ * Cache is invalidated when manifest version changes.
+ *
  * @returns Map of category name to KB items
  * @throws Error if any KB file fails to load or has invalid structure
  *
@@ -244,6 +290,12 @@ export function validateKBFile(data: any, fileName: string): asserts data is KBF
  * const constitutionItems = kbFiles.constitution;
  */
 export function loadKB(): Record<string, KBItem[]> {
+  // Check cache first
+  const cached = getCachedKB();
+  if (cached) {
+    return cached;
+  }
+
   const result: Record<string, KBItem[]> = {};
 
   for (const fname of manifest.kb_files) {
@@ -285,6 +337,10 @@ export function loadKB(): Record<string, KBItem[]> {
       throw new Error(`Failed to load KB file ${fname}: ${errorMsg}`);
     }
   }
+
+  // Store in cache
+  kbCache = result;
+  cacheVersion = manifest.version;
 
   return result;
 }
