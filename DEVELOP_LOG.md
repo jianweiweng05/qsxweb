@@ -1,5 +1,41 @@
 # QuantscopeX Development Log
 
+## 2026-01-27: Code Cleanup Phase 2 - Unify Data Fetching and Remove Unused Routes
+
+### Cleanup Summary
+- Unified report_payload data fetching across the application
+- Removed unused API proxy routes
+- Improved caching consistency
+
+### Changes Made
+
+#### Modified Files
+- `app/(main)/radar/client.tsx`
+  - Changed from direct fetch to `useReport()` hook for report_payload data
+  - Now uses centralized `/api/report` endpoint with 5-minute cache
+  - Separated control_tower fetching (still needed for layer metrics)
+  - Improved error handling with separate error states
+
+#### Deleted Files
+- `app/api/proxy/route.ts` - Duplicate of /api/report, no longer needed
+- `app/api/control_tower_ui/route.ts` - No references found in codebase
+
+#### Preserved Files
+- `app/api/control_tower/route.ts` - **Kept** (actively used by radar page for layer metrics)
+- Reason: radar page depends on control_tower data to build L1-L6 layer cards
+
+### Benefits
+- Unified caching strategy: all report_payload requests now use same 5-minute cache
+- Reduced code duplication: removed redundant proxy endpoint
+- Improved maintainability: single source of truth for report data
+
+### Verification
+- TypeScript compilation passed (`npx tsc --noEmit`)
+- Build cache cleaned to remove stale route references
+- Total files removed: 2 API routes
+
+---
+
 ## 2026-01-27: Code Cleanup - Remove Dead Code and Deduplicate Helpers
 
 ### Cleanup Summary

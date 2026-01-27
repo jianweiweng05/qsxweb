@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { HelpButton } from '../toolbox/help-modal';
 import { ProGate } from '@/app/lib/gate';
+import { useReport } from '../report-provider';
 
 // 类型定义
 interface Metric {
@@ -386,33 +387,30 @@ function LoadingSkeleton() {
 
 // 主组件
 export default function RadarClient() {
-  const [data, setData] = useState<ReportPayload | null>(null);
+  const { data: reportData, error: reportError, isLoading: reportLoading } = useReport();
   const [ctData, setCtData] = useState<ControlTowerPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [ctError, setCtError] = useState<string | null>(null);
+  const [ctLoading, setCtLoading] = useState(true);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchControlTower = useCallback(async () => {
+    setCtLoading(true);
+    setCtError(null);
     try {
-      const [res1, res2] = await Promise.all([
-        fetch('/api/proxy', { cache: 'no-store' }),
-        fetch('/api/control_tower', { cache: 'no-store' })
-      ]);
-
-      if (!res1.ok) throw new Error(`report_payload 返回 ${res1.status}`);
-      if (!res2.ok) throw new Error(`control_tower 返回 ${res2.status}`);
-
-      setData(await res1.json());
-      setCtData(await res2.json());
+      const res = await fetch('/api/control_tower', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`control_tower 返回 ${res.status}`);
+      setCtData(await res.json());
     } catch (e) {
-      setError(e instanceof Error ? e.message : '网络错误');
+      setCtError(e instanceof Error ? e.message : '网络错误');
     } finally {
-      setLoading(false);
+      setCtLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { fetchControlTower(); }, [fetchControlTower]);
+
+  const data = reportData as ReportPayload | null;
+  const loading = reportLoading || ctLoading;
+  const error = reportError || ctError;
 
   // 层级名称映射
   const layerTitles: Record<string, string> = {
@@ -455,7 +453,7 @@ export default function RadarClient() {
   }
 
   if (error) {
-    return <ErrorState message={error} onRetry={fetchData} />;
+    return <ErrorState message={error} onRetry={() => { fetchControlTower(); }} />;
   }
 
   return (
