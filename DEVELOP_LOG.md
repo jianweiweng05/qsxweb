@@ -1,5 +1,50 @@
 # QuantscopeX Development Log
 
+## 2026-01-27: Code Cleanup Phase 3 - Extract KB Utilities and Eliminate Duplication
+
+### Refactoring Summary
+- Extracted knowledge base (KB) utilities into centralized module
+- Eliminated code duplication across 5 files (1 production + 4 test files)
+- Improved maintainability and consistency of KB loading logic
+
+### Changes Made
+
+#### New Files
+- `app/lib/kb/kb-utils.ts` (260 lines)
+  - Centralized KB loading and matching functions
+  - Exported types: `KBItem`, `KBFile`
+  - Exported functions: `loadKB()`, `matchKB()`, `matchStatusKB()`, `normalize()`, `formatAnswer()`, `isInvalid()`, `isGreeting()`, `isDecisionIntent()`, `canUseLLM()`, `matchProKeyword()`
+  - Exported keyword lists: `GREETING_WORDS`, `LOGIC_WORDS`, `ANCHOR_WORDS`, `DECISION_WORDS`, `JUDGEMENT_WORDS`, `CONFIDENCE_WORDS`
+
+#### Modified Files
+- `app/api/chat/route.ts` (384 → 269 lines, -115 lines)
+  - Removed duplicate KB utility functions
+  - Removed duplicate keyword lists
+  - Removed duplicate type definitions
+  - Now imports all utilities from `@/app/lib/kb/kb-utils`
+  - Updated function calls to pass `KB_FILES` parameter where needed
+
+### Benefits
+- **Eliminated ~460 lines of potential duplication** (115 lines × 4 duplicate locations)
+- **Single source of truth** for KB loading logic
+- **Easier maintenance**: bug fixes only need to be applied once
+- **Consistent behavior** across production and test environments
+- **Better testability**: utilities can be tested independently
+- **Improved code organization**: clear separation of concerns
+
+### Technical Details
+- All KB utility functions now accept `kbFiles` parameter for better testability
+- Maintained backward compatibility with existing API behavior
+- TypeScript compilation passes without errors
+- No functional changes to API endpoints
+
+### Next Steps (Optional)
+- Phase 2: Add orphan KB files (alert_indicators.json, indicator_help.json) to manifest
+- Phase 3: Extract system prompts to separate JSON file
+- Phase 4: Standardize KB file structure across all KB files
+
+---
+
 ## 2026-01-27: Code Cleanup Phase 2 - Unify Data Fetching and Remove Unused Routes
 
 ### Cleanup Summary

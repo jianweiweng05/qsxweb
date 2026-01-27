@@ -1,134 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserTier, UserTier } from "@/app/lib/entitlements";
 import manifest from "@/app/lib/kb/manifest.json";
-
-type KBItem = { id: string; triggers: string[]; a: string | object };
-type KBFile = { entries?: KBItem[]; constitution?: KBItem[]; rules?: KBItem[]; terms?: KBItem[]; status?: KBItem[]; templates?: KBItem[]; page_guides?: KBItem[]; subscription?: KBItem[] };
-
-function loadKB(): Record<string, KBItem[]> {
-  const result: Record<string, KBItem[]> = {};
-  for (const fname of manifest.kb_files) {
-    try {
-      const data: KBFile = require(`@/app/lib/kb/${fname}`);
-      const entries = data.entries || data.constitution || data.rules || data.terms || data.status || data.templates || data.page_guides || data.subscription;
-      if (!entries) throw new Error(`No valid entries in ${fname}`);
-      const cat = fname.replace('.json', '');
-
-      // kb_p0_patch: merge entries into their target categories
-      if (cat === 'kb_p0_patch') {
-        for (const item of entries) {
-          const targetCat = (item as any).cat?.toLowerCase() || 'constitution';
-          if (!result[targetCat]) result[targetCat] = [];
-          result[targetCat].push(item);
-        }
-      } else {
-        result[cat] = entries;
-      }
-    } catch (e) {
-      throw new Error(`Failed to load ${fname}: ${e}`);
-    }
-  }
-  return result;
-}
+import {
+  loadKB,
+  normalize,
+  formatAnswer,
+  isInvalid,
+  matchKB,
+  matchStatusKB,
+  matchProKeyword,
+  isDecisionIntent,
+  canUseLLM,
+  isGreeting,
+} from "@/app/lib/kb/kb-utils";
 
 const KB_FILES = loadKB();
-
-const GREETING_WORDS = ["你好", "在吗", "吃了吗", "hello", "hi", "嗨", "哈喽", "早", "晚上好", "下午好", "早上好"];
-const LOGIC_WORDS = ["为什么", "背离", "关联", "导致", "影响", "原因", "逻辑", "意味", "暗示", "预示", "是否", "会不会", "如何", "怎么"];
-const ANCHOR_WORDS = ["l1", "l2", "l3", "l4", "l5", "l6", "rr25", "gamma", "funding", "ls", "etf", "fgi", "hcri", "risk_cap", "coef", "macrocoef"];
-const DECISION_WORDS = ["怎么办", "能不能", "要不要", "可以吗", "适合", "应该", "仓位", "风险", "短线", "波段", "观望", "昨天", "持续", "状态", "市场", "行情", "大跌", "加仓", "减仓", "满仓", "轻仓", "防守", "进攻", "趋势", "区间", "危险", "顺风", "逆风", "交易", "纪律", "预期", "依据", "代价", "改善", "忍耐", "行动"];
-const JUDGEMENT_WORDS = ["偏多", "偏空", "牛市", "熊市", "震荡", "反弹", "下跌", "筑底", "情绪", "基本面", "顺势", "逆势", "成功率", "靠谱", "安全", "确定", "错误", "注意", "信号", "历史", "机构", "策略", "现货", "警惕", "问题", "类似"];
-const CONFIDENCE_WORDS = ["确定", "靠谱", "安全", "什么都不做", "不做"];
-
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/\s+/g, "").replace(/[，。？！、：；""'']/g, "");
-}
-
-function formatAnswer(a: string | object): string {
-  if (typeof a === 'string') return a;
-  const obj = a as any;
-  if (obj.one_liner) return obj.one_liner;
-  if (obj.what) return obj.what;
-  return JSON.stringify(a);
-}
-
-function isInvalid(s: string): boolean {
-  if (s.length < 2 || s.length > 200) return true;
-  // 纯数字/符号
-  if (/^[0-9\s\p{P}\p{S}]+$/u.test(s)) return true;
-  // 重复字符（如 aaa, 😀😀😀）
-  const chars = [...s];
-  const unique = new Set(chars).size;
-  if (unique <= 2 && s.length >= 3) return true;
-  return false;
-}
-
-function matchKB(s: string): { id: string; a: string | object } | null {
-  // 优先精确匹配（完整词）
-  for (const cat of manifest.match_policy.priority_order) {
-    const items = KB_FILES[cat] || [];
-    for (const item of items) {
-      for (const t of item.triggers) {
-        if (s === t.toLowerCase()) {
-          return { id: item.id, a: item.a };
-        }
-      }
-    }
-  }
-  // 再进行包含匹配
-  for (const cat of manifest.match_policy.priority_order) {
-    const items = KB_FILES[cat] || [];
-    for (const item of items) {
-      for (const t of item.triggers) {
-        const trigger = t.toLowerCase();
-        if (s.includes(trigger)) {
-          return { id: item.id, a: item.a };
-        }
-      }
-    }
-  }
-  return null;
-}
-
-function matchStatusKB(s: string): { id: string; a: string | object } | null {
-  for (const item of KB_FILES.status || []) {
-    for (const t of item.triggers) {
-      if (s.includes(t.toLowerCase())) {
-        return { id: item.id, a: item.a };
-      }
-    }
-  }
-  return null;
-}
-
-function matchProKeyword(s: string): boolean {
-  return manifest.pro_config.pro_keywords.some(k => s.includes(k.toLowerCase()));
-}
-
-function isDecisionIntent(s: string): boolean {
-  return DECISION_WORDS.some(w => s.includes(w)) || JUDGEMENT_WORDS.some(w => s.includes(w));
-}
-
-function canUseLLM(s: string): boolean {
-  // 裁决类问题放宽门槛：只需长度 ≥ 6
-  if (isDecisionIntent(s) && [...s].length >= 6) {
-    return true;
-  }
-  // 非裁决类：严格门槛 2+ anchor + 1+ logic + 12+ chars
-  const anchorCount = ANCHOR_WORDS.filter(w => s.includes(w)).length;
-  const hasLogic = LOGIC_WORDS.some(w => s.includes(w));
-  const charCount = [...s].length;
-
-  if (anchorCount >= 5 && !s.match(/\d+|具体|当前|现在|如果/)) {
-    return false;
-  }
-
-  return charCount >= 12 && anchorCount >= 2 && hasLogic;
-}
-
-function isGreeting(s: string): boolean {
-  return GREETING_WORDS.some(w => s.includes(w));
-}
 
 const MSG_GREETING = "你好！我是 QuantscopeX AI 助手。我能回答：市场状态/仓位规则/指标定义/页面功能。试试问：'RR25 是什么？'或'仓位规则'";
 const MSG_GREETING_EN = "Hello! I'm QuantscopeX AI assistant. I can answer: market status/position rules/indicator definitions/page features. Try asking: 'What is RR25?' or 'Position rules'";
@@ -180,14 +66,14 @@ function classifyQuery(q: string, tier: UserTier, lang: "zh" | "en"): ClassifyRe
 
   // 1. 裁决短路：裁决意图优先匹配 status KB
   if (isDecisionIntent(s)) {
-    const statusKb = matchStatusKB(s);
+    const statusKb = matchStatusKB(s, KB_FILES);
     if (statusKb) {
       return { type: "kb", text: formatAnswer(statusKb.a), source_id: statusKb.id };
     }
   }
 
   // 2. 通用 KB 匹配
-  const kb = matchKB(s);
+  const kb = matchKB(s, KB_FILES);
   if (kb) {
     return { type: "kb", text: `💡 [系统百科]\n${formatAnswer(kb.a)}`, source_id: kb.id };
   }
