@@ -1,5 +1,54 @@
 # QuantscopeX Development Log
 
+## 2026-01-27: Code Cleanup Phase 4 - Integrate UI Help Files into KB Management
+
+### Integration Summary
+- Added UI help files to manifest.json for unified KB management
+- Added type definitions for UI help file structures
+- Maintained existing help-modal.tsx functionality (zero breaking changes)
+
+### Changes Made
+
+#### Modified Files
+- `app/lib/kb/manifest.json`
+  - Added new field: `ui_help_files: ["indicator_help.json", "alert_indicators.json"]`
+  - These files are now officially tracked in the KB system
+  - Separated from regular KB files due to different structure and usage
+
+- `app/lib/kb/kb-utils.ts`
+  - Added documentation comment explaining UI help files
+  - Added type definitions:
+    - `IndicatorHelpItem`: Type for indicator_help.json entries
+    - `AlertIndicatorItem`: Type for alert indicator entries
+    - `AlertIndicatorsFile`: Type for alert_indicators.json structure
+  - These types are exported for use by UI components
+
+#### Unchanged Files
+- `app/(main)/toolbox/help-modal.tsx` - No changes needed, continues to work as before
+
+### Benefits
+- **Unified management**: All KB files now tracked in manifest.json
+- **Clear documentation**: UI help files are explicitly marked as special-purpose
+- **Type safety**: Exported types can be used by UI components
+- **Zero risk**: No functional changes, existing code continues to work
+- **Future-ready**: Foundation for potential future integration
+
+### Technical Details
+- UI help files use different structures than regular KB files:
+  - No `triggers` field (not used for text matching)
+  - Different field names (title, one_liner, how_to_read vs id, triggers, a)
+  - Specialized for UI help documentation
+- `loadKB()` function only processes files in `kb_files` array
+- UI components continue to directly import help files as before
+
+### Why This Approach?
+- **Minimal risk**: No changes to existing functionality
+- **Clear separation**: UI help files are tracked but not mixed with text-matching KB
+- **Flexibility**: Future option to integrate more deeply if needed
+- **Documentation**: Makes it clear these files are part of the KB system
+
+---
+
 ## 2026-01-27: Code Cleanup Phase 3 - Extract KB Utilities and Eliminate Duplication
 
 ### Refactoring Summary

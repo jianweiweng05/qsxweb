@@ -12,6 +12,7 @@
     "fallback": "llm"
   },
   "kb_files": ["constitution.json", "rules.json", "terms.json", "status.json", "templates.json", "page_guides.json", "subscription.json", "kb_p0_patch.json"],
+  "ui_help_files": ["indicator_help.json", "alert_indicators.json"],
   "entitlement_config": {
     "enabled": true,
     "tiers": ["Free", "VIP", "Pro"],

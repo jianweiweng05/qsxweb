@@ -3,6 +3,10 @@
  *
  * Centralized utilities for loading and matching knowledge base entries.
  * Used by chat API and test files to avoid duplication.
+ *
+ * Note: UI help files (indicator_help.json, alert_indicators.json) are managed
+ * separately in manifest.json under "ui_help_files". They use different structures
+ * and are loaded directly by UI components (e.g., help-modal.tsx).
  */
 
 import manifest from "./manifest.json";
@@ -27,6 +31,38 @@ export type KBFile = {
   templates?: KBItem[];
   page_guides?: KBItem[];
   subscription?: KBItem[];
+};
+
+// UI Help File Types (for reference, not used in loadKB)
+export type IndicatorHelpItem = {
+  title: string;
+  one_liner: string;
+  how_to_read: string;
+  notes: string[];
+};
+
+export type AlertIndicatorItem = {
+  id?: string;
+  code?: string;
+  title: string;
+  short: string;
+  what_it_means: string;
+  what_can_happen: string[];
+  recommended_actions: string[];
+  caveats?: string[];
+  tags: string[];
+};
+
+export type AlertIndicatorsFile = {
+  version: string;
+  language: string;
+  updated_at: string;
+  ui: {
+    max_detail_chars: number;
+    default_disclaimer: string;
+  };
+  threshold_indicators: AlertIndicatorItem[];
+  composite_events: AlertIndicatorItem[];
 };
 
 // ============================================================================
