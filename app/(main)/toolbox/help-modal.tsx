@@ -27,19 +27,19 @@ export function HelpButton({
   // 根据 kbFile 选择知识库
   const kb = kbFile === "alert_indicators" ? alertIndicators : indicatorHelp;
 
-  // 如果提供了 indicatorKey，从字典加载内容
+  // 如果提供了 indicatorKey，从知识库加载内容
   const helpData: HelpContent | null = indicatorKey
     ? (() => {
         if (kbFile === "alert_indicators") {
-          // 新格式：在 threshold_indicators 和 composite_events 数组中查找
+          // alert_indicators: 在 threshold_indicators 和 composite_events 数组中查找
           const allItems = [
             ...(alertIndicators.threshold_indicators || []),
             ...(alertIndicators.composite_events || [])
           ];
           const item = allItems.find((x: any) =>
-          x.id?.toUpperCase() === indicatorKey?.toUpperCase() ||
-          x.code?.toUpperCase() === indicatorKey?.toUpperCase()
-        );
+            x.id?.toUpperCase() === indicatorKey?.toUpperCase() ||
+            x.code?.toUpperCase() === indicatorKey?.toUpperCase()
+          );
           if (!item) {
             console.log('[HelpButton] Item not found for key:', indicatorKey);
             return null;
@@ -61,7 +61,25 @@ export function HelpButton({
           console.log('[HelpButton] Loaded data for', indicatorKey, ':', result);
           return result;
         }
-        return (kb as Record<string, HelpContent>)[indicatorKey] || null;
+
+        // indicator_help: 在 entries 数组中查找
+        const entries = (kb as any).entries || [];
+        const item = entries.find((x: any) =>
+          x.id?.toUpperCase() === indicatorKey?.toUpperCase()
+        );
+        if (!item) {
+          console.log('[HelpButton] Item not found for key:', indicatorKey);
+          return null;
+        }
+
+        const result = {
+          title: item.title,
+          one_liner: item.one_liner || "",
+          how_to_read: item.how_to_read || "",
+          notes: item.notes || []
+        };
+        console.log('[HelpButton] Loaded data for', indicatorKey, ':', result);
+        return result;
       })()
     : null;
 

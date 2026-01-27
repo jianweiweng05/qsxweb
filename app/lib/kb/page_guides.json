@@ -2,11 +2,5 @@
   "version": "3.1.0",
   "system_name": "QSX Market Risk Engine",
   "language": "zh-CN",
-  "entries": [
-    { "id": "page_guide_today", "cat": "PageGuide", "tier": "P0", "triggers": [], "q": "", "a": "" },
-    { "id": "page_guide_radar", "cat": "PageGuide", "tier": "P0", "triggers": [], "q": "", "a": "" },
-    { "id": "page_guide_alerts", "cat": "PageGuide", "tier": "P0", "triggers": [], "q": "", "a": "" },
-    { "id": "page_guide_toolbox", "cat": "PageGuide", "tier": "P0", "triggers": [], "q": "", "a": "" },
-    { "id": "page_guide_account", "cat": "PageGuide", "tier": "P0", "triggers": [], "q": "", "a": "" }
-  ]
+  "entries": []
 }
