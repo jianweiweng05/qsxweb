@@ -22,6 +22,7 @@ export default function ToolboxPage() {
   const proStrategy = payload?.pro_strategy;
   const similarityHistoryRestore = payload?.similarity_history_restore;
   const crossAsset = payload?.cross_asset;
+  const similarityStats = payload?.similarity_stats;
 
   // Create a lookup map for chart URLs by date
   const chartUrlMap = new Map(
@@ -466,10 +467,145 @@ export default function ToolboxPage() {
                       </div>
                     )}
 
-                    {/* D. 关键时间窗口 */}
+                    {/* D. 历史统计数据 */}
+                    {similarityStats && (similarityStats['7d'] || similarityStats['14d'] || similarityStats['30d']) && (
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="text-xs text-white/50 mb-3">D. 历史统计数据</div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b border-white/10">
+                                <th className="text-left py-2 px-3 text-white/50 font-normal">指标</th>
+                                <th className="text-center py-2 px-3 text-white/50 font-normal">7天</th>
+                                <th className="text-center py-2 px-3 text-white/50 font-normal">14天</th>
+                                <th className="text-center py-2 px-3 text-white/50 font-normal">30天</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {/* 胜率 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">胜率</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['7d']?.win_rate >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['7d']?.win_rate ? (similarityStats['7d'].win_rate * 100).toFixed(1) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['14d']?.win_rate >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['14d']?.win_rate ? (similarityStats['14d'].win_rate * 100).toFixed(1) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['30d']?.win_rate >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['30d']?.win_rate ? (similarityStats['30d'].win_rate * 100).toFixed(1) + '%' : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 平均收益 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">平均收益</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['7d']?.avg_return >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['7d']?.avg_return ? (similarityStats['7d'].avg_return * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['14d']?.avg_return >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['14d']?.avg_return ? (similarityStats['14d'].avg_return * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['30d']?.avg_return >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['30d']?.avg_return ? (similarityStats['30d'].avg_return * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 盈亏比 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">盈亏比</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['7d']?.profit_loss_ratio >= 1 ? 'text-green-400' : 'text-yellow-400'}`}>
+                                    {similarityStats['7d']?.profit_loss_ratio ? similarityStats['7d'].profit_loss_ratio.toFixed(2) : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['14d']?.profit_loss_ratio >= 1 ? 'text-green-400' : 'text-yellow-400'}`}>
+                                    {similarityStats['14d']?.profit_loss_ratio ? similarityStats['14d'].profit_loss_ratio.toFixed(2) : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['30d']?.profit_loss_ratio >= 1 ? 'text-green-400' : 'text-yellow-400'}`}>
+                                    {similarityStats['30d']?.profit_loss_ratio ? similarityStats['30d'].profit_loss_ratio.toFixed(2) : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 平均回撤 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">平均回撤</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-orange-400">
+                                    {similarityStats['7d']?.avg_drawdown ? (similarityStats['7d'].avg_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-orange-400">
+                                    {similarityStats['14d']?.avg_drawdown ? (similarityStats['14d'].avg_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-orange-400">
+                                    {similarityStats['30d']?.avg_drawdown ? (similarityStats['30d'].avg_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 最大回撤 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">最大回撤</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-red-400">
+                                    {similarityStats['7d']?.max_drawdown ? (similarityStats['7d'].max_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-red-400">
+                                    {similarityStats['14d']?.max_drawdown ? (similarityStats['14d'].max_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-red-400">
+                                    {similarityStats['30d']?.max_drawdown ? (similarityStats['30d'].max_drawdown * 100).toFixed(2) + '%' : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 样本数 */}
+                              <tr className="hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">样本数</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-white/60">
+                                    {similarityStats['7d']?.sample_n || '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-white/60">
+                                    {similarityStats['14d']?.sample_n || '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-white/60">
+                                    {similarityStats['30d']?.sample_n || '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* E. 关键时间窗口 */}
                     {finalDecisionStats?.common_window && (
                       <div className="border-t border-white/10 pt-6">
-                        <div className="text-xs text-white/50 mb-3">D. 关键时间窗口</div>
+                        <div className="text-xs text-white/50 mb-3">E. 关键时间窗口</div>
                         <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                           <div className="text-xs text-white/80 leading-relaxed">
                             {finalDecisionStats.common_window}
@@ -478,10 +614,10 @@ export default function ToolboxPage() {
                       </div>
                     )}
 
-                    {/* E. PRO 行动指引 */}
+                    {/* F. PRO 行动指引 */}
                     {proStrategy && (
                       <div className="border-t border-white/10 pt-6">
-                        <div className="text-xs text-white/50 mb-3">E. PRO 行动指引</div>
+                        <div className="text-xs text-white/50 mb-3">F. PRO 行动指引</div>
                         <div className="space-y-3">
                           {/* 模式和仓位上限 */}
                           <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
