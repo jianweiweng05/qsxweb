@@ -619,9 +619,9 @@ export default function ToolboxPage() {
                                   </span>
                                 </td>
                               </tr>
-                              {/* 平均持仓时长 */}
+                              {/* 平均套牢时长 */}
                               <tr className="border-b border-white/5 hover:bg-white/5">
-                                <td className="py-2.5 px-3 text-white/70">平均持仓时长</td>
+                                <td className="py-2.5 px-3 text-white/70">平均套牢时长</td>
                                 <td className="py-2.5 px-3 text-center">
                                   <span className="font-mono text-blue-400">
                                     {similarityStats['7d']?.avg_holding_duration ? similarityStats['7d'].avg_holding_duration.toFixed(1) + '天' : '-'}
@@ -638,9 +638,9 @@ export default function ToolboxPage() {
                                   </span>
                                 </td>
                               </tr>
-                              {/* 中位持仓时长 */}
+                              {/* 中位套牢时长 */}
                               <tr className="hover:bg-white/5">
-                                <td className="py-2.5 px-3 text-white/70">中位持仓时长</td>
+                                <td className="py-2.5 px-3 text-white/70">中位套牢时长</td>
                                 <td className="py-2.5 px-3 text-center">
                                   <span className="font-mono text-blue-400">
                                     {similarityStats['7d']?.median_holding_duration ? similarityStats['7d'].median_holding_duration + '天' : '-'}
