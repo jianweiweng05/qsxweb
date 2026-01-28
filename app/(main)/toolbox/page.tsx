@@ -23,6 +23,7 @@ export default function ToolboxPage() {
   const similarityHistoryRestore = payload?.similarity_history_restore;
   const crossAsset = payload?.cross_asset;
   const similarityStats = payload?.similarity_stats;
+  const finalDecisionText = payload?.similarity?.final_decision_text;
 
   // Create a lookup map for chart URLs by date
   const chartUrlMap = new Map(
@@ -439,29 +440,13 @@ export default function ToolboxPage() {
                       </div>
                     )}
 
-                    {/* C. 风险画像（文字模板，来自结构） */}
-                    {finalDecisionStats?.top_structure && (
+                    {/* C. 风险决策建议 */}
+                    {finalDecisionText && (
                       <div className="border-t border-white/10 pt-6">
-                        <div className="text-xs text-white/50 mb-3">C. 风险画像</div>
+                        <div className="text-xs text-white/50 mb-3">C. 风险决策建议</div>
                         <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                           <div className="text-xs text-white/80 leading-relaxed">
-                            {(() => {
-                              const structure = finalDecisionStats.top_structure;
-                              const highRisk = finalDecisionStats.high_risk_share;
-
-                              // 根据结构生成风险画像文字模板
-                              if (structure.includes('顶部') || structure.includes('peak')) {
-                                return `当前市场结构与历史顶部特征相似度较高（${highRisk}），建议控制仓位，警惕回调风险。`;
-                              } else if (structure.includes('底部') || structure.includes('bottom')) {
-                                return `当前市场结构与历史底部特征相似，但需注意${highRisk}的案例出现进一步下跌，建议分批建仓。`;
-                              } else if (structure.includes('震荡') || structure.includes('consolidation')) {
-                                return `当前市场处于震荡整理阶段，${highRisk}的历史案例出现方向性突破失败，建议等待明确信号。`;
-                              } else if (structure.includes('上涨') || structure.includes('rally')) {
-                                return `当前市场处于上涨趋势中，但${highRisk}的案例随后出现反转，建议设置止盈止损。`;
-                              } else {
-                                return `当前市场结构为"${structure}"，历史相似案例中${highRisk}出现高风险情况，建议谨慎操作。`;
-                              }
-                            })()}
+                            {finalDecisionText}
                           </div>
                         </div>
                       </div>
@@ -578,7 +563,7 @@ export default function ToolboxPage() {
                                 </td>
                               </tr>
                               {/* 样本数 */}
-                              <tr className="hover:bg-white/5">
+                              <tr className="border-b border-white/5 hover:bg-white/5">
                                 <td className="py-2.5 px-3 text-white/70">样本数</td>
                                 <td className="py-2.5 px-3 text-center">
                                   <span className="font-mono text-white/60">
@@ -593,6 +578,82 @@ export default function ToolboxPage() {
                                 <td className="py-2.5 px-3 text-center">
                                   <span className="font-mono text-white/60">
                                     {similarityStats['30d']?.sample_n || '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 收益偏度 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">收益偏度</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['7d']?.return_skewness >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['7d']?.return_skewness ? similarityStats['7d'].return_skewness.toFixed(3) : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['14d']?.return_skewness >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['14d']?.return_skewness ? similarityStats['14d'].return_skewness.toFixed(3) : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['30d']?.return_skewness >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {similarityStats['30d']?.return_skewness ? similarityStats['30d'].return_skewness.toFixed(3) : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 共振置信度 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">共振置信度</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['7d']?.resonance_confidence >= 80 ? 'text-green-400' : similarityStats['7d']?.resonance_confidence >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                    {similarityStats['7d']?.resonance_confidence || '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['14d']?.resonance_confidence >= 80 ? 'text-green-400' : similarityStats['14d']?.resonance_confidence >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                    {similarityStats['14d']?.resonance_confidence || '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`font-mono ${similarityStats['30d']?.resonance_confidence >= 80 ? 'text-green-400' : similarityStats['30d']?.resonance_confidence >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                    {similarityStats['30d']?.resonance_confidence || '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 平均持仓时长 */}
+                              <tr className="border-b border-white/5 hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">平均持仓时长</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['7d']?.avg_holding_duration ? similarityStats['7d'].avg_holding_duration.toFixed(1) + '天' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['14d']?.avg_holding_duration ? similarityStats['14d'].avg_holding_duration.toFixed(1) + '天' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['30d']?.avg_holding_duration ? similarityStats['30d'].avg_holding_duration.toFixed(1) + '天' : '-'}
+                                  </span>
+                                </td>
+                              </tr>
+                              {/* 中位持仓时长 */}
+                              <tr className="hover:bg-white/5">
+                                <td className="py-2.5 px-3 text-white/70">中位持仓时长</td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['7d']?.median_holding_duration ? similarityStats['7d'].median_holding_duration + '天' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['14d']?.median_holding_duration ? similarityStats['14d'].median_holding_duration + '天' : '-'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className="font-mono text-blue-400">
+                                    {similarityStats['30d']?.median_holding_duration ? similarityStats['30d'].median_holding_duration + '天' : '-'}
                                   </span>
                                 </td>
                               </tr>
