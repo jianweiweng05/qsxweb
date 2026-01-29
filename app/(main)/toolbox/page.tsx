@@ -378,20 +378,30 @@ export default function ToolboxPage() {
                       <div className="space-y-3">
                         {similarityTop3.map((item: any, i: number) => (
                           <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="flex items-baseline gap-2 mb-1.5">
-                              <span className="text-white/90 font-medium">{'①②③'[i]}</span>
-                              <span className="text-white/60 text-[10px]">{item.date}</span>
-                              <span className="text-white/90 text-xs">｜{getBilingualMarketText(item.name, lang)}</span>
-                              {chartUrlMap.get(item.date) && (
-                                <button
-                                  onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
-                                  className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
-                                >
-                                  {t.historyReplay} {expandedHistory === i ? '▲' : '▼'}
-                                </button>
-                              )}
+                            <div className="flex items-start gap-2 mb-2">
+                              <span className="text-white/90 font-medium mt-0.5">{'①②③'[i]}</span>
+                              <div className="flex-1">
+                                <div className="flex items-baseline gap-2 mb-1">
+                                  <span className="text-white/60 text-[10px]">{item.date}</span>
+                                  {item.display_title && (
+                                    <span className="text-cyan-400 text-xs font-medium">｜{item.display_title}</span>
+                                  )}
+                                  {chartUrlMap.get(item.date) && (
+                                    <button
+                                      onClick={() => setExpandedHistory(expandedHistory === i ? null : i)}
+                                      className="ml-auto text-yellow-400/70 text-[10px] font-medium hover:text-yellow-400 transition-colors"
+                                    >
+                                      {t.historyReplay} {expandedHistory === i ? '▲' : '▼'}
+                                    </button>
+                                  )}
+                                </div>
+                                {item.display_note && (
+                                  <div className="text-white/70 text-[10px] leading-relaxed">
+                                    {item.display_note}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div className="text-cyan-400/80 text-[10px] mb-1">{t.similarity}：{(item.sim * 100).toFixed(1)}%</div>
                             {expandedHistory === i && (() => {
                               const chartPath = chartUrlMap.get(item.date);
                               if (!chartPath) return null;
