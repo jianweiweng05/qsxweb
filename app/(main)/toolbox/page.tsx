@@ -24,7 +24,9 @@ export default function ToolboxPage() {
   const crossAsset = payload?.cross_asset;
   const similarityStats = payload?.similarity_stats;
   const finalDecisionText = payload?.similarity?.final_decision_text;
-  const statsEnv = payload?.stats_env;
+
+  // Extract stats_env from the first strategy row (all rows share the same environment)
+  const statsEnv = strategyMatrix?.rows?.[0]?.stats?.stats_env;
 
   // Create a lookup map for chart URLs by date
   const chartUrlMap = new Map(
@@ -41,8 +43,9 @@ export default function ToolboxPage() {
     console.log('strategyMatrix keys:', strategyMatrix ? Object.keys(strategyMatrix) : 'no strategyMatrix');
     console.log('Has rows?', strategyMatrix?.rows);
     console.log('Version:', strategyMatrix?.version);
-    console.log('statsEnv:', statsEnv);
+    console.log('statsEnv (from first row):', statsEnv);
     console.log('statsEnv status:', statsEnv?.status);
+    console.log('statsEnv env_key:', statsEnv?.env_key);
   }
 
   return (
