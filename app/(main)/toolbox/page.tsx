@@ -46,6 +46,18 @@ export default function ToolboxPage() {
     console.log('statsEnv (from first row):', statsEnv);
     console.log('statsEnv status:', statsEnv?.status);
     console.log('statsEnv env_key:', statsEnv?.env_key);
+
+    // Debug: Log stats for each strategy row
+    if (strategyMatrix?.rows && Array.isArray(strategyMatrix.rows)) {
+      console.log('=== Strategy Stats Debug ===');
+      strategyMatrix.rows.forEach((row: any, i: number) => {
+        console.log(`Strategy ${i} (${row.name}):`, {
+          stats: row.stats,
+          stats_all: row.stats?.stats_all,
+          stats_env: row.stats?.stats_env
+        });
+      });
+    }
   }
 
   return (
@@ -783,7 +795,7 @@ export default function ToolboxPage() {
                       </div>
                     )}
 
-                    {/* 矩阵表格 */}
+                    {/* 策略卡片列表 */}
                     {(() => {
                       // 从 rows 字段获取矩阵数据
                       const rows = strategyMatrix.rows || [];
@@ -807,75 +819,134 @@ export default function ToolboxPage() {
                         return { color: 'bg-gray-400', text: 'text-gray-400', label: d || l };
                       };
 
-                      return (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-xs">
-                            <thead>
-                              <tr className="border-b border-white/10">
-                                <th className="text-left py-2 px-2 text-white/50 font-normal w-8"></th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">{t.strategyName}</th>
-                                <th className="text-left py-2 px-2 text-white/50 font-normal">{t.strategyType}</th>
-                                {isProUser && (
-                                  <>
-                                    <th className="text-left py-2 px-2 text-white/50 font-normal">{t.decision}</th>
-                                    <th className="text-left py-2 px-2 text-white/50 font-normal">{t.score}</th>
-                                  </>
-                                )}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {rows.map((row: any, i: number) => {
-                                const lightStyle = getLightStyle(row.light, row.decision);
-                                const score = row.score || 0;
-                                const scorePercent = score; // score is already 0-100
+                      // 渲染统计数据面板的辅助函数
+                      const renderStatsPanel = (stats: any, title: string, envKey?: string) => {
+                        if (!stats || stats.status !== 'ok') return null;
 
-                                return (
-                                  <tr key={row.key || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                    <td className="py-2.5 px-2">
-                                      <div className="flex items-center gap-1.5">
-                                        {/* 红绿灯指示器 */}
-                                        <div
-                                          className={`w-2 h-2 rounded-full ${lightStyle.color} shadow-lg`}
-                                          style={{
-                                            boxShadow: `0 0 8px ${
-                                              lightStyle.color === 'bg-green-400' ? 'rgba(34, 197, 94, 0.6)' :
-                                              lightStyle.color === 'bg-red-400' ? 'rgba(239, 68, 68, 0.6)' :
-                                              'rgba(234, 179, 8, 0.6)'
-                                            }`
-                                          }}
-                                        />
+                        return (
+                          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                            <div className="text-xs text-white/50 mb-2">
+                              {title}
+                              {envKey && <span className="ml-2 text-cyan-400">({envKey})</span>}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {/* 胜率 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">胜率</span>
+                                <span className={`font-mono text-xs font-medium ${
+                                  stats.win_rate >= 0.5 ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {stats.win_rate ? (stats.win_rate * 100).toFixed(1) + '%' : '-'}
+                                </span>
+                              </div>
+
+                              {/* 平均收益 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">平均收益</span>
+                                <span className={`font-mono text-xs font-medium ${
+                                  stats.avg_return >= 0 ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {stats.avg_return !== undefined ? (stats.avg_return * 100).toFixed(2) + '%' : '-'}
+                                </span>
+                              </div>
+
+                              {/* 盈亏比 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">盈亏比</span>
+                                <span className={`font-mono text-xs font-medium ${
+                                  stats.profit_factor >= 1 ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {stats.profit_factor !== undefined ? stats.profit_factor.toFixed(2) : '-'}
+                                </span>
+                              </div>
+
+                              {/* 最大回撤 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">最大回撤</span>
+                                <span className="font-mono text-xs font-medium text-orange-400">
+                                  {stats.max_drawdown !== undefined ? '-' + (stats.max_drawdown * 100).toFixed(2) + '%' : '-'}
+                                </span>
+                              </div>
+
+                              {/* 平均回撤 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">平均回撤</span>
+                                <span className="font-mono text-xs font-medium text-orange-400">
+                                  {stats.avg_drawdown !== undefined ? '-' + (stats.avg_drawdown * 100).toFixed(2) + '%' : '-'}
+                                </span>
+                              </div>
+
+                              {/* 样本数 */}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-white/60 text-[10px]">样本数</span>
+                                <span className="font-mono text-xs font-medium text-white/80">
+                                  {stats.sample_n || '-'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      };
+
+                      return (
+                        <div className="space-y-3">
+                          {rows.map((row: any, i: number) => {
+                            const lightStyle = getLightStyle(row.light, row.decision);
+                            const score = row.score || 0;
+                            const scorePercent = score; // score is already 0-100
+                            const stats = row.stats || {};
+
+                            return (
+                              <div key={row.key || i} className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/[0.07] transition-colors">
+                                {/* 策略头部信息 */}
+                                <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/10">
+                                  {/* 红绿灯指示器 */}
+                                  <div
+                                    className={`w-2.5 h-2.5 rounded-full ${lightStyle.color} shadow-lg flex-shrink-0`}
+                                    style={{
+                                      boxShadow: `0 0 8px ${
+                                        lightStyle.color === 'bg-green-400' ? 'rgba(34, 197, 94, 0.6)' :
+                                        lightStyle.color === 'bg-red-400' ? 'rgba(239, 68, 68, 0.6)' :
+                                        'rgba(234, 179, 8, 0.6)'
+                                      }`
+                                    }}
+                                  />
+
+                                  {/* 策略名称 */}
+                                  <div className="flex-1">
+                                    <div className="text-sm font-medium text-white/90">{getBilingualMarketText(row.name, lang)}</div>
+                                    <div className="text-[10px] text-white/50 mt-0.5">{getBilingualMarketText(row.type, lang)}</div>
+                                  </div>
+
+                                  {/* 决策和评分 */}
+                                  {isProUser && (
+                                    <div className="flex items-center gap-3">
+                                      <span className={`${lightStyle.text} text-[10px] font-semibold`}>
+                                        {lightStyle.label}
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                          <div
+                                            className={`h-full ${lightStyle.color} transition-all`}
+                                            style={{ width: `${scorePercent}%` }}
+                                          />
+                                        </div>
                                       </div>
-                                    </td>
-                                    <td className="py-2.5 px-2">
-                                      <div className="text-white/90 font-medium">{getBilingualMarketText(row.name, lang)}</div>
-                                    </td>
-                                    <td className="py-2.5 px-2">
-                                      <span className="text-white/60 text-[10px]">{getBilingualMarketText(row.type, lang)}</span>
-                                    </td>
-                                    {isProUser && (
-                                      <>
-                                        <td className="py-2.5 px-2">
-                                          <span className={`${lightStyle.text} text-[10px] font-semibold`}>
-                                            {lightStyle.label}
-                                          </span>
-                                        </td>
-                                        <td className="py-2.5 px-2">
-                                          <div className="flex items-center gap-2">
-                                            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden max-w-[50px]">
-                                              <div
-                                                className={`h-full ${lightStyle.color} transition-all`}
-                                                style={{ width: `${scorePercent}%` }}
-                                              />
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </>
-                                    )}
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* 统计数据面板 */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  {/* 全状态数据 */}
+                                  {renderStatsPanel(stats.stats_all, '全状态数据')}
+
+                                  {/* 当前环境数据 */}
+                                  {renderStatsPanel(stats.stats_env, '当前环境数据', stats.stats_env?.env_key)}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       );
                     })()}
