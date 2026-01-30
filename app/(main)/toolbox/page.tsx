@@ -41,6 +41,8 @@ export default function ToolboxPage() {
     console.log('strategyMatrix keys:', strategyMatrix ? Object.keys(strategyMatrix) : 'no strategyMatrix');
     console.log('Has rows?', strategyMatrix?.rows);
     console.log('Version:', strategyMatrix?.version);
+    console.log('statsEnv:', statsEnv);
+    console.log('statsEnv status:', statsEnv?.status);
   }
 
   return (
