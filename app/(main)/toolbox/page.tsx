@@ -24,6 +24,7 @@ export default function ToolboxPage() {
   const crossAsset = payload?.cross_asset;
   const similarityStats = payload?.similarity_stats;
   const finalDecisionText = payload?.similarity?.final_decision_text;
+  const statsEnv = payload?.stats_env;
 
   // Create a lookup map for chart URLs by date
   const chartUrlMap = new Map(
@@ -705,6 +706,73 @@ export default function ToolboxPage() {
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-red-400"></div>
                             <span className="text-white/60">{t.avoidCount}: {strategyMatrix.summary.red} {t.items}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 环境统计数据 */}
+                    {statsEnv && statsEnv.status === 'ok' && (
+                      <div className="mb-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className="text-xs text-white/50 mb-3">
+                          环境统计数据
+                          {statsEnv.env_key && (
+                            <span className="ml-2 text-cyan-400">({statsEnv.env_key})</span>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {/* 胜率 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">胜率</span>
+                            <span className={`font-mono text-sm font-medium ${
+                              statsEnv.win_rate >= 0.5 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {statsEnv.win_rate ? (statsEnv.win_rate * 100).toFixed(1) + '%' : '-'}
+                            </span>
+                          </div>
+
+                          {/* 平均收益 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">平均收益</span>
+                            <span className={`font-mono text-sm font-medium ${
+                              statsEnv.avg_return >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {statsEnv.avg_return !== undefined ? (statsEnv.avg_return * 100).toFixed(2) + '%' : '-'}
+                            </span>
+                          </div>
+
+                          {/* 盈亏比 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">盈亏比</span>
+                            <span className={`font-mono text-sm font-medium ${
+                              statsEnv.profit_factor >= 1 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {statsEnv.profit_factor !== undefined ? statsEnv.profit_factor.toFixed(2) : '-'}
+                            </span>
+                          </div>
+
+                          {/* 最大回撤 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">最大回撤</span>
+                            <span className="font-mono text-sm font-medium text-orange-400">
+                              {statsEnv.max_drawdown !== undefined ? '-' + (statsEnv.max_drawdown * 100).toFixed(2) + '%' : '-'}
+                            </span>
+                          </div>
+
+                          {/* 平均回撤 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">平均回撤</span>
+                            <span className="font-mono text-sm font-medium text-orange-400">
+                              {statsEnv.avg_drawdown !== undefined ? '-' + (statsEnv.avg_drawdown * 100).toFixed(2) + '%' : '-'}
+                            </span>
+                          </div>
+
+                          {/* 样本数 */}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/60 text-[10px]">样本数</span>
+                            <span className="font-mono text-sm font-medium text-white/80">
+                              {statsEnv.sample_n || '-'}
+                            </span>
                           </div>
                         </div>
                       </div>
