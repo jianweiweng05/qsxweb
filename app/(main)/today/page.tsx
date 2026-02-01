@@ -99,27 +99,19 @@ export default function TodayPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
           <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-            <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
-              <span>{t.marketStatus}</span>
-              <HelpButton indicatorKey="market_weather" />
-            </div>
-            <div className="text-[22px] font-semibold text-white/90 leading-snug mb-3">
-              {macroState}
-            </div>
-
-            {/* qsx100指数 */}
-            <div className="mb-3 pb-3 border-b border-white/10">
-              <div className="text-[10px] text-white/50 mb-1">qsx100指数</div>
-              <div className="text-lg font-bold text-cyan-400">
-                {qsx100Index != null ? qsx100Index : '—'}
+            {/* QSX宏观100指数 */}
+            <div className="mb-4 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
+                <span>QSX宏观100指数</span>
+                <HelpButton indicatorKey="market_weather" />
               </div>
-            </div>
-
-            {/* 操作建议 */}
-            <div className="mb-3">
-              <div className="text-[10px] text-white/50 mb-1">操作建议</div>
-              <div className="text-sm font-medium text-white/80">
-                {operationSuggestion}
+              <div className="flex items-end justify-between">
+                <div className="text-4xl font-bold text-cyan-400">
+                  {qsx100Index != null ? qsx100Index : '—'}
+                </div>
+                <div className="text-base font-medium text-white/70">
+                  恐慌
+                </div>
               </div>
             </div>
 
@@ -163,8 +155,13 @@ export default function TodayPage() {
               <span>{t.recommendedPosition}</span>
               <HelpButton indicatorKey="risk_cap" />
             </div>
-            <div className="text-4xl font-bold text-cyan-400 tracking-tight">
-              {riskCap != null ? `≤ ${riskCap}%` : "—"}
+            <div className="flex items-end justify-between gap-3">
+              <div className="text-4xl font-bold text-cyan-400 tracking-tight">
+                {riskCap != null ? `≤ ${riskCap}%` : "—"}
+              </div>
+              <div className="text-base font-medium text-white/70 pb-1">
+                分批买入
+              </div>
             </div>
           </div>
 
