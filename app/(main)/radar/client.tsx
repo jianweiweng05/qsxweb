@@ -60,6 +60,22 @@ interface UIText {
   L6?: { title: string; desc: string; conclusion?: string };
 }
 
+interface QSX100Historical {
+  qsx_bucket: number;
+  win_rate_7d: number;
+  win_rate_30d: number;
+  win_rate_90d: number;
+  avg_return_7d: number;
+  avg_return_30d: number;
+  avg_return_90d: number;
+  max_dd_7d: number;
+  max_dd_30d: number;
+  max_dd_90d: number;
+  pl_ratio_7d: number;
+  pl_ratio_30d: number;
+  pl_ratio_90d: number;
+}
+
 interface ReportPayload {
   macro?: {
     macro_coef?: {
@@ -104,6 +120,7 @@ interface ReportPayload {
       evidences: string[];
     };
   };
+  qsx100_historical?: QSX100Historical;
 }
 
 interface ControlTowerPayload {
@@ -140,6 +157,73 @@ function badgeColorClass(color: string): string {
     case 'yellow': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
     default: return 'bg-white/10 text-white/70 border-white/20';
   }
+}
+
+// QSX100历史表现表格组件
+function QSX100HistoricalTable({ data }: { data: QSX100Historical | undefined }) {
+  if (!data) return null;
+
+  const formatPercent = (value: number) => {
+    const percent = (value * 100).toFixed(2);
+    const isPositive = value >= 0;
+    const color = isPositive ? 'text-green-400' : 'text-red-400';
+    return <span className={color}>{isPositive ? '+' : ''}{percent}%</span>;
+  };
+
+  const formatRatio = (value: number) => {
+    return <span className="text-cyan-400">{value.toFixed(2)}</span>;
+  };
+
+  return (
+    <div className="mb-6 p-4 rounded-lg bg-white/8 border border-white/10">
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-base font-semibold text-white">qsx100宏观指数历史表现统计</h2>
+        <span className="px-2 py-0.5 rounded text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+          当前指数: {data.qsx_bucket}
+        </span>
+        <HelpButton indicatorKey="qsx100_historical" />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="text-left py-3 px-4 text-white/60 font-medium">指标</th>
+              <th className="text-center py-3 px-4 text-white/60 font-medium">7天</th>
+              <th className="text-center py-3 px-4 text-white/60 font-medium">30天</th>
+              <th className="text-center py-3 px-4 text-white/60 font-medium">90天</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td className="py-3 px-4 text-white/80">胜率</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_7d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_30d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_90d)}</td>
+            </tr>
+            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td className="py-3 px-4 text-white/80">平均收益</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_7d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_30d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_90d)}</td>
+            </tr>
+            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td className="py-3 px-4 text-white/80">最大回撤</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_7d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_30d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_90d)}</td>
+            </tr>
+            <tr className="hover:bg-white/5 transition-colors">
+              <td className="py-3 px-4 text-white/80">盈亏比</td>
+              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_7d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_30d)}</td>
+              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_90d)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
 // 军用雷达图组件
@@ -457,7 +541,12 @@ export default function RadarClient() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+    <div>
+      {/* QSX100历史表现统计表 */}
+      <QSX100HistoricalTable data={data?.qsx100_historical} />
+
+      {/* 雷达图和风险内参 */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
       {/* 左列：雷达图 */}
       <div className="h-full p-4 rounded-lg bg-white/8 border border-white/10 flex flex-col">
         <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
@@ -667,6 +756,7 @@ export default function RadarClient() {
           </ProGate>
         </div>
       </div>
+    </div>
     </div>
   );
 }
