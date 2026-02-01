@@ -46,6 +46,12 @@ export default function TodayPage() {
     ? payload.weather.title
     : (payload?.weather?.title?.zh || '');
   const weatherTitle = getBilingualMarketText(payload?.weather?.title, lang) || t.noData;
+
+  // New weather data structure
+  const macroState = payload?.macro_state || t.noData;
+  const qsx100Index = payload?.weather?.index != null ? Math.round(payload.weather.index) : null;
+  const operationSuggestion = payload?.weather?.suggestion || t.noData;
+
   const generatedAt = payload?.generated_at
     ? new Date(payload.generated_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
     : t.noData;
@@ -76,7 +82,7 @@ export default function TodayPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-semibold">{t.todayOverview}</h1>
             <span className="text-2xl" title={weatherTitle}>
-              {getWeatherIcon(weatherTitleOriginal)}
+              {getWeatherIcon(macroState)}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -98,7 +104,23 @@ export default function TodayPage() {
               <HelpButton indicatorKey="market_weather" />
             </div>
             <div className="text-[22px] font-semibold text-white/90 leading-snug mb-3">
-              {weatherTitle}
+              {macroState}
+            </div>
+
+            {/* qsx100指数 */}
+            <div className="mb-3 pb-3 border-b border-white/10">
+              <div className="text-[10px] text-white/50 mb-1">qsx100指数</div>
+              <div className="text-lg font-bold text-cyan-400">
+                {qsx100Index != null ? qsx100Index : '—'}
+              </div>
+            </div>
+
+            {/* 操作建议 */}
+            <div className="mb-3">
+              <div className="text-[10px] text-white/50 mb-1">操作建议</div>
+              <div className="text-sm font-medium text-white/80">
+                {operationSuggestion}
+              </div>
             </div>
 
             {/* Collapsible Gamma section */}
