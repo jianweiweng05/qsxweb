@@ -401,8 +401,8 @@ export default function ToolboxPage() {
                               <div className="flex-1">
                                 <div className="flex items-baseline gap-2 mb-1">
                                   <span className="text-white/60 text-[10px]">{item.date}</span>
-                                  {item.display_title && (
-                                    <span className="text-cyan-400 text-xs font-medium">｜{item.display_title}</span>
+                                  {(item.display_title || item.regime_display_title) && (
+                                    <span className="text-cyan-400 text-xs font-medium">｜{item.display_title || item.regime_display_title}</span>
                                   )}
                                   {chartUrlMap.get(item.date) && (
                                     <button
@@ -413,9 +413,9 @@ export default function ToolboxPage() {
                                     </button>
                                   )}
                                 </div>
-                                {item.display_note && (
+                                {(item.display_note || item.regime_display_note) && (
                                   <div className="text-white/70 text-[10px] leading-relaxed">
-                                    {item.display_note}
+                                    {item.display_note || item.regime_display_note}
                                   </div>
                                 )}
                               </div>
