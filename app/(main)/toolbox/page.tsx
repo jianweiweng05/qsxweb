@@ -16,7 +16,7 @@ export default function ToolboxPage() {
   const isProUser = isPro();
 
   const strategyMatrix = payload?.pro_strategy_matrix;
-  const similarityTop3 = payload?.similarity?.top3;
+  const similarityTop3 = payload?.similarity_top5_qsxu;
   const similarityTop20 = payload?.similarity_top20;
   const finalDecisionStats = payload?.final_decision_stats;
   const proStrategy = payload?.pro_strategy;
@@ -390,14 +390,14 @@ export default function ToolboxPage() {
               <ProGate lockedMessage={t.upgradeProForSimilarity}>
                 {similarityTop3 && Array.isArray(similarityTop3) && similarityTop3.length > 0 ? (
                   <div className="space-y-6">
-                    {/* A. 相似场景 Top3（仅展示） */}
+                    {/* A. 相似场景 Top5（仅展示） */}
                     <div>
-                      <div className="text-xs text-white/50 mb-3">A. {t.similarScenes} Top 3</div>
+                      <div className="text-xs text-white/50 mb-3">A. {t.similarScenes} Top 5</div>
                       <div className="space-y-3">
                         {similarityTop3.map((item: any, i: number) => (
                           <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/10">
                             <div className="flex items-start gap-2 mb-2">
-                              <span className="text-white/90 font-medium mt-0.5">{'①②③'[i]}</span>
+                              <span className="text-white/90 font-medium mt-0.5">{'①②③④⑤'[i]}</span>
                               <div className="flex-1">
                                 <div className="flex items-baseline gap-2 mb-1">
                                   <span className="text-white/60 text-[10px]">{item.date}</span>
