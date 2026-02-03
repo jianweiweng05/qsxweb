@@ -99,19 +99,14 @@ export default function TodayPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
           <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-            {/* QSX宏观100指数 */}
+            {/* 市场状态 */}
             <div className="mb-4 pb-4 border-b border-white/10">
               <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
-                <span>QSX宏观100指数</span>
+                <span>市场状态</span>
                 <HelpButton indicatorKey="market_weather" />
               </div>
-              <div className="flex items-end justify-between">
-                <div className="text-4xl font-bold text-cyan-400">
-                  {qsx100Index != null ? qsx100Index : '—'}
-                </div>
-                <div className="text-base font-medium text-white/70">
-                  恐慌
-                </div>
+              <div className="text-2xl font-bold text-cyan-400">
+                {macroState}
               </div>
             </div>
 
