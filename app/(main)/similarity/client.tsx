@@ -27,15 +27,20 @@ export default function SimilarityClient({
   stageShareTop20,
   qsxuTop5
 }: SimilarityClientProps) {
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('[SimilarityClient] qsxuTop5:', qsxuTop5);
+  }
+
   return (
     <div className="p-4 text-white min-h-full bg-black/90">
       <h1 className="text-xl font-bold mb-2">历史相似性分析</h1>
       <p className="text-xs text-white/40 mb-6">Pro 专属</p>
 
       {/* Top 5 Similar Historical Dates */}
-      {qsxuTop5 && qsxuTop5.length > 0 && (
-        <div className="mb-6">
-          <div className="text-sm text-white/50 mb-3">历史相似度</div>
+      <div className="mb-6">
+        <div className="text-sm text-white/50 mb-3">历史相似度</div>
+        {qsxuTop5 && qsxuTop5.length > 0 ? (
           <div className="space-y-3">
             {qsxuTop5.map((item, index) => (
               <div
@@ -63,8 +68,12 @@ export default function SimilarityClient({
               </div>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+            <div className="text-white/50">暂无历史相似性数据</div>
+          </div>
+        )}
+      </div>
 
       <div className="mb-6">
         <div className="text-sm text-white/50 mb-3">当前市场相似性分析</div>

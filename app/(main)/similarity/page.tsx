@@ -34,6 +34,13 @@ export default function SimilarityPage() {
   const stageShareTop20 = payload?.pro_strategy?.stage_share_top20;
   const qsxuTop5 = payload?.similarity?.qsxu_top10?.slice(0, 5) || [];
 
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('[SimilarityPage] payload.similarity:', payload?.similarity);
+    console.log('[SimilarityPage] qsxu_top10:', payload?.similarity?.qsxu_top10);
+    console.log('[SimilarityPage] qsxuTop5:', qsxuTop5);
+  }
+
   return (
     <SimilarityClient
       similarityText={similarityText}
