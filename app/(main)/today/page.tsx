@@ -69,9 +69,6 @@ export default function TodayPage() {
   const allocationLocks = cryptoAllocation?.locks;
   const allocationOneLiner = getBilingualText(cryptoAllocation?.one_liner, lang);
 
-  // Similarity data - get top 5 from qsxu_top10
-  const similarityTop5 = payload?.similarity?.qsxu_top10?.slice(0, 5) || [];
-
   // Debug: log the allocation data
   if (typeof window !== 'undefined') {
     console.log('[TodayPage] crypto_risk_allocation:', cryptoAllocation);
@@ -296,64 +293,6 @@ export default function TodayPage() {
               </div>
             </div>
           </VIPGate>
-        </div>
-
-        {/* Historical Similarity Section */}
-        <div className="rounded-xl bg-white/6 border border-white/10 p-6 mt-8">
-          <div className="flex items-center gap-2 text-sm font-medium text-white/60 mb-4">
-            <span>历史相似度</span>
-            <span className="px-1.5 py-0.5 text-[9px] rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-              PRO
-            </span>
-            <HelpButton indicatorKey="similarity" />
-          </div>
-
-          <ProGate
-            lockedMessage={t.upgradeProForVolatility}
-            unlockConfig={{
-              title: "历史相似度分析",
-              description: "查看与当前市场结构相似的历史时期",
-              features: ["识别相似市场环境", "参考历史结构特征", "辅助决策判断"]
-            }}
-          >
-            {similarityTop5.length > 0 ? (
-              <div className="space-y-3">
-                {similarityTop5.map((item: any, index: number) => (
-                  <div
-                    key={index}
-                    className="p-3 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-cyan-400">
-                        {item.date}
-                      </span>
-                      <span className="text-xs text-white/50">
-                        相似度: {(item.sim * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-xs">
-                      <div>
-                        <span className="text-white/40">结构: </span>
-                        <span className="text-white/70">{item.structure}</span>
-                      </div>
-                      <div>
-                        <span className="text-white/40">阶段: </span>
-                        <span className="text-white/70">{item.stage}</span>
-                      </div>
-                      <div>
-                        <span className="text-white/40">涨幅: </span>
-                        <span className={item.qsxu_delta > 0 ? "text-green-400" : "text-red-400"}>
-                          {item.qsxu_delta > 0 ? '+' : ''}{item.qsxu_delta.toFixed(2)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-white/40">暂无历史相似性数据</div>
-            )}
-          </ProGate>
         </div>
 
         {(bearish.length > 0 || bullish.length > 0) && (

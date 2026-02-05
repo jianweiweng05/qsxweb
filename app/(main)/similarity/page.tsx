@@ -32,12 +32,14 @@ export default function SimilarityPage() {
   const similarityText = payload?.similarity_text;
   const finalDecisionText = payload?.final_decision_text;
   const stageShareTop20 = payload?.pro_strategy?.stage_share_top20;
+  const qsxuTop5 = payload?.similarity?.qsxu_top10?.slice(0, 5) || [];
 
   return (
     <SimilarityClient
       similarityText={similarityText}
       finalDecisionText={finalDecisionText}
       stageShareTop20={stageShareTop20}
+      qsxuTop5={qsxuTop5}
     />
   );
 }
