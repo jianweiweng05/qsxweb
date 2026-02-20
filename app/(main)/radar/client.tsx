@@ -152,6 +152,73 @@ function badgeColorClass(color: string): string {
   }
 }
 
+// 军用雷达图组件
+function GlowingRadar({
+  values
+}: {
+  values: number[];
+  layers: Layer[];
+}) {
+
+  const cx = 150, cy = 150, maxR = 120;
+
+  return (
+    <svg viewBox="0 0 300 300" className="w-full max-w-[256px] sm:max-w-[288px] lg:max-w-[320px] mx-auto">
+      <defs>
+        <filter id="metalGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <radialGradient id="radarSweep">
+          <stop offset="0%" stopColor="rgba(0,255,100,0.6)" />
+          <stop offset="100%" stopColor="rgba(0,255,100,0)" />
+        </radialGradient>
+        <mask id="sweepMask">
+          <path d="M 150 150 L 150 30 A 120 120 0 0 1 220 80 Z" fill="url(#radarSweep)">
+            <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="3s" repeatCount="indefinite" />
+          </path>
+        </mask>
+        <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="rgba(0,255,100,0.15)" />
+          <stop offset="100%" stopColor="rgba(0,255,100,0.05)" />
+        </linearGradient>
+        <radialGradient id="metalBezel" cx="50%" cy="50%">
+          <stop offset="85%" stopColor="rgba(60,60,70,0)" />
+          <stop offset="88%" stopColor="rgba(100,100,110,0.4)" />
+          <stop offset="92%" stopColor="rgba(140,140,150,0.6)" />
+          <stop offset="96%" stopColor="rgba(80,80,90,0.5)" />
+          <stop offset="100%" stopColor="rgba(40,40,50,0.7)" />
+        </radialGradient>
+        <radialGradient id="earthGradient" cx="50%" cy="50%">
+          <stop offset="0%" stopColor="rgba(100,150,200,0.3)" />
+          <stop offset="100%" stopColor="rgba(50,100,150,0.6)" />
+        </radialGradient>
+      </defs>
+
+      {/* 三圈颜色区域：内红/中黄/外绿 */}
+      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="rgba(255,50,50,0.08)" stroke="none" />
+      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="rgba(255,200,50,0.08)" stroke="none" />
+      <circle cx={cx} cy={cy} r={maxR} fill="rgba(50,255,100,0.08)" stroke="none" />
+
+      {/* 同心圆网格 - 三圈 */}
+      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="none" stroke="rgba(255,80,80,0.5)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="none" stroke="rgba(255,200,80,0.5)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={maxR} fill="none" stroke="rgba(80,255,120,0.6)" strokeWidth="2" filter="url(#metalGlow)" />
+
+      {/* 角度刻度线 */}
+      {Array.from({length: 12}).map((_, i) => {
+        const angle = (i * Math.PI) / 6;
+        const x2 = cx + maxR * Math.cos(angle);
+        const y2 = cy + maxR * Math.sin(angle);
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(100,100,120,0.2)" strokeWidth="1" />;
+      })}
+
+      {/* 六边形轴线 */}
+      {LAYER_KEYS.map((_, i) => {
+        const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
         return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(120,120,140,0.4)" strokeWidth="2" />;
