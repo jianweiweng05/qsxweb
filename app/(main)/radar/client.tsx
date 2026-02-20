@@ -469,7 +469,15 @@ export default function RadarClient() {
   return (
     <div>
       {/* Guard Dashboard - 替换 QSX100历史表现统计表 */}
-      {data?.guard && <GuardDashboard data={data.guard} />}
+      <div className="mb-6">
+        <GuardDashboard data={data?.guard || {
+          death_score: 50,
+          position_cap: 0.6,
+          allow_add: false,
+          allow_trade: true,
+          guard_state: 'block'
+        }} />
+      </div>
 
       {/* 雷达图和风险内参 */}
       <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
