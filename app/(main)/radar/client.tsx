@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { HelpButton } from '../toolbox/help-modal';
 import { ProGate } from '@/app/lib/gate';
 import { useReport } from '../report-provider';
+import GuardDashboard from '../reports/guard-dashboard';
 
 // 类型定义
 interface Metric {
@@ -60,20 +61,12 @@ interface UIText {
   L6?: { title: string; desc: string; conclusion?: string };
 }
 
-interface QSX100Historical {
-  qsx_bucket: number;
-  win_rate_7d: number;
-  win_rate_30d: number;
-  win_rate_90d: number;
-  avg_return_7d: number;
-  avg_return_30d: number;
-  avg_return_90d: number;
-  max_dd_7d: number;
-  max_dd_30d: number;
-  max_dd_90d: number;
-  pl_ratio_7d: number;
-  pl_ratio_30d: number;
-  pl_ratio_90d: number;
+interface GuardData {
+  death_score: number;
+  position_cap: number;
+  allow_add: boolean;
+  allow_trade: boolean;
+  guard_state: 'normal' | 'warning' | 'block';
 }
 
 interface ReportPayload {
@@ -120,7 +113,7 @@ interface ReportPayload {
       evidences: string[];
     };
   };
-  qsx100_historical?: QSX100Historical;
+  guard?: GuardData;
 }
 
 interface ControlTowerPayload {
@@ -159,140 +152,6 @@ function badgeColorClass(color: string): string {
   }
 }
 
-// QSX100历史表现表格组件
-function QSX100HistoricalTable({ data }: { data: QSX100Historical | undefined }) {
-  if (!data) return null;
-
-  const formatPercent = (value: number) => {
-    const percent = (value * 100).toFixed(2);
-    const isPositive = value >= 0;
-    const color = isPositive ? 'text-green-400' : 'text-red-400';
-    return <span className={color}>{isPositive ? '+' : ''}{percent}%</span>;
-  };
-
-  const formatRatio = (value: number) => {
-    return <span className="text-cyan-400">{value.toFixed(2)}</span>;
-  };
-
-  return (
-    <div className="mb-6 p-4 rounded-lg bg-white/8 border border-white/10">
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-base font-semibold text-white">qsx100宏观指数历史表现统计</h2>
-        <span className="px-2 py-0.5 rounded text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-          当前指数: {data.qsx_bucket}
-        </span>
-        <HelpButton indicatorKey="qsx100_historical" />
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-left py-3 px-4 text-white/60 font-medium">指标</th>
-              <th className="text-center py-3 px-4 text-white/60 font-medium">7天</th>
-              <th className="text-center py-3 px-4 text-white/60 font-medium">30天</th>
-              <th className="text-center py-3 px-4 text-white/60 font-medium">90天</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td className="py-3 px-4 text-white/80">胜率</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_7d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_30d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.win_rate_90d)}</td>
-            </tr>
-            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td className="py-3 px-4 text-white/80">平均收益</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_7d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_30d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.avg_return_90d)}</td>
-            </tr>
-            <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td className="py-3 px-4 text-white/80">最大回撤</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_7d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_30d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatPercent(data.max_dd_90d)}</td>
-            </tr>
-            <tr className="hover:bg-white/5 transition-colors">
-              <td className="py-3 px-4 text-white/80">盈亏比</td>
-              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_7d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_30d)}</td>
-              <td className="py-3 px-4 text-center font-mono">{formatRatio(data.pl_ratio_90d)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// 军用雷达图组件
-function GlowingRadar({
-  values
-}: {
-  values: number[];
-  layers: Layer[];
-}) {
-
-  const cx = 150, cy = 150, maxR = 120;
-
-  return (
-    <svg viewBox="0 0 300 300" className="w-full max-w-[256px] sm:max-w-[288px] lg:max-w-[320px] mx-auto">
-      <defs>
-        <filter id="metalGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <radialGradient id="radarSweep">
-          <stop offset="0%" stopColor="rgba(0,255,100,0.6)" />
-          <stop offset="100%" stopColor="rgba(0,255,100,0)" />
-        </radialGradient>
-        <mask id="sweepMask">
-          <path d="M 150 150 L 150 30 A 120 120 0 0 1 220 80 Z" fill="url(#radarSweep)">
-            <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="3s" repeatCount="indefinite" />
-          </path>
-        </mask>
-        <linearGradient id="dataFill" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="rgba(0,255,100,0.15)" />
-          <stop offset="100%" stopColor="rgba(0,255,100,0.05)" />
-        </linearGradient>
-        <radialGradient id="metalBezel" cx="50%" cy="50%">
-          <stop offset="85%" stopColor="rgba(60,60,70,0)" />
-          <stop offset="88%" stopColor="rgba(100,100,110,0.4)" />
-          <stop offset="92%" stopColor="rgba(140,140,150,0.6)" />
-          <stop offset="96%" stopColor="rgba(80,80,90,0.5)" />
-          <stop offset="100%" stopColor="rgba(40,40,50,0.7)" />
-        </radialGradient>
-        <radialGradient id="earthGradient" cx="50%" cy="50%">
-          <stop offset="0%" stopColor="rgba(100,150,200,0.3)" />
-          <stop offset="100%" stopColor="rgba(50,100,150,0.6)" />
-        </radialGradient>
-      </defs>
-
-      {/* 三圈颜色区域：内红/中黄/外绿 */}
-      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="rgba(255,50,50,0.08)" stroke="none" />
-      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="rgba(255,200,50,0.08)" stroke="none" />
-      <circle cx={cx} cy={cy} r={maxR} fill="rgba(50,255,100,0.08)" stroke="none" />
-
-      {/* 同心圆网格 - 三圈 */}
-      <circle cx={cx} cy={cy} r={maxR * 0.33} fill="none" stroke="rgba(255,80,80,0.5)" strokeWidth="1.5" />
-      <circle cx={cx} cy={cy} r={maxR * 0.66} fill="none" stroke="rgba(255,200,80,0.5)" strokeWidth="1.5" />
-      <circle cx={cx} cy={cy} r={maxR} fill="none" stroke="rgba(80,255,120,0.6)" strokeWidth="2" filter="url(#metalGlow)" />
-
-      {/* 角度刻度线 */}
-      {Array.from({length: 12}).map((_, i) => {
-        const angle = (i * Math.PI) / 6;
-        const x2 = cx + maxR * Math.cos(angle);
-        const y2 = cy + maxR * Math.sin(angle);
-        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(100,100,120,0.2)" strokeWidth="1" />;
-      })}
-
-      {/* 六边形轴线 */}
-      {LAYER_KEYS.map((_, i) => {
-        const angle = (Math.PI / 2) + (i * 2 * Math.PI) / 6;
         const x2 = cx + maxR * Math.cos(angle);
         const y2 = cy - maxR * Math.sin(angle);
         return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(120,120,140,0.4)" strokeWidth="2" />;
@@ -542,8 +401,8 @@ export default function RadarClient() {
 
   return (
     <div>
-      {/* QSX100历史表现统计表 */}
-      <QSX100HistoricalTable data={data?.qsx100_historical} />
+      {/* Guard Dashboard - 替换 QSX100历史表现统计表 */}
+      {data?.guard && <GuardDashboard data={data.guard} />}
 
       {/* 雷达图和风险内参 */}
       <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">

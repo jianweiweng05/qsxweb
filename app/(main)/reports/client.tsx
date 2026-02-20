@@ -1,10 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import GuardDashboard from './guard-dashboard';
 
 export default function ReportsClient() {
   const [period, setPeriod] = useState<'am' | 'pm'>('am');
+  const [guardData, setGuardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const today = new Date().toISOString().split('T')[0];
+
+  // Fetch guard data from API
+  useEffect(() => {
+    const fetchGuardData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`https://qsx-ai.onrender.com/macro/v1/reportv2?window_id=${today}@${period}`);
+        const data = await response.json();
+
+        // Extract guard data from report_payload
+        if (data?.report_payload?.guard) {
+          setGuardData(data.report_payload.guard);
+        } else {
+          // Fallback mock data for testing
+          setGuardData({
+            death_score: 50,
+            position_cap: 0.6,
+            allow_add: false,
+            allow_trade: true,
+            guard_state: 'block'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch guard data:', error);
+        // Use mock data on error
+        setGuardData({
+          death_score: 50,
+          position_cap: 0.6,
+          allow_add: false,
+          allow_trade: true,
+          guard_state: 'block'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGuardData();
+  }, [period, today]);
 
   return (
     <main className="min-h-screen px-6 py-24">
@@ -73,23 +115,16 @@ export default function ReportsClient() {
           </a>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-            <div className="mb-2 text-sm text-gray-400">Report Sections</div>
-            <div className="mb-4 text-2xl font-bold text-white">8</div>
-            <div className="text-xs text-gray-500">Market overview, technicals, risk, positions</div>
+        {/* Guard Dashboard - replaces the 3 stat cards */}
+        {loading ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-gray-400">Loading guard data...</div>
+            </div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-            <div className="mb-2 text-sm text-gray-400">Assets Covered</div>
-            <div className="mb-4 text-2xl font-bold text-white">15+</div>
-            <div className="text-xs text-gray-500">Major crypto assets and indices</div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-            <div className="mb-2 text-sm text-gray-400">Update Frequency</div>
-            <div className="mb-4 text-2xl font-bold text-white">2x</div>
-            <div className="text-xs text-gray-500">Daily AM and PM reports</div>
-          </div>
-        </div>
+        ) : guardData ? (
+          <GuardDashboard data={guardData} />
+        ) : null}
       </div>
     </main>
   );
