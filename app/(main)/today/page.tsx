@@ -287,8 +287,8 @@ export default function TodayPage() {
                 {oneLiner}
               </div>
               <div className={expandComment ? "text-sm text-white/70 leading-relaxed space-y-3" : "text-sm text-white/70 leading-relaxed line-clamp-5"}>
-                {marketComment.split('\n\n').map((paragraph: string, index: number) => (
-                  <p key={index}>{paragraph}</p>
+                {marketComment.split(/(?=宏观市场：|核心矛盾：|定价分歧：|边界条件：|历史表现：)/).filter(p => p.trim()).map((paragraph: string, index: number) => (
+                  <p key={index}>{paragraph.trim()}</p>
                 ))}
               </div>
             </div>
