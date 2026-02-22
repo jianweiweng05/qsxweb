@@ -61,8 +61,6 @@ export default function TodayPage() {
 
   const oneLiner = getBilingualText(payload?.ai_json?.one_liner, lang) || t.noData;
   const marketComment = getBilingualText(payload?.ai_json?.market_comment, lang) || t.noData;
-  const bearish = payload?.ai_json?.collision?.bearish_2 || [];
-  const bullish = payload?.ai_json?.collision?.bullish_2 || [];
 
   const cryptoAllocation = payload?.crypto_risk_allocation;
   const allocationWeights = cryptoAllocation?.weights;
@@ -288,56 +286,14 @@ export default function TodayPage() {
               <div className="text-sm text-white/95 font-medium leading-relaxed">
                 {oneLiner}
               </div>
-              <div className={expandComment ? "text-sm text-white/70 leading-relaxed" : "text-sm text-white/70 leading-relaxed line-clamp-5"}>
-                {marketComment}
+              <div className={expandComment ? "text-sm text-white/70 leading-relaxed space-y-3" : "text-sm text-white/70 leading-relaxed line-clamp-5"}>
+                {marketComment.split('\n\n').map((paragraph: string, index: number) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
             </div>
           </VIPGate>
         </div>
-
-        {(bearish.length > 0 || bullish.length > 0) && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
-            <div className="p-5 rounded-xl bg-red-500/8 border border-red-500/15">
-              <div className="flex items-center gap-2 text-xs text-red-400/80 mb-3">
-                <span>{t.bearishSignals}</span>
-                <HelpButton indicatorKey="bearish_signals" />
-              </div>
-              <VIPGate lockedMessage={t.vipVisible}>
-                {bearish.length > 0 ? (
-                  <div className="space-y-2">
-                    {bearish.map((item: string, i: number) => (
-                      <div key={i} className="text-xs text-white/70 leading-relaxed">
-                        • {item}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-white/40">{t.noData}</div>
-                )}
-              </VIPGate>
-            </div>
-
-            <div className="p-5 rounded-xl bg-green-500/8 border border-green-500/15">
-              <div className="flex items-center gap-2 text-xs text-green-400/80 mb-3">
-                <span>{t.bullishSignals}</span>
-                <HelpButton indicatorKey="bullish_signals" />
-              </div>
-              <VIPGate lockedMessage={t.vipVisible}>
-                {bullish.length > 0 ? (
-                  <div className="space-y-2">
-                    {bullish.map((item: string, i: number) => (
-                      <div key={i} className="text-xs text-white/70 leading-relaxed">
-                        • {item}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-white/40">{t.noData}</div>
-                )}
-              </VIPGate>
-            </div>
-          </div>
-        )}
 
         <div className="p-5 rounded-xl bg-red-500/10 border border-red-500/20 mt-8">
           <div className="text-sm font-medium text-red-400 mb-2">📌 {t.riskWarning}</div>
