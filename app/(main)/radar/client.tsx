@@ -568,122 +568,139 @@ export default function RadarClient() {
         )}
       </div>
 
-      {/* 右列：机构风险内参 */}
+      {/* 右列：Pro 情景概率引擎 */}
       <div className="h-full mt-4 lg:mt-0 p-4 rounded-lg bg-white/8 border border-white/10 flex flex-col">
         <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
-          <span>机构风险内参</span>
-          <span className="text-white/30 text-xs">Risk Decomposition</span>
+          <span>Pro 情景概率引擎</span>
+          <span className="text-white/30 text-xs">Scenario Probability Engine</span>
           <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">PRO</span>
-          <HelpButton indicatorKey="risk_decomposition" size="xs" />
         </div>
         <div className="flex-1 overflow-y-auto">
           <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
-            const oneLiner = data?.pro_one_liner;
-            const panels = data?.pro_evidence_panels;
-            if (!oneLiner && !panels) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
+            const sig = (data as any)?.weather?.pro?.pro_signal_7d;
+            if (!sig?.available) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
+            const { direction, path, verdict } = sig;
+            const pUp = direction?.p_up_7d ?? 0;
+            const avgRet = direction?.avg_ret_7d ?? 0;
+            const maxDd = direction?.max_dd_7d ?? 0;
+            const confidence = direction?.confidence_level ?? 'N/A';
+            const pStay = path?.p_stay ?? 0;
+            const currentState = path?.current_state ?? '';
+            const transitions = path?.top_transitions ?? [];
+            const sampleN = path?.sample_n ?? 0;
+            const coverage = path?.coverage_7d ?? 0;
+            const verdictLabel = verdict?.label_zh ?? '';
+            const verdictTag = verdict?.tag_zh ?? '';
 
-            const statusColors: Record<string, string> = {
-              RISK_ON: 'bg-green-500/20 text-green-400 border-green-500/30',
-              RISK_OFF: 'bg-red-500/20 text-red-400 border-red-500/30',
-              NEUTRAL: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-              OFFENSIVE: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-              DEFENSIVE: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-              CONFLICT: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-              HIGH_RISK: 'bg-red-500/20 text-red-400 border-red-500/30',
-              MEDIUM_RISK: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-              LOW_RISK: 'bg-green-500/20 text-green-400 border-green-500/30',
-            };
-
-            const boxes = [
-              { key: 'macro_gravity', title: '宏观引力场', data: panels?.macro_gravity },
-              { key: 'smart_money_skew', title: '机构暗流', data: panels?.smart_money_skew },
-              { key: 'liquidation_battlefield', title: '清算猎杀区', data: panels?.liquidation_battlefield },
-            ];
+            // 方向色
+            const dirColor = pUp >= 45 ? 'text-green-400' : pUp >= 30 ? 'text-yellow-400' : 'text-red-400';
+            const dirBg = pUp >= 45 ? 'bg-green-500/15' : pUp >= 30 ? 'bg-yellow-500/15' : 'bg-red-500/15';
+            const dirBorder = pUp >= 45 ? 'border-green-500/30' : pUp >= 30 ? 'border-yellow-500/30' : 'border-red-500/30';
+            const tagColor = verdictTag === '防守' ? 'bg-red-500/20 text-red-400 border-red-500/30'
+              : verdictTag === '进攻' ? 'bg-green-500/20 text-green-400 border-green-500/30'
+              : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
 
             return (
               <div className="flex flex-col gap-3 h-full">
-                {oneLiner && (
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                    <div className="text-sm text-white/70 leading-relaxed">{oneLiner}</div>
+                {/* 结论卡片 */}
+                <div className={`p-3 rounded-lg ${dirBg} border ${dirBorder}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`text-lg font-bold ${dirColor}`}>{verdictLabel}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] border font-medium ${tagColor}`}>{verdictTag}</span>
                   </div>
-                )}
-                {boxes.map(box => {
-                  if (!box.data) return null;
-                  const { status, conclusion, evidences } = box.data;
-                  const badgeClass = statusColors[status] || statusColors.NEUTRAL;
+                  <div className="text-[11px] text-white/50 font-mono">{verdict?.logic}</div>
+                </div>
 
-                  return (
-                    <div key={box.key} className="flex-1 p-3 rounded-lg bg-white/5 border border-white/10 flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-white/80">{box.title}</span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] border ${badgeClass}`}>
-                          {status}
-                        </span>
-                      </div>
-                      <div className="text-xs text-white/70 mb-2 leading-relaxed">{conclusion}</div>
-                      {evidences && evidences.length > 0 && (
-                        <div className="space-y-1">
-                          {evidences.map((ev: string, i: number) => (
-                            <div key={i} className="text-[10px] text-white/50 leading-relaxed">• {ev}</div>
-                          ))}
+                {/* 方向概率 - 半圆仪表盘 */}
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-xs text-white/40 mb-2">7D 方向概率</div>
+                  <div className="flex justify-center">
+                    <svg viewBox="0 0 200 120" className="w-full max-w-[220px]">
+                      <defs>
+                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#ef4444" />
+                          <stop offset="45%" stopColor="#eab308" />
+                          <stop offset="100%" stopColor="#22c55e" />
+                        </linearGradient>
+                      </defs>
+                      {/* 背景弧 */}
+                      <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="12" strokeLinecap="round" />
+                      {/* 彩色弧 */}
+                      <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.7" />
+                      {/* 指针 */}
+                      {(() => {
+                        const angle = Math.PI - (pUp / 100) * Math.PI;
+                        const nx = 100 + 65 * Math.cos(angle);
+                        const ny = 100 - 65 * Math.sin(angle);
+                        return <line x1="100" y1="100" x2={nx} y2={ny} stroke="white" strokeWidth="2.5" strokeLinecap="round" />;
+                      })()}
+                      <circle cx="100" cy="100" r="4" fill="white" />
+                      <text x="100" y="88" textAnchor="middle" className="fill-white text-[22px] font-bold font-mono">{pUp}%</text>
+                      <text x="100" y="100" textAnchor="middle" className="fill-white/40 text-[9px]">上涨概率</text>
+                      <text x="20" y="115" textAnchor="middle" className="fill-red-400 text-[8px]">0%</text>
+                      <text x="180" y="115" textAnchor="middle" className="fill-green-400 text-[8px]">100%</text>
+                    </svg>
+                  </div>
+                  {/* 关键指标行 */}
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <div className="text-center">
+                      <div className="text-[10px] text-white/40">均值收益</div>
+                      <div className={`text-sm font-mono font-bold ${avgRet >= 0 ? 'text-green-400' : 'text-red-400'}`}>{avgRet > 0 ? '+' : ''}{avgRet}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-white/40">最大回撤</div>
+                      <div className="text-sm font-mono font-bold text-red-400">{maxDd}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] text-white/40">置信度</div>
+                      <div className={`text-sm font-bold ${confidence === 'HIGH' ? 'text-green-400' : confidence === 'MEDIUM' ? 'text-yellow-400' : 'text-white/60'}`}>{confidence}</div>
+                    </div>
+                  </div>
+                </div>
+                {/* 路径转移概率 */}
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-xs text-white/40 mb-3">7D 路径转移</div>
+                  {/* 当前状态 */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-white/50">当前</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-white/10 text-white/80 border border-white/20 font-medium">{currentState}</span>
+                    <span className="text-xs text-white/50 ml-auto">维持 {pStay}%</span>
+                  </div>
+                  {/* 维持概率条 */}
+                  <div className="mb-3">
+                    <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-500/60 to-cyan-400/40 transition-all duration-700" style={{ width: `${pStay}%` }} />
+                    </div>
+                  </div>
+                  {/* 转向概率 */}
+                  <div className="space-y-2">
+                    {transitions.map((t: { state: string; prob_percent: number }, i: number) => {
+                      const barColors = ['bg-orange-400/60', 'bg-blue-400/60', 'bg-purple-400/60'];
+                      return (
+                        <div key={i}>
+                          <div className="flex items-center justify-between text-[11px] mb-1">
+                            <span className="text-white/60">→ {t.state}</span>
+                            <span className="text-white/70 font-mono">{t.prob_percent}%</span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                            <div className={`h-full rounded-full ${barColors[i % 3]} transition-all duration-700`} style={{ width: `${t.prob_percent}%` }} />
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                </div>
 
-                {/* 清算墙 */}
-                {(() => {
-                  const liqUp = data?.macro?.structure_l6?.tv?.liq_target_up;
-                  const liqDn = data?.macro?.structure_l6?.tv?.liq_target_dn;
-                  const liqBias = data?.macro?.structure_l6?.tv?.liq_bias;
-                  const lsRatio = data?.macro?.derivatives?.ls_ratio_top?.btc;
-                  const ethLong = data?.macro?.derivatives?.liquidation?.eth_long;
-                  const ethShort = data?.macro?.derivatives?.liquidation?.eth_short;
-
-                  if (!liqUp && !liqDn) return null;
-
-                  const ratio = ethLong && ethShort ? (ethLong / ethShort).toFixed(1) : null;
-
-                  return (
-                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-sm font-medium text-white/80">清算墙</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400 border border-red-500/30">
-                          {liqBias || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="space-y-2 text-xs">
-                        {(liqUp || liqDn) && (
-                          <div className="flex justify-between">
-                            <span className="text-white/50">BTC 狙击位</span>
-                            <span className="text-white/80 font-mono">
-                              {liqUp ? `↑${liqUp.toLocaleString()}` : ''} {liqDn ? `↓${liqDn.toLocaleString()}` : ''}
-                            </span>
-                          </div>
-                        )}
-                        {lsRatio && (
-                          <div className="flex justify-between">
-                            <span className="text-white/50">多空比</span>
-                            <span className="text-white/80 font-mono">{lsRatio}</span>
-                          </div>
-                        )}
-                        {(ethLong || ethShort) && (
-                          <div className="flex justify-between">
-                            <span className="text-white/50">ETH 战损</span>
-                            <span className="text-white/80 font-mono text-[10px]">
-                              多${ethLong?.toLocaleString()} 空${ethShort?.toLocaleString()}
-                            </span>
-                          </div>
-                        )}
-                        {ratio && (
-                          <div className="text-[10px] text-red-400 text-right">空头的 {ratio} 倍</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
+                {/* 数据质量 */}
+                <div className="p-2 rounded-lg bg-white/3 border border-white/5 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-[10px] text-white/30">
+                    <span>样本 <span className="text-white/50 font-mono">{sampleN}</span></span>
+                    <span>覆盖 <span className="text-white/50 font-mono">{coverage}%</span></span>
+                    <span>窗口 <span className="text-white/50 font-mono">7D</span></span>
+                  </div>
+                  <div className={`w-1.5 h-1.5 rounded-full ${confidence === 'HIGH' ? 'bg-green-400' : confidence === 'MEDIUM' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                </div>
               </div>
             );
           })()}
