@@ -578,104 +578,112 @@ export default function RadarClient() {
         <div className="flex-1 overflow-y-auto">
           <ProGate lockedMessage="Pro 专属：解锁后可见">
           {(() => {
-            const sig = (data as any)?.weather?.pro?.pro_signal_7d;
-            if (!sig?.available) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
-            const { direction, path, verdict } = sig;
-            const pUp = direction?.p_up_7d ?? 0;
-            const avgRet = direction?.avg_ret_7d ?? 0;
-            const maxDd = direction?.max_dd_7d ?? 0;
-            const confidence = direction?.confidence_level ?? 'N/A';
-            const pStay = path?.p_stay ?? 0;
-            const currentState = path?.current_state ?? '';
-            const transitions = path?.top_transitions ?? [];
-            const sampleN = path?.sample_n ?? 0;
-            const coverage = path?.coverage_7d ?? 0;
+            const board = (data as any)?.weather?.pro?.pro_similarity_board;
+            if (!board?.available) return <div className="text-white/30 text-sm text-center py-4">暂无数据</div>;
+            const { odds, path: pathData, verdict, confidence } = board;
+            const o7 = odds?.['7d'];
+            const o30 = odds?.['30d'];
+            const confLevel = confidence?.level ?? 'N/A';
+            const currentState = pathData?.current_state ?? '';
+            const pStay = pathData?.p_stay_7d ?? 0;
+            const switches = pathData?.top_switches ?? [];
+            const sampleN = pathData?.sample_n ?? 0;
+            const coverage = pathData?.coverage_7d ?? 0;
             const verdictLabel = verdict?.label_zh ?? '';
             const verdictTag = verdict?.tag_zh ?? '';
+            const riskFocus = verdict?.risk_focus ?? '';
 
-            // 方向色
-            const dirColor = pUp >= 45 ? 'text-green-400' : pUp >= 30 ? 'text-yellow-400' : 'text-red-400';
-            const dirBg = pUp >= 45 ? 'bg-green-500/15' : pUp >= 30 ? 'bg-yellow-500/15' : 'bg-red-500/15';
-            const dirBorder = pUp >= 45 ? 'border-green-500/30' : pUp >= 30 ? 'border-yellow-500/30' : 'border-red-500/30';
             const tagColor = verdictTag === '防守' ? 'bg-red-500/20 text-red-400 border-red-500/30'
               : verdictTag === '进攻' ? 'bg-green-500/20 text-green-400 border-green-500/30'
               : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-
+            const confColor = confLevel === 'HIGH' ? 'text-green-400' : confLevel === 'MED' ? 'text-yellow-400' : 'text-red-400';
             return (
               <div className="flex flex-col gap-3 h-full">
                 {/* 结论卡片 */}
-                <div className={`p-3 rounded-lg ${dirBg} border ${dirBorder}`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className={`text-lg font-bold ${dirColor}`}>{verdictLabel}</span>
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-base font-bold text-white/90">{verdictLabel}</span>
                     <span className={`px-2 py-0.5 rounded text-[10px] border font-medium ${tagColor}`}>{verdictTag}</span>
                   </div>
-                  <div className="text-[11px] text-white/50 font-mono">{verdict?.logic}</div>
+                  <div className="text-[11px] text-white/40 font-mono mb-2">{verdict?.logic}</div>
+                  {riskFocus && (
+                    <div className="flex items-center gap-1.5 text-[11px]">
+                      <span className="text-white/40">最大风险</span>
+                      <span className="px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 border border-red-500/20 text-[10px]">{riskFocus}</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* 方向概率 - 半圆仪表盘 */}
-                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                  <div className="text-xs text-white/40 mb-2">7D 方向概率</div>
-                  <div className="flex justify-center">
-                    <svg viewBox="0 0 200 120" className="w-full max-w-[220px]">
-                      <defs>
-                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#ef4444" />
-                          <stop offset="45%" stopColor="#eab308" />
-                          <stop offset="100%" stopColor="#22c55e" />
-                        </linearGradient>
-                      </defs>
-                      {/* 背景弧 */}
-                      <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="12" strokeLinecap="round" />
-                      {/* 彩色弧 */}
-                      <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.7" />
-                      {/* 指针 */}
-                      {(() => {
-                        const angle = Math.PI - (pUp / 100) * Math.PI;
-                        const nx = 100 + 65 * Math.cos(angle);
-                        const ny = 100 - 65 * Math.sin(angle);
-                        return <line x1="100" y1="100" x2={nx} y2={ny} stroke="white" strokeWidth="2.5" strokeLinecap="round" />;
-                      })()}
-                      <circle cx="100" cy="100" r="4" fill="white" />
-                      <text x="100" y="88" textAnchor="middle" className="fill-white text-[22px] font-bold font-mono">{pUp}%</text>
-                      <text x="100" y="100" textAnchor="middle" className="fill-white/40 text-[9px]">上涨概率</text>
-                      <text x="20" y="115" textAnchor="middle" className="fill-red-400 text-[8px]">0%</text>
-                      <text x="180" y="115" textAnchor="middle" className="fill-green-400 text-[8px]">100%</text>
-                    </svg>
-                  </div>
-                  {/* 关键指标行 */}
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    <div className="text-center">
-                      <div className="text-[10px] text-white/40">均值收益</div>
-                      <div className={`text-sm font-mono font-bold ${avgRet >= 0 ? 'text-green-400' : 'text-red-400'}`}>{avgRet > 0 ? '+' : ''}{avgRet}%</div>
+                {/* 赔率对比 - 7D vs 30D */}
+                {[
+                  { label: '7D 赔率', d: o7 },
+                  { label: '30D 赔率', d: o30 },
+                ].map((item) => {
+                  if (!item.d) return null;
+                  const pUp = item.d.p_up ?? 0;
+                  const avgRet = item.d.avg_return_pct ?? 0;
+                  const maxDd = item.d.max_drawdown_pct ?? 0;
+                  const bias = item.d.bias ?? '';
+                  const biasColor = bias === '偏多' ? 'text-green-400 bg-green-500/15 border-green-500/20'
+                    : bias === '偏空' ? 'text-red-400 bg-red-500/15 border-red-500/20'
+                    : 'text-yellow-400 bg-yellow-500/15 border-yellow-500/20';
+                  return (
+                    <div key={item.label} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-white/40">{item.label}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] border ${biasColor}`}>{bias}</span>
+                      </div>
+                      {/* 半圆仪表 */}
+                      <div className="flex justify-center">
+                        <svg viewBox="0 0 200 110" className="w-full max-w-[200px]">
+                          <defs>
+                            <linearGradient id={`gg-${item.label}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#ef4444" />
+                              <stop offset="45%" stopColor="#eab308" />
+                              <stop offset="100%" stopColor="#22c55e" />
+                            </linearGradient>
+                          </defs>
+                          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" strokeLinecap="round" />
+                          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke={`url(#gg-${item.label})`} strokeWidth="10" strokeLinecap="round" opacity="0.6" />
+                          {(() => {
+                            const a = Math.PI - (pUp / 100) * Math.PI;
+                            const nx = 100 + 60 * Math.cos(a);
+                            const ny = 95 - 60 * Math.sin(a);
+                            return <line x1="100" y1="95" x2={nx} y2={ny} stroke="white" strokeWidth="2" strokeLinecap="round" />;
+                          })()}
+                          <circle cx="100" cy="95" r="3" fill="white" />
+                          <text x="100" y="82" textAnchor="middle" className="fill-white text-[20px] font-bold font-mono">{pUp}%</text>
+                          <text x="100" y="95" textAnchor="middle" className="fill-white/35 text-[8px]">上涨概率</text>
+                        </svg>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        <div className="text-center">
+                          <div className="text-[10px] text-white/35">均值收益</div>
+                          <div className={`text-sm font-mono font-bold ${avgRet >= 0 ? 'text-green-400' : 'text-red-400'}`}>{avgRet > 0 ? '+' : ''}{avgRet}%</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-[10px] text-white/35">最大回撤</div>
+                          <div className="text-sm font-mono font-bold text-red-400">{maxDd}%</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-[10px] text-white/40">最大回撤</div>
-                      <div className="text-sm font-mono font-bold text-red-400">{maxDd}%</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-[10px] text-white/40">置信度</div>
-                      <div className={`text-sm font-bold ${confidence === 'HIGH' ? 'text-green-400' : confidence === 'MEDIUM' ? 'text-yellow-400' : 'text-white/60'}`}>{confidence}</div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
                 {/* 路径转移概率 */}
                 <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                  <div className="text-xs text-white/40 mb-3">7D 路径转移</div>
-                  {/* 当前状态 */}
+                  <div className="text-xs text-white/40 mb-3">7D 结构路径</div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs text-white/50">当前</span>
                     <span className="px-2 py-0.5 rounded text-[10px] bg-white/10 text-white/80 border border-white/20 font-medium">{currentState}</span>
-                    <span className="text-xs text-white/50 ml-auto">维持 {pStay}%</span>
+                    <span className="text-xs text-white/50 ml-auto font-mono">维持 {pStay}%</span>
                   </div>
-                  {/* 维持概率条 */}
                   <div className="mb-3">
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-cyan-500/60 to-cyan-400/40 transition-all duration-700" style={{ width: `${pStay}%` }} />
                     </div>
                   </div>
-                  {/* 转向概率 */}
                   <div className="space-y-2">
-                    {transitions.map((t: { state: string; prob_percent: number }, i: number) => {
+                    {switches.map((t: { state: string; prob_percent: number }, i: number) => {
                       const barColors = ['bg-orange-400/60', 'bg-blue-400/60', 'bg-purple-400/60'];
                       return (
                         <div key={i}>
@@ -697,9 +705,9 @@ export default function RadarClient() {
                   <div className="flex items-center gap-3 text-[10px] text-white/30">
                     <span>样本 <span className="text-white/50 font-mono">{sampleN}</span></span>
                     <span>覆盖 <span className="text-white/50 font-mono">{coverage}%</span></span>
-                    <span>窗口 <span className="text-white/50 font-mono">7D</span></span>
+                    <span>置信 <span className={`font-mono ${confColor}`}>{confLevel}</span></span>
                   </div>
-                  <div className={`w-1.5 h-1.5 rounded-full ${confidence === 'HIGH' ? 'bg-green-400' : confidence === 'MEDIUM' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full ${confLevel === 'HIGH' ? 'bg-green-400' : confLevel === 'MED' ? 'bg-yellow-400' : 'bg-red-400'}`} />
                 </div>
               </div>
             );
